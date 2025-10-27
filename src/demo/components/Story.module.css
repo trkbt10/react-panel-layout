@@ -1,0 +1,68 @@
+.section {
+  margin-bottom: 3rem;
+}
+
+.sectionTitle {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.story {
+  margin-bottom: 2rem;
+}
+
+.storyHeader {
+  margin-bottom: 1rem;
+}
+
+.storyTitle {
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.storyDescription {
+  margin-bottom: 1rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.storyPreview {
+  padding: 2rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.storyActions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  padding: 0.5rem 1rem;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s;
+}
+
+.actionButton:hover {
+  background: #1976d2;
+}
+
+.actionButtonSecondary {
+  background: #757575;
+}
+
+.actionButtonSecondary:hover {
+  background: #616161;
+}

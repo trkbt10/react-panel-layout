@@ -1,0 +1,203 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.demoContainer {
+  display: flex;
+  height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.demoContainerVertical {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.demoContainerInline {
+  display: inline-block;
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.demoContainerNested {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 400px;
+}
+
+.resizeWrapper {
+  position: relative;
+  display: flex;
+}
+
+.verticalHandleWrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.horizontalHandleWrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.resizablePanel {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resizablePanelAlt {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 1rem;
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resizableBox {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  padding: 1rem;
+  padding-left: 1.5rem;
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.panelTitle {
+  margin: 0;
+}
+
+.panelInfo {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.panelText {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.sizeInfo {
+  margin-top: 1rem;
+}
+
+.sizeInfoText {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.staticPanel {
+  flex: 1;
+  background: #f5f5f5;
+  padding: 1rem;
+}
+
+.staticPanelTitle {
+  margin-top: 0;
+}
+
+.staticPanelMinHeight {
+  background: #f5f5f5;
+  padding: 1rem;
+  min-height: 100px;
+}
+
+.nestedLayout {
+  display: flex;
+  height: 100%;
+}
+
+.nestedSidebar {
+  background: #e8eaf6;
+  padding: 1rem;
+  padding-left: 1.5rem;
+  overflow: auto;
+}
+
+.nestedRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.nestedTop {
+  background: #fff3e0;
+  padding: 1rem;
+  padding-top: 1.5rem;
+  overflow: auto;
+}
+
+.nestedBottom {
+  flex: 1;
+  background: #e0f2f1;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.resetButtons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.resetButton {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  transition: opacity 0.2s;
+}
+
+.resetButton:hover {
+  opacity: 0.8;
+}
+
+.resetButtonPurple {
+  background: #667eea;
+}
+
+.resetButtonPink {
+  background: #f5576c;
+}
+
+.resetButtonCyan {
+  background: #00f2fe;
+}
