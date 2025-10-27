@@ -12,7 +12,6 @@ export default defineConfig({
     outDir: "dist",
     lib: {
       entry: resolve(__dirname, "src/index.tsx"),
-      name: "ReactApp",
       formats: ["es", "cjs"],
       fileName: (format) => `index.${format === "es" ? "js" : "cjs"}`,
     },
