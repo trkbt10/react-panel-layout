@@ -1,7 +1,7 @@
 /**
  * @file Shared useIntersectionObserver hook with cached observer instances.
  */
-import React from "react";
+import * as React from "react";
 
 const createIdGenerator = () => {
   const map = new Map<object, number>();

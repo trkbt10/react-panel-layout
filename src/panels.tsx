@@ -12,6 +12,117 @@ export type Position = {
 };
 
 /**
+ * Offset value used when positioning floating windows.
+ * Numbers are treated as pixel values while strings are passed through.
+ */
+export type WindowOffset = number | string;
+
+/**
+ * CSS-like position offsets for floating windows.
+ */
+export type WindowPosition = {
+  top?: WindowOffset;
+  right?: WindowOffset;
+  bottom?: WindowOffset;
+  left?: WindowOffset;
+};
+
+/**
+ * Explicit dimensions for floating windows.
+ */
+export type WindowSize = {
+  width: number;
+  height: number;
+};
+
+/**
+ * Complete bounds definition for floating windows.
+ */
+export type WindowBounds = {
+  position?: WindowPosition;
+  size: WindowSize;
+};
+
+/**
+ * Size constraints that can be applied to floating windows.
+ */
+export type WindowConstraints = {
+  minWidth?: number;
+  maxWidth?: number;
+  minHeight?: number;
+  maxHeight?: number;
+};
+
+/**
+ * Controllable popup window feature toggles.
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/open#window_features}
+ */
+export type PopupWindowFeatures = {
+  toolbar?: boolean;
+  menubar?: boolean;
+  location?: boolean;
+  status?: boolean;
+  resizable?: boolean;
+  scrollbars?: boolean;
+};
+
+/**
+ * Extra configuration applied when rendering floating windows as browser popups.
+ */
+export type PopupWindowOptions = {
+  /** Optional window name used when calling window.open (reuses existing window with the same name). */
+  name?: string;
+  /** Feature overrides passed to window.open (toolbar, menubar, etc.). */
+  features?: PopupWindowFeatures;
+  /** Whether to focus the popup once it opens. Defaults to true. */
+  focus?: boolean;
+  /** Whether to close the popup when the layer unmounts. Defaults to true. */
+  closeOnUnmount?: boolean;
+  /** Optional factory used to create the popup window (primarily for testing environments). */
+  createWindow?: (config: PopupWindowFactoryConfig) => Window | null;
+};
+
+/**
+ * Parameters provided when creating a popup window via a custom factory.
+ */
+export type PopupWindowFactoryConfig = {
+  name: string;
+  features: string;
+  bounds: WindowBounds;
+};
+
+/**
+ * Display mode for floating windows.
+ * - "embedded" renders within the current document (previous floating behaviour).
+ * - "popup" opens a dedicated browser window.
+ */
+export type FloatingWindowMode = "embedded" | "popup";
+
+/**
+ * Unified configuration for floating windows (either embedded or popup).
+ */
+export type FloatingWindowConfig = {
+  /** Rendering mode (embedded within layout or browser popup). */
+  mode?: FloatingWindowMode;
+  /** Position and size bounds for the floating window. */
+  bounds: WindowBounds;
+  /** Z-index override specific to this floating window. */
+  zIndex?: number;
+  /** Enable drag interactions for embedded mode floating windows. */
+  draggable?: boolean;
+  /** Enable resize interactions for embedded mode floating windows. */
+  resizable?: boolean;
+  /** Optional size constraints applied during resize interactions. */
+  constraints?: WindowConstraints;
+  /** Callback invoked when the floating window moves. */
+  onMove?: (position: WindowPosition) => void;
+  /** Callback invoked when the floating window is resized. */
+  onResize?: (size: WindowSize) => void;
+  /** Popup-specific options when mode is set to "popup". */
+  popup?: PopupWindowOptions;
+};
+
+/**
  * Panel position - either a named column position or floating coordinates
  * - 'left': Dock to left side
  * - 'right': Dock to right side
@@ -42,17 +153,8 @@ export type PanelDefinition = {
   /** Callback when panel width changes (column mode) */
   onWidthChange?: (width: number) => void;
 
-  // Floating layout options (when position is { x, y })
-  /** Size for floating layout */
-  size?: { width: number; height: number };
-  /** Whether the panel can be dragged (floating mode) */
-  draggable?: boolean;
-  /** Z-index for stacking order (floating mode) */
-  zIndex?: number;
-  /** Callback when panel position changes (floating mode) */
-  onPositionChange?: (position: Position) => void;
-  /** Callback when panel size changes (floating mode) */
-  onSizeChange?: (size: { width: number; height: number }) => void;
+  /** Floating window configuration when the panel is not docked */
+  floating?: FloatingWindowConfig;
 };
 
 /**
@@ -70,7 +172,13 @@ export type PanelDefinition = {
  *   library: {
  *     component: <LibraryPanel />,
  *     position: { x: 20, y: 80 },
- *     size: { width: 280, height: 500 },
+ *     floating: {
+ *       bounds: {
+ *         position: { left: 20, top: 80 },
+ *         size: { width: 280, height: 500 },
+ *       },
+ *       draggable: true,
+ *     },
  *   }
  * }}
  * ```
@@ -210,27 +318,14 @@ export type LayerDefinition = {
   /** Height (CSS value or pixels) */
   height?: string | number;
 
-  // Interactivity
   /** Whether the layer blocks pointer events (default: true for absolute/fixed, false for grid) */
   pointerEvents?: boolean | "auto" | "none";
-  /** Whether the layer can be dragged (for floating layers) */
-  draggable?: boolean;
-  /** Whether the layer can be resized from its corners (floating layers only) */
-  resizable?: boolean;
-  /** Minimum width in pixels when resizing (floating mode) */
-  minWidth?: number;
-  /** Minimum height in pixels when resizing (floating mode) */
-  minHeight?: number;
-  /** Maximum width in pixels when resizing (floating mode) */
-  maxWidth?: number;
-  /** Maximum height in pixels when resizing (floating mode) */
-  maxHeight?: number;
-  /** Callback when layer position changes (for draggable layers) */
-  onPositionChange?: (position: Position) => void;
-  /** Callback when layer size changes (for resizable layers) */
-  onSizeChange?: (size: { width: number; height: number }) => void;
+
   /** Drawer behavior for mobile-friendly slide-in panels */
   drawer?: DrawerBehavior;
+
+  /** Floating window configuration for overlay/popup rendering */
+  floating?: FloatingWindowConfig;
 
   // Styling
   /** Custom inline styles */

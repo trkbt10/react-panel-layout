@@ -87,12 +87,14 @@ export const DraggableOverlays = () => {
           </div>
         </DraggablePanel>
       ),
-      positionMode: "absolute",
-      position: { left: 20, top: 20 },
-      width: 200,
-      height: 250,
-      draggable: true,
-      zIndex: 10,
+      floating: {
+        bounds: {
+          position: { left: 20, top: 20 },
+          size: { width: 200, height: 250 },
+        },
+        draggable: true,
+        zIndex: 10,
+      },
     },
     {
       id: "panel2",
@@ -118,12 +120,14 @@ export const DraggableOverlays = () => {
           </div>
         </DraggablePanel>
       ),
-      positionMode: "absolute",
-      position: { right: 20, top: 20 },
-      width: 220,
-      height: 200,
-      draggable: true,
-      zIndex: 11,
+      floating: {
+        bounds: {
+          position: { left: 260, top: 20 },
+          size: { width: 220, height: 200 },
+        },
+        draggable: true,
+        zIndex: 11,
+      },
     },
     {
       id: "panel3",
@@ -141,12 +145,14 @@ export const DraggableOverlays = () => {
           </div>
         </DraggablePanel>
       ),
-      positionMode: "absolute",
-      position: { left: 20, bottom: 20 },
-      width: 250,
-      height: 180,
-      draggable: true,
-      zIndex: 12,
+      floating: {
+        bounds: {
+          position: { left: 20, top: 300 },
+          size: { width: 250, height: 180 },
+        },
+        draggable: true,
+        zIndex: 12,
+      },
     },
   ];
 
@@ -177,32 +183,38 @@ const layers: LayerDefinition[] = [
   {
     id: "panel1",
     component: <ToolsPanel />,
-    positionMode: "absolute",
-    position: { left: 20, top: 20 },
-    width: 200,
-    height: 250,
-    draggable: true,
-    zIndex: 10,
+    floating: {
+      bounds: {
+        position: { left: 20, top: 20 },
+        size: { width: 200, height: 250 },
+      },
+      draggable: true,
+      zIndex: 10,
+    },
   },
   {
     id: "panel2",
     component: <ColorsPanel />,
-    positionMode: "absolute",
-    position: { right: 20, top: 20 },
-    width: 220,
-    height: 200,
-    draggable: true,
-    zIndex: 11,
+    floating: {
+      bounds: {
+        position: { left: 260, top: 20 },
+        size: { width: 220, height: 200 },
+      },
+      draggable: true,
+      zIndex: 11,
+    },
   },
   {
     id: "panel3",
     component: <SettingsPanel />,
-    positionMode: "absolute",
-    position: { left: 20, bottom: 20 },
-    width: 250,
-    height: 180,
-    draggable: true,
-    zIndex: 12,
+    floating: {
+      bounds: {
+        position: { left: 20, top: 300 },
+        size: { width: 250, height: 180 },
+      },
+      draggable: true,
+      zIndex: 12,
+    },
   },
 ];
 

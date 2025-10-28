@@ -149,18 +149,20 @@ export const IDELayout = () => {
       zIndex: 10,
       visible: true,
     },
-    {
-      id: "data-preview",
-      component: <DataPreview width={300} height={400} />,
-      positionMode: "absolute",
-      position: { right: 10, top: 10 },
-      zIndex: 20,
+  {
+    id: "data-preview",
+    component: <DataPreview width={300} height={400} />,
+    floating: {
+      bounds: {
+        position: { left: 720, top: 10 },
+        size: { width: 300, height: 400 },
+      },
       draggable: true,
-      width: 300,
-      height: 400,
-      visible: true,
+      zIndex: 20,
     },
-  ];
+    visible: true,
+  },
+];
 
   return (
     <div style={{ width: "100%", height: "600px", overflow: "hidden", border: "1px solid #ddd" }}>
@@ -226,12 +228,14 @@ const layers: LayerDefinition[] = [
   {
     id: "data-preview",
     component: <DataPreview />,
-    positionMode: "absolute",
-    position: { right: 10, top: 10 },
-    zIndex: 20,
-    draggable: true,
-    width: 300,
-    height: 400,
+    floating: {
+      bounds: {
+        position: { left: 720, top: 10 },
+        size: { width: 300, height: 400 },
+      },
+      draggable: true,
+      zIndex: 20,
+    },
   },
 ];
 

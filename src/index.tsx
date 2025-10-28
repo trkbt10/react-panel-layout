@@ -2,7 +2,9 @@
  * @file Main entry point for the React Panel Layout library
  */
 
-// Export type definitions
+// ============================================================================
+// Core Type Definitions
+// ============================================================================
 export type {
   Position,
   PanelPosition,
@@ -14,21 +16,35 @@ export type {
   DrawerBehavior,
   LayerDefinition,
   PanelLayoutProps,
+  WindowOffset,
+  WindowPosition,
+  WindowSize,
+  WindowBounds,
+  WindowConstraints,
+  PopupWindowFeatures,
+  PopupWindowOptions,
+  PopupWindowFactoryConfig,
+  FloatingWindowMode,
+  FloatingWindowConfig,
 } from "./panels";
 
-// Export main components
+// ============================================================================
+// Main Layout Component
+// ============================================================================
 export { GridLayout } from "./components/layout/grid/GridLayout";
 export type { GridLayoutProps } from "./components/layout/grid/GridLayout";
-export { useLayerDragHandle } from "./components/layout/grid/useLayerDragHandle";
 
-// Export drawer components
+// ============================================================================
+// Drawer Components
+// ============================================================================
 export { Drawer } from "./components/drawer/Drawer";
 export type { DrawerProps } from "./components/drawer/Drawer";
 export { DrawerLayers } from "./components/drawer/DrawerLayers";
 export type { DrawerLayersProps } from "./components/drawer/DrawerLayers";
-export { useDrawerState } from "./components/drawer/useDrawerState";
 
-// Export panel components
+// ============================================================================
+// Panel Components
+// ============================================================================
 export {
   FloatingPanelFrame,
   FloatingPanelHeader,
@@ -52,22 +68,7 @@ export type { HorizontalDividerProps } from "./components/panels/HorizontalDivid
 export { ResizeHandle } from "./components/panels/ResizeHandle";
 export type { ResizeHandleProps } from "./components/panels/ResizeHandle";
 
-export { DialogOverlay } from "./components/overlay/DialogOverlay";
-export type { DialogOverlayProps } from "./components/overlay/DialogOverlay";
-
-// Export hooks
-export {
-  useDocumentPointerEvents,
-  usePointerCapture,
-  usePreventPointerDefaults,
-  useDragPointerEvents,
-} from "./hooks/useDocumentPointerEvents";
-export type { UseDocumentPointerEventsOptions } from "./hooks/useDocumentPointerEvents";
-
-export { useEffectEvent } from "./hooks/useEffectEvent";
-export { useIsomorphicLayoutEffect } from "./hooks/useIsomorphicLayoutEffect";
-export { useResizeDrag } from "./hooks/useResizeDrag";
-
-// Export utilities
-export { getViewportInfo, calculateContextMenuPosition } from "./utils/dialogUtils";
-export type { ViewportInfo } from "./utils/dialogUtils";
+// ============================================================================
+// Public Hooks
+// ============================================================================
+export { useLayerDragHandle } from "./components/layout/grid/useLayerDragHandle";

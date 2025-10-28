@@ -170,12 +170,14 @@ const featuredLayers: LayerDefinition[] = [
   {
     id: "data-preview",
     component: <DataPreview width={300} height={400} />,
-    positionMode: "absolute",
-    position: { right: 10, top: 10 },
-    zIndex: 20,
-    draggable: true,
-    width: 300,
-    height: 400,
+    floating: {
+      bounds: {
+        position: { left: 720, top: 10 },
+        size: { width: 300, height: 400 },
+      },
+      draggable: true,
+      zIndex: 20,
+    },
     visible: true,
   },
 ];
@@ -210,9 +212,14 @@ const layers: LayerDefinition[] = [
   { id: "statusbar", gridArea: "statusbar", component: <StatusBar /> },
   {
     id: "data-preview",
-    positionMode: "absolute",
-    position: { right: 10, top: 10 },
-    draggable: true,
+    floating: {
+      bounds: {
+        position: { left: 720, top: 10 },
+        size: { width: 300, height: 400 },
+      },
+      draggable: true,
+      zIndex: 20,
+    },
     component: <DataPreview width={300} height={400} />,
   },
 ];

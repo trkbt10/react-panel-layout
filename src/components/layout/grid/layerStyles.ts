@@ -2,22 +2,24 @@
  * @file Helper utilities for computing layer styles in the grid layout.
  */
 import type { CSSProperties } from "react";
-import type { LayerDefinition } from "../../../panels";
+import type { LayerDefinition, WindowPosition } from "../../../panels";
 
-type LayerPosition = {
-  top?: string | number;
-  right?: string | number;
-  bottom?: string | number;
-  left?: string | number;
+const resolvePositionMode = (layer: LayerDefinition): LayerDefinition["positionMode"] => {
+  if (layer.positionMode) {
+    return layer.positionMode;
+  }
+  if (layer.floating) {
+    const floatingMode = layer.floating.mode ?? "embedded";
+    return floatingMode === "embedded" ? "absolute" : "relative";
+  }
+  return "grid";
 };
 
-const getPositionModeStyle = (positionMode?: LayerDefinition["positionMode"]): CSSProperties => {
-  const mode = positionMode ?? "grid";
+const getPositionModeStyle = (mode: LayerDefinition["positionMode"]): CSSProperties => {
   return { position: mode === "grid" ? "relative" : mode };
 };
 
-const getGridAreaStyle = (layer: LayerDefinition): CSSProperties => {
-  const mode = layer.positionMode ?? "grid";
+const getGridAreaStyle = (layer: LayerDefinition, mode: LayerDefinition["positionMode"]): CSSProperties => {
   if (mode !== "grid") {
     return {};
   }
@@ -28,7 +30,7 @@ const getGridAreaStyle = (layer: LayerDefinition): CSSProperties => {
   };
 };
 
-const getAbsolutePositionStyle = (position?: LayerPosition): CSSProperties => {
+const getAbsolutePositionStyle = (position?: WindowPosition | LayerDefinition["position"]): CSSProperties => {
   if (!position) {
     return {};
   }
@@ -52,15 +54,14 @@ const getDimensionsStyle = (width?: number | string, height?: number | string): 
   };
 };
 
-const getPointerEventsStyle = (layer: LayerDefinition): CSSProperties => {
-  const mode = layer.positionMode ?? "grid";
-
+const getPointerEventsStyle = (layer: LayerDefinition, mode: LayerDefinition["positionMode"]): CSSProperties => {
   if (layer.pointerEvents !== undefined) {
     if (typeof layer.pointerEvents === "boolean") {
       return { pointerEvents: layer.pointerEvents ? "auto" : "none" };
     }
     return { pointerEvents: layer.pointerEvents };
   }
+
   if (mode === "absolute" || mode === "fixed") {
     return { pointerEvents: "auto" };
   }
@@ -68,17 +69,54 @@ const getPointerEventsStyle = (layer: LayerDefinition): CSSProperties => {
   return {};
 };
 
+const resolveEffectivePosition = (layer: LayerDefinition): WindowPosition | LayerDefinition["position"] | undefined => {
+  if (layer.floating) {
+    return layer.floating.bounds.position;
+  }
+  return layer.position;
+};
+
+const resolveEffectiveSize = (
+  layer: LayerDefinition,
+): {
+  width?: number | string;
+  height?: number | string;
+} => {
+  if (layer.floating) {
+    return {
+      width: layer.floating.bounds.size.width,
+      height: layer.floating.bounds.size.height,
+    };
+  }
+  return {
+    width: layer.width,
+    height: layer.height,
+  };
+};
+
+const resolveEffectiveZIndex = (layer: LayerDefinition): number | undefined => {
+  if (layer.floating && layer.floating.zIndex !== undefined) {
+    return layer.floating.zIndex;
+  }
+  return layer.zIndex;
+};
+
 /**
  * Compute the base style object for a layer definition.
  */
 export const buildLayerStyleObject = (layer: LayerDefinition): CSSProperties => {
+  const resolvedMode = resolvePositionMode(layer);
+  const effectivePosition = resolveEffectivePosition(layer);
+  const effectiveSize = resolveEffectiveSize(layer);
+  const effectiveZIndex = resolveEffectiveZIndex(layer);
+
   return {
     ...layer.style,
-    ...getPositionModeStyle(layer.positionMode),
-    ...getGridAreaStyle(layer),
-    ...getAbsolutePositionStyle(layer.position),
-    ...getZIndexStyle(layer.zIndex),
-    ...getDimensionsStyle(layer.width, layer.height),
-    ...getPointerEventsStyle(layer),
+    ...getPositionModeStyle(resolvedMode),
+    ...getGridAreaStyle(layer, resolvedMode),
+    ...getAbsolutePositionStyle(effectivePosition),
+    ...getZIndexStyle(effectiveZIndex),
+    ...getDimensionsStyle(effectiveSize.width, effectiveSize.height),
+    ...getPointerEventsStyle(layer, resolvedMode),
   };
 };

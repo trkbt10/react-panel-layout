@@ -1,7 +1,7 @@
 /**
  * @file Shared useResizeObserver hook with cached observer instances.
  */
-import React from "react";
+import * as React from "react";
 
 type Unobserve = () => void;
 type Callback = (entry: ResizeObserverEntry, observer: ResizeObserver) => void;
@@ -46,7 +46,10 @@ const getSharedObserver = (options: ResizeObserverOptions) => {
  * @param options - Resize observer configuration.
  * @returns Latest resize entry and a derived DOMRect snapshot.
  */
-export function useResizeObserver<T extends HTMLElement>(ref: React.RefObject<T | null>, { box }: ResizeObserverOptions) {
+export function useResizeObserver<T extends HTMLElement>(
+  ref: React.RefObject<T | null>,
+  { box }: ResizeObserverOptions,
+) {
   const [entry, setEntry] = React.useState<ResizeObserverEntry | null>(null);
   const target = ref.current;
 

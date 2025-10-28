@@ -5,7 +5,7 @@ import * as React from "react";
 import { useDocumentPointerEvents } from "../../../hooks/useDocumentPointerEvents";
 import { useEffectEvent } from "../../../hooks/useEffectEvent";
 import { useIsomorphicLayoutEffect } from "../../../hooks/useIsomorphicLayoutEffect";
-import type { LayerDefinition } from "../../../panels";
+import type { LayerDefinition, WindowPosition, WindowSize } from "../../../panels";
 import { buildLayerStyleObject } from "./layerStyles";
 import styles from "./GridLayout.module.css";
 import type { GridLayerHandleProps, GridLayoutContextValue } from "./GridLayoutContext";
@@ -16,10 +16,12 @@ type LayerSize = {
 };
 
 type DragState = {
-  x: number;
-  y: number;
-  initialX: number;
-  initialY: number;
+  pointerStartX: number;
+  pointerStartY: number;
+  initialTranslationX: number;
+  initialTranslationY: number;
+  baseLeft: number;
+  baseTop: number;
   layerId: string;
   pointerId: number;
   target: HTMLElement;
@@ -54,6 +56,8 @@ type ResizeState = {
   startWidth: number;
   startHeight: number;
   startPosition: { x: number; y: number };
+  baseLeft: number;
+  baseTop: number;
   minWidth?: number;
   maxWidth?: number;
   minHeight?: number;
@@ -61,11 +65,21 @@ type ResizeState = {
   target: HTMLElement;
 };
 
-const FLOATING_POSITION_MODES: ReadonlyArray<LayerDefinition["positionMode"]> = ["absolute", "fixed"];
+const resolveFloatingMode = (layer: LayerDefinition): "embedded" | "popup" | null => {
+  const floating = layer.floating;
+  if (!floating) {
+    return null;
+  }
+  const mode = floating.mode ?? "embedded";
+  return mode;
+};
 
-const isFloatingLayer = (layer: LayerDefinition): boolean => {
-  const mode = layer.positionMode ?? "grid";
-  return FLOATING_POSITION_MODES.includes(mode);
+const getEmbeddedFloatingConfig = (layer: LayerDefinition) => {
+  const mode = resolveFloatingMode(layer);
+  if (mode !== "embedded") {
+    return null;
+  }
+  return layer.floating ?? null;
 };
 
 const isInteractiveElement = (target: EventTarget | null): target is HTMLElement => {
@@ -75,24 +89,44 @@ const isInteractiveElement = (target: EventTarget | null): target is HTMLElement
   return ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName);
 };
 
-const parseDimensionValue = (value: number | string | undefined): number | null => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (typeof value === "string") {
-    const match = value.match(/^(-?\d+(?:\.\d+)?)px$/);
-    if (match) {
-      return Number.parseFloat(match[1]);
-    }
-  }
-
-  return null;
-};
 
 const clampDimension = (value: number, min?: number, max?: number): number => {
   const withMinimum = min !== undefined ? Math.max(value, min) : value;
   return max !== undefined ? Math.min(withMinimum, max) : withMinimum;
+};
+
+const ensureNumericOffset = (value: number | string | undefined, key: keyof WindowPosition, layerId: string): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  throw new Error(
+    `Floating layer "${layerId}" must provide a numeric "${key}" value when draggable mode is enabled.`,
+  );
+};
+
+const resolveDragAnchor = (layer: LayerDefinition): { left: number; top: number } => {
+  const floating = getEmbeddedFloatingConfig(layer);
+  if (!floating) {
+    throw new Error(`Floating layer "${layer.id}" is missing floating configuration required for dragging.`);
+  }
+  const position = floating.bounds.position;
+  if (!position) {
+    throw new Error(`Floating layer "${layer.id}" must define bounds.position with left and top values.`);
+  }
+  return {
+    left: ensureNumericOffset(position.left, "left", layer.id),
+    top: ensureNumericOffset(position.top, "top", layer.id),
+  };
+};
+
+const resolveFloatingConstraints = (
+  layer: LayerDefinition,
+): { minWidth?: number; maxWidth?: number; minHeight?: number; maxHeight?: number } => {
+  const floating = getEmbeddedFloatingConfig(layer);
+  if (!floating) {
+    return {};
+  }
+  return floating.constraints ?? {};
 };
 
 const resolveHorizontalSizeCandidate = (
@@ -188,19 +222,26 @@ const isResizeControl = (target: EventTarget | null): boolean => {
 };
 
 const shouldRenderFloatingResize = (layer: LayerDefinition): boolean => {
-  if (!layer.resizable) {
+  const floating = getEmbeddedFloatingConfig(layer);
+  if (!floating) {
     return false;
   }
-  return isFloatingLayer(layer);
+  return floating.resizable === true;
 };
 
 const getLayerSizeFromDefinition = (layer: LayerDefinition): LayerSize | null => {
-  const width = parseDimensionValue(layer.width);
-  const height = parseDimensionValue(layer.height);
-  if (width === null || height === null) {
+  const floating = getEmbeddedFloatingConfig(layer);
+  if (!floating) {
     return null;
   }
-  return { width, height };
+  const size = floating.bounds.size;
+  if (!size) {
+    throw new Error(`Floating layer "${layer.id}" must define bounds.size when resizable or draggable.`);
+  }
+  return {
+    width: size.width,
+    height: size.height,
+  };
 };
 
 const RESIZE_HANDLE_CONFIGS: ReadonlyArray<ResizeHandleConfig> = [
@@ -334,11 +375,11 @@ export const useLayerInteractions = ({
   const dragStartRef = React.useRef<DragState | null>(null);
   const resizeStartRef = React.useRef<ResizeState | null>(null);
 
-  const notifyPositionChange = useEffectEvent((layerId: string, newPos: { x: number; y: number }) => {
-    layerById.get(layerId)?.onPositionChange?.(newPos);
+  const notifyFloatingMove = useEffectEvent((layerId: string, nextPosition: WindowPosition) => {
+    layerById.get(layerId)?.floating?.onMove?.(nextPosition);
   });
-  const notifySizeChange = useEffectEvent((layerId: string, newSize: LayerSize) => {
-    layerById.get(layerId)?.onSizeChange?.(newSize);
+  const notifyFloatingResize = useEffectEvent((layerId: string, newSize: WindowSize) => {
+    layerById.get(layerId)?.floating?.onResize?.(newSize);
   });
 
   useIsomorphicLayoutEffect(() => {
@@ -350,6 +391,12 @@ export const useLayerInteractions = ({
 
   const beginLayerDrag = React.useCallback(
     (layerId: string, layer: LayerDefinition, captureElement: HTMLElement, event: React.PointerEvent<HTMLElement>) => {
+      const floating = getEmbeddedFloatingConfig(layer);
+      if (!floating || floating.draggable !== true) {
+        return;
+      }
+      const baseAnchor = resolveDragAnchor(layer);
+
       event.preventDefault();
       event.stopPropagation();
 
@@ -364,10 +411,12 @@ export const useLayerInteractions = ({
       setDraggingLayerId(layerId);
       const existingPos = layerPositions[layerId] ?? { x: 0, y: 0 };
       dragStartRef.current = {
-        x: event.clientX,
-        y: event.clientY,
-        initialX: existingPos.x,
-        initialY: existingPos.y,
+        pointerStartX: event.clientX,
+        pointerStartY: event.clientY,
+        initialTranslationX: existingPos.x,
+        initialTranslationY: existingPos.y,
+        baseLeft: baseAnchor.left,
+        baseTop: baseAnchor.top,
         layerId,
         pointerId: event.pointerId,
         target: captureElement,
@@ -392,17 +441,16 @@ export const useLayerInteractions = ({
       }
 
       const layer = layerById.get(layerId);
-      if (!layer?.draggable) {
+      const floating = layer ? getEmbeddedFloatingConfig(layer) : null;
+      if (!layer || !floating || floating.draggable !== true) {
         return;
       }
 
-      if (isFloatingLayer(layer)) {
-        const dragHandle = findDragHandleElement(event.target);
-        if (!dragHandle) {
-          const handleExists = event.currentTarget.querySelector('[data-drag-handle="true"]');
-          if (handleExists) {
-            return;
-          }
+      const dragHandle = findDragHandleElement(event.target);
+      if (!dragHandle) {
+        const handleExists = event.currentTarget.querySelector('[data-drag-handle="true"]');
+        if (handleExists) {
+          return;
         }
       }
 
@@ -414,11 +462,8 @@ export const useLayerInteractions = ({
   const handleDragHandlePointerDown = React.useCallback(
     (layerId: string, event: React.PointerEvent<HTMLElement>) => {
       const layer = layerById.get(layerId);
-      if (!layer?.draggable) {
-        return;
-      }
-
-      if (!isFloatingLayer(layer)) {
+      const floating = layer ? getEmbeddedFloatingConfig(layer) : null;
+      if (!layer || !floating || floating.draggable !== true) {
         return;
       }
 
@@ -452,6 +497,9 @@ export const useLayerInteractions = ({
         return;
       }
 
+      const baseAnchor = resolveDragAnchor(layer);
+      const constraints = resolveFloatingConstraints(layer);
+
       const initialPosition = layerPositions[layerId] ?? { x: 0, y: 0 };
 
       event.stopPropagation();
@@ -475,10 +523,12 @@ export const useLayerInteractions = ({
         startWidth: sizeEntry.width,
         startHeight: sizeEntry.height,
         startPosition: initialPosition,
-        minWidth: layer.minWidth,
-        maxWidth: layer.maxWidth,
-        minHeight: layer.minHeight,
-        maxHeight: layer.maxHeight,
+        baseLeft: baseAnchor.left,
+        baseTop: baseAnchor.top,
+        minWidth: constraints.minWidth,
+        maxWidth: constraints.maxWidth,
+        minHeight: constraints.minHeight,
+        maxHeight: constraints.maxHeight,
         target: event.currentTarget,
       };
 
@@ -494,17 +544,20 @@ export const useLayerInteractions = ({
         return;
       }
 
-      const deltaX = event.clientX - dragStart.x;
-      const deltaY = event.clientY - dragStart.y;
+      const deltaX = event.clientX - dragStart.pointerStartX;
+      const deltaY = event.clientY - dragStart.pointerStartY;
       const newPos = {
-        x: dragStart.initialX + deltaX,
-        y: dragStart.initialY + deltaY,
+        x: dragStart.initialTranslationX + deltaX,
+        y: dragStart.initialTranslationY + deltaY,
       };
 
       setLayerPositions((prev) => ({ ...prev, [dragStart.layerId]: newPos }));
-      notifyPositionChange(dragStart.layerId, newPos);
+      notifyFloatingMove(dragStart.layerId, {
+        left: dragStart.baseLeft + newPos.x,
+        top: dragStart.baseTop + newPos.y,
+      });
     },
-    [notifyPositionChange],
+    [notifyFloatingMove],
   );
 
   const handleResizePointerMove = React.useCallback(
@@ -539,7 +592,7 @@ export const useLayerInteractions = ({
       const nextPositionY = resolveVerticalPosition(resizeStart.verticalEdge, resizeStart.startPosition.y, heightDelta);
 
       const currentSize = layerSizes[resizeStart.layerId];
-      const nextSize = { width: nextWidth, height: nextHeight };
+      const nextSize: WindowSize = { width: nextWidth, height: nextHeight };
       const sizeChanged =
         !currentSize || currentSize.width !== nextWidth || currentSize.height !== nextHeight;
       if (sizeChanged) {
@@ -547,7 +600,7 @@ export const useLayerInteractions = ({
           ...prev,
           [resizeStart.layerId]: nextSize,
         }));
-        notifySizeChange(resizeStart.layerId, nextSize);
+        notifyFloatingResize(resizeStart.layerId, nextSize);
       }
 
       const currentPosition = layerPositions[resizeStart.layerId] ?? { x: 0, y: 0 };
@@ -559,10 +612,13 @@ export const useLayerInteractions = ({
           ...prev,
           [resizeStart.layerId]: nextPosition,
         }));
-        notifyPositionChange(resizeStart.layerId, nextPosition);
+        notifyFloatingMove(resizeStart.layerId, {
+          left: resizeStart.baseLeft + nextPosition.x,
+          top: resizeStart.baseTop + nextPosition.y,
+        });
       }
     },
-    [layerById, layerPositions, layerSizes, notifyPositionChange, notifySizeChange],
+    [layerById, layerPositions, layerSizes, notifyFloatingMove, notifyFloatingResize],
   );
 
   const finishDrag = React.useCallback((event: PointerEvent) => {
@@ -611,7 +667,8 @@ export const useLayerInteractions = ({
     (layer: LayerDefinition): React.CSSProperties => {
       const baseStyle = buildLayerStyleObject(layer);
 
-      if (!layer.draggable) {
+      const floating = getEmbeddedFloatingConfig(layer);
+      if (!floating || floating.draggable !== true) {
         return baseStyle;
       }
 

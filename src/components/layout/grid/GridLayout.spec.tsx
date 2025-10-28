@@ -4,7 +4,7 @@
 import * as React from "react";
 import { render, cleanup, act, fireEvent } from "@testing-library/react";
 import { GridLayout } from "./GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../../../panels";
+import type { PanelLayoutConfig, LayerDefinition, WindowPosition, WindowSize } from "../../../panels";
 import { useLayerDragHandle } from "./useLayerDragHandle";
 
 const ensurePointerEvent = () => {
@@ -77,7 +77,7 @@ describe("GridLayout", () => {
     rows: [{ size: "100%" }],
   };
 
-  const createLayers = (onPositionChange?: (pos: { x: number; y: number }) => void): LayerDefinition[] => {
+  const createLayers = (onMove?: (position: WindowPosition) => void): LayerDefinition[] => {
     return [
       {
         id: "sidebar",
@@ -88,16 +88,20 @@ describe("GridLayout", () => {
         id: "layer-1",
         gridArea: "main",
         component: <div data-testid="layer" />,
-        draggable: true,
-        positionMode: "absolute",
-        position: { left: 0, top: 0 },
-        onPositionChange,
+        floating: {
+          bounds: {
+            position: { left: 0, top: 0 },
+            size: { width: 180, height: 180 },
+          },
+          draggable: true,
+          onMove,
+        },
       },
     ];
   };
 
-  it("does not call onPositionChange on initial render", () => {
-    const recordedPositions: Array<{ x: number; y: number }> = [];
+  it("does not call onMove on initial render", () => {
+    const recordedPositions: WindowPosition[] = [];
 
     render(
       <GridLayout
@@ -111,8 +115,8 @@ describe("GridLayout", () => {
     expect(recordedPositions).toHaveLength(0);
   });
 
-  it("emits onPositionChange exactly once when pointer moves", async () => {
-    const recordedPositions: Array<{ x: number; y: number }> = [];
+  it("emits onMove exactly once when pointer moves", async () => {
+    const recordedPositions: WindowPosition[] = [];
     const { container } = render(
       <GridLayout
         config={baseConfig}
@@ -136,7 +140,7 @@ describe("GridLayout", () => {
     });
 
     expect(recordedPositions).toHaveLength(1);
-    expect(recordedPositions[0]).toEqual({ x: 20, y: 12 });
+    expect(recordedPositions[0]).toEqual({ left: 20, top: 12 });
 
     await act(async () => {
       document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true }));
@@ -242,12 +246,14 @@ describe("GridLayout", () => {
                 <div>Content</div>
               </div>
             ),
-            positionMode: "absolute",
-            position: { left: 0, top: 0 },
-            width: 200,
-            height: 160,
-            draggable: true,
-            resizable: true,
+            floating: {
+              bounds: {
+                position: { left: 0, top: 0 },
+                size: { width: 200, height: 160 },
+              },
+              draggable: true,
+              resizable: true,
+            },
           },
         ]}
       />,
@@ -260,7 +266,7 @@ describe("GridLayout", () => {
   });
 
   it("requires drag gestures to originate from declared handles on floating layers", async () => {
-    const recordedPositions: Array<{ x: number; y: number }> = [];
+    const recordedPositions: WindowPosition[] = [];
     const { container } = render(
       <GridLayout
         config={baseConfig}
@@ -280,14 +286,16 @@ describe("GridLayout", () => {
                 <div data-testid="content">Content</div>
               </div>
             ),
-            positionMode: "absolute",
-            position: { left: 0, top: 0 },
-            width: 200,
-            height: 160,
-            draggable: true,
-            resizable: true,
-            onPositionChange: (position) => {
-              recordedPositions.push(position);
+            floating: {
+              bounds: {
+                position: { left: 0, top: 0 },
+                size: { width: 200, height: 160 },
+              },
+              draggable: true,
+              resizable: true,
+              onMove: (position) => {
+                recordedPositions.push(position);
+              },
             },
           },
         ]}
@@ -315,7 +323,7 @@ describe("GridLayout", () => {
   });
 
   it("supports drag handles provided via the context hook", async () => {
-    const recordedPositions: Array<{ x: number; y: number }> = [];
+    const recordedPositions: WindowPosition[] = [];
 
     const HandleComponent: React.FC = () => {
       const handleProps = useLayerDragHandle();
@@ -341,14 +349,16 @@ describe("GridLayout", () => {
           {
             id: "floating",
             component: <HandleComponent />,
-            positionMode: "absolute",
-            position: { left: 0, top: 0 },
-            width: 200,
-            height: 160,
-            draggable: true,
-            resizable: true,
-            onPositionChange: (position) => {
-              recordedPositions.push(position);
+            floating: {
+              bounds: {
+                position: { left: 0, top: 0 },
+                size: { width: 200, height: 160 },
+              },
+              draggable: true,
+              resizable: true,
+              onMove: (position) => {
+                recordedPositions.push(position);
+              },
             },
           },
         ]}
@@ -378,6 +388,7 @@ describe("GridLayout", () => {
   });
 
   it("resizes floating panels from the bottom-right handle", async () => {
+    const recordedSizes: WindowSize[] = [];
     const { container } = render(
       <GridLayout
         config={baseConfig}
@@ -395,12 +406,17 @@ describe("GridLayout", () => {
                 <div>Content</div>
               </div>
             ),
-            positionMode: "absolute",
-            position: { left: 0, top: 0 },
-            width: 200,
-            height: 160,
-            draggable: true,
-            resizable: true,
+            floating: {
+              bounds: {
+                position: { left: 0, top: 0 },
+                size: { width: 200, height: 160 },
+              },
+              draggable: true,
+              resizable: true,
+              onResize: (size) => {
+                recordedSizes.push(size);
+              },
+            },
           },
         ]}
       />,
@@ -423,6 +439,8 @@ describe("GridLayout", () => {
 
     expect(layerElement.style.width).toBe("240px");
     expect(layerElement.style.height).toBe("210px");
+    const lastRecordedSize = recordedSizes[recordedSizes.length - 1];
+    expect(lastRecordedSize).toEqual({ width: 240, height: 210 });
 
     await act(async () => {
       document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true }));
@@ -430,7 +448,7 @@ describe("GridLayout", () => {
   });
 
   it("resizes floating panels from the left edge handle", async () => {
-    const recordedPositions: Array<{ x: number; y: number }> = [];
+    const recordedPositions: WindowPosition[] = [];
 
     const { container } = render(
       <GridLayout
@@ -449,14 +467,16 @@ describe("GridLayout", () => {
                 <div>Content</div>
               </div>
             ),
-            positionMode: "absolute",
-            position: { left: 0, top: 0 },
-            width: 200,
-            height: 160,
-            draggable: true,
-            resizable: true,
-            onPositionChange: (position) => {
-              recordedPositions.push(position);
+            floating: {
+              bounds: {
+                position: { left: 0, top: 0 },
+                size: { width: 200, height: 160 },
+              },
+              draggable: true,
+              resizable: true,
+              onMove: (position) => {
+                recordedPositions.push(position);
+              },
             },
           },
         ]}
@@ -483,11 +503,115 @@ describe("GridLayout", () => {
     expect(layerElement.style.transform).toBe("translate(40px, 0px)");
     expect(recordedPositions).not.toHaveLength(0);
     const lastRecordedPosition = recordedPositions[recordedPositions.length - 1];
-    expect(lastRecordedPosition).toEqual({ x: 40, y: 0 });
+    expect(lastRecordedPosition).toEqual({ left: 40, top: 0 });
 
     await act(async () => {
       document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true }));
     });
+  });
+
+  it("opens floating layers in a popup window when configured", async () => {
+    const state = {
+      openCallCount: 0,
+      capturedName: undefined as string | undefined,
+      capturedFeatures: undefined as string | undefined,
+      moveCalls: [] as Array<[number, number]>,
+      resizeCalls: [] as Array<[number, number]>,
+      focusCount: 0,
+      closeCount: 0,
+      removeEventListenerCalled: false,
+      document: null as Document | null,
+    };
+
+    const registeredListeners = new Map<string, EventListenerOrEventListenerObject>();
+
+    try {
+      render(
+        <GridLayout
+          config={baseConfig}
+          layers={[
+            {
+              id: "sidebar",
+              gridArea: "sidebar",
+              component: <div />,
+            },
+            {
+              id: "popup-layer",
+              component: <div>Popup Content</div>,
+              floating: {
+                mode: "popup",
+                bounds: {
+                  position: { left: 120, top: 80 },
+                  size: { width: 320, height: 260 },
+                },
+                popup: {
+                  name: "popup-layer",
+                  createWindow: (config) => {
+                    state.openCallCount += 1;
+                    state.capturedName = config.name;
+                    state.capturedFeatures = config.features;
+                    const stubWindow = Object.create(window);
+                    const popupDocument = document.implementation.createHTMLDocument(config.name);
+                    stubWindow.document = popupDocument;
+                    stubWindow.moveTo = (x: number, y: number) => {
+                      state.moveCalls.push([x, y]);
+                    };
+                    stubWindow.resizeTo = (width: number, height: number) => {
+                      state.resizeCalls.push([width, height]);
+                    };
+                    stubWindow.focus = () => {
+                      state.focusCount += 1;
+                    };
+                    stubWindow.close = () => {
+                      state.closeCount += 1;
+                    };
+                    stubWindow.addEventListener = (type: string, listener: EventListenerOrEventListenerObject) => {
+                      registeredListeners.set(type, listener);
+                    };
+                    stubWindow.removeEventListener = (type: string, listener: EventListenerOrEventListenerObject) => {
+                      const registered = registeredListeners.get(type);
+                      if (registered === listener) {
+                        state.removeEventListenerCalled = true;
+                        registeredListeners.delete(type);
+                      }
+                    };
+                    state.document = popupDocument;
+                    return stubWindow;
+                  },
+                },
+              },
+            },
+          ]}
+        />,
+      );
+
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      expect(state.openCallCount).toBe(1);
+      expect(state.capturedName).toBe("popup-layer");
+      expect(state.capturedFeatures?.includes("left=120")).toBe(true);
+      expect(state.capturedFeatures?.includes("top=80")).toBe(true);
+      expect(state.capturedFeatures?.includes("width=320")).toBe(true);
+      expect(state.capturedFeatures?.includes("height=260")).toBe(true);
+      expect(state.moveCalls).toContainEqual([120, 80]);
+      expect(state.resizeCalls).toContainEqual([320, 260]);
+      expect(state.focusCount).toBe(1);
+      const popupDoc = state.document;
+      if (!popupDoc) {
+        throw new Error("Popup document was not captured");
+      }
+      const popupContainer = popupDoc.body.querySelector('[data-layer-id="popup-layer"]');
+      expect(popupContainer).not.toBeNull();
+      expect(popupDoc.body.textContent).toContain("Popup Content");
+
+      cleanup();
+      expect(state.removeEventListenerCalled).toBe(true);
+      expect(state.closeCount).toBe(1);
+    } finally {
+      registeredListeners.clear();
+    }
   });
 
   it("wraps grid resize handles with directional metadata", () => {
@@ -562,7 +686,9 @@ describe("GridLayout", () => {
     });
 
     await act(async () => {
-      fireEvent.pointerDown(firstHandle, { clientX: 0, clientY: 0, pointerId: 1 });
+      firstHandle.dispatchEvent(
+        new window.PointerEvent("pointerdown", { clientX: 0, clientY: 0, pointerId: 1, bubbles: true }),
+      );
     });
 
     await act(async () => {
@@ -615,7 +741,9 @@ describe("GridLayout", () => {
     });
 
     await act(async () => {
-      fireEvent.pointerDown(lastHandle, { clientX: 0, clientY: 0, pointerId: 2 });
+      lastHandle.dispatchEvent(
+        new window.PointerEvent("pointerdown", { clientX: 0, clientY: 0, pointerId: 2, bubbles: true }),
+      );
     });
 
     await act(async () => {
@@ -665,7 +793,9 @@ describe("GridLayout", () => {
     });
 
     await act(async () => {
-      fireEvent.pointerDown(horizontalHandle, { clientX: 0, clientY: 0, pointerId: 3 });
+      horizontalHandle.dispatchEvent(
+        new window.PointerEvent("pointerdown", { clientX: 0, clientY: 0, pointerId: 3, bubbles: true }),
+      );
     });
 
     await act(async () => {
