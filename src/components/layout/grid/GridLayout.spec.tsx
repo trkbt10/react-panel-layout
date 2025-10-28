@@ -221,4 +221,337 @@ describe("GridLayout", () => {
     expect(contentLayer.style.gridColumn).toBe("2 / 4");
   });
 
+  it("renders four corner resize handles for floating resizable layers", () => {
+    const { container } = render(
+      <GridLayout
+        config={baseConfig}
+        layers={[
+          {
+            id: "sidebar",
+            gridArea: "sidebar",
+            component: <div />,
+          },
+          {
+            id: "floating",
+            component: (
+              <div>
+                <div data-testid="drag-handle" data-drag-handle="true">
+                  Title
+                </div>
+                <div>Content</div>
+              </div>
+            ),
+            positionMode: "absolute",
+            position: { left: 0, top: 0 },
+            width: 200,
+            height: 160,
+            draggable: true,
+            resizable: true,
+          },
+        ]}
+      />,
+    );
+
+    const handles = container.querySelectorAll('[data-resize-corner]');
+    expect(handles).toHaveLength(4);
+  });
+
+  it("requires drag gestures to originate from declared handles on floating layers", async () => {
+    const recordedPositions: Array<{ x: number; y: number }> = [];
+    const { container } = render(
+      <GridLayout
+        config={baseConfig}
+        layers={[
+          {
+            id: "sidebar",
+            gridArea: "sidebar",
+            component: <div />,
+          },
+          {
+            id: "floating",
+            component: (
+              <div>
+                <div data-testid="drag-handle" data-drag-handle="true">
+                  Title
+                </div>
+                <div data-testid="content">Content</div>
+              </div>
+            ),
+            positionMode: "absolute",
+            position: { left: 0, top: 0 },
+            width: 200,
+            height: 160,
+            draggable: true,
+            resizable: true,
+            onPositionChange: (position) => {
+              recordedPositions.push(position);
+            },
+          },
+        ]}
+      />,
+    );
+
+    const content = container.querySelector('[data-testid="content"]');
+    if (!content) {
+      throw new Error("Expected content element to be rendered");
+    }
+
+    await act(async () => {
+      fireEvent.pointerDown(content, { clientX: 0, clientY: 0 });
+    });
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointermove", { clientX: 25, clientY: 30, bubbles: true }));
+    });
+
+    expect(recordedPositions).toHaveLength(0);
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true }));
+    });
+  });
+
+  it("resizes floating panels from the bottom-right handle", async () => {
+    const { container } = render(
+      <GridLayout
+        config={baseConfig}
+        layers={[
+          {
+            id: "sidebar",
+            gridArea: "sidebar",
+            component: <div />,
+          },
+          {
+            id: "floating",
+            component: (
+              <div>
+                <div data-drag-handle="true">Title</div>
+                <div>Content</div>
+              </div>
+            ),
+            positionMode: "absolute",
+            position: { left: 0, top: 0 },
+            width: 200,
+            height: 160,
+            draggable: true,
+            resizable: true,
+          },
+        ]}
+      />,
+    );
+
+    const resizeHandle = container.querySelector('[data-resize-corner="bottom-right"]');
+    const layerElement = container.querySelector('[data-layer-id="floating"]') as HTMLElement | null;
+
+    if (!resizeHandle || !layerElement) {
+      throw new Error("Expected resizable layer and handle to be rendered");
+    }
+
+    await act(async () => {
+      fireEvent.pointerDown(resizeHandle, { clientX: 200, clientY: 160 });
+    });
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointermove", { clientX: 240, clientY: 210, bubbles: true }));
+    });
+
+    expect(layerElement.style.width).toBe("240px");
+    expect(layerElement.style.height).toBe("210px");
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true }));
+    });
+  });
+
+  it("wraps grid resize handles with directional metadata", () => {
+    const resizableConfig: PanelLayoutConfig = {
+      areas: [["left", "right"]],
+      columns: [
+        { size: "200px", resizable: true },
+        { size: "1fr" },
+      ],
+      rows: [
+        { size: "240px", resizable: true },
+      ],
+    };
+
+    const { container } = render(
+      <GridLayout
+        config={resizableConfig}
+        layers={[
+          { id: "left", component: <div /> },
+          { id: "right", component: <div /> },
+        ]}
+      />,
+    );
+
+    const handleWrappers = Array.from(container.querySelectorAll('[data-resize-handle="true"]')).map((handle) => {
+      const wrapper = handle.parentElement;
+      if (!wrapper) {
+        throw new Error("Expected resize handle wrapper element");
+      }
+      return wrapper;
+    });
+
+    expect(handleWrappers).toHaveLength(2);
+    expect(handleWrappers.some((wrapper) => wrapper.getAttribute("data-direction") === "vertical")).toBe(true);
+    expect(handleWrappers.some((wrapper) => wrapper.getAttribute("data-direction") === "horizontal")).toBe(true);
+  });
+
+  it("increases the width of the targeted column when dragging the vertical handle to the right", async () => {
+    const resizableConfig: PanelLayoutConfig = {
+      areas: [["left", "middle", "right"]],
+      columns: [
+        { size: "200px", resizable: true },
+        { size: "1fr" },
+        { size: "260px" },
+      ],
+      rows: [{ size: "1fr" }],
+      gap: "0",
+    };
+
+    const { container } = render(
+      <GridLayout
+        config={resizableConfig}
+        layers={[
+          { id: "left", component: <div /> },
+          { id: "middle", component: <div /> },
+          { id: "right", component: <div /> },
+        ]}
+      />,
+    );
+
+    const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
+    const handles = container.querySelectorAll('[data-resize-handle="true"][data-direction="vertical"]');
+
+    if (!gridElement || handles.length === 0) {
+      throw new Error("Expected grid element and vertical handle to exist");
+    }
+
+    const firstHandle = handles[0] as HTMLElement;
+    Object.assign(firstHandle, {
+      setPointerCapture: () => {},
+      releasePointerCapture: () => {},
+    });
+
+    await act(async () => {
+      fireEvent.pointerDown(firstHandle, { clientX: 0, clientY: 0, pointerId: 1 });
+    });
+
+    await act(async () => {
+      document.dispatchEvent(
+        new window.PointerEvent("pointermove", { clientX: 40, clientY: 0, bubbles: true, pointerId: 1 }),
+      );
+    });
+
+    expect(gridElement.style.gridTemplateColumns).toBe("240px 1fr 260px");
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
+    });
+  });
+
+  it("updates the width of the trailing column when dragging the second vertical handle to the left", async () => {
+    const resizableConfig: PanelLayoutConfig = {
+      areas: [["left", "middle", "right"]],
+      columns: [
+        { size: "250px" },
+        { size: "1fr" },
+        { size: "300px", resizable: true },
+      ],
+      rows: [{ size: "1fr" }],
+      gap: "0",
+    };
+
+    const { container } = render(
+      <GridLayout
+        config={resizableConfig}
+        layers={[
+          { id: "left", component: <div /> },
+          { id: "middle", component: <div /> },
+          { id: "right", component: <div /> },
+        ]}
+      />,
+    );
+
+    const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
+    const handles = container.querySelectorAll('[data-resize-handle="true"][data-direction="vertical"]');
+
+    if (!gridElement || handles.length < 1) {
+      throw new Error("Expected grid element and vertical handles to exist");
+    }
+
+    const lastHandle = handles[handles.length - 1] as HTMLElement;
+    Object.assign(lastHandle, {
+      setPointerCapture: () => {},
+      releasePointerCapture: () => {},
+    });
+
+    await act(async () => {
+      fireEvent.pointerDown(lastHandle, { clientX: 0, clientY: 0, pointerId: 2 });
+    });
+
+    await act(async () => {
+      document.dispatchEvent(
+        new window.PointerEvent("pointermove", { clientX: -40, clientY: 0, bubbles: true, pointerId: 2 }),
+      );
+    });
+
+    expect(gridElement.style.gridTemplateColumns).toBe("250px 1fr 260px");
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, pointerId: 2 }));
+    });
+  });
+
+  it("adjusts row heights when dragging a horizontal handle downward", async () => {
+    const resizableConfig: PanelLayoutConfig = {
+      areas: [["top"], ["bottom"]],
+      columns: [{ size: "1fr" }],
+      rows: [
+        { size: "120px", resizable: true },
+        { size: "1fr" },
+      ],
+      gap: "0",
+    };
+
+    const { container } = render(
+      <GridLayout
+        config={resizableConfig}
+        layers={[
+          { id: "top", component: <div /> },
+          { id: "bottom", component: <div /> },
+        ]}
+      />,
+    );
+
+    const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
+    const horizontalHandle = container.querySelector('[data-resize-handle="true"][data-direction="horizontal"]') as HTMLElement | null;
+
+    if (!gridElement || !horizontalHandle) {
+      throw new Error("Expected grid element and horizontal handle to exist");
+    }
+
+    Object.assign(horizontalHandle, {
+      setPointerCapture: () => {},
+      releasePointerCapture: () => {},
+    });
+
+    await act(async () => {
+      fireEvent.pointerDown(horizontalHandle, { clientX: 0, clientY: 0, pointerId: 3 });
+    });
+
+    await act(async () => {
+      document.dispatchEvent(
+        new window.PointerEvent("pointermove", { clientX: 0, clientY: 30, bubbles: true, pointerId: 3 }),
+      );
+    });
+
+    expect(gridElement.style.gridTemplateRows).toBe("150px 1fr");
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, pointerId: 3 }));
+    });
+  });
+
 });

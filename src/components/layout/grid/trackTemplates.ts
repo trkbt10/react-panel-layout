@@ -41,7 +41,3 @@ export const extractInitialTrackSizes = (tracks: GridTrack[], direction: TrackDi
     return acc;
   }, {});
 };
-
-export const getResizableTrackInfo = (tracks: GridTrack[]) => {
-  return tracks.map((track, index) => ({ track, index })).filter(({ track }) => track.resizable);
-};

@@ -213,8 +213,20 @@ export type LayerDefinition = {
   pointerEvents?: boolean | "auto" | "none";
   /** Whether the layer can be dragged (for floating layers) */
   draggable?: boolean;
+  /** Whether the layer can be resized from its corners (floating layers only) */
+  resizable?: boolean;
+  /** Minimum width in pixels when resizing (floating mode) */
+  minWidth?: number;
+  /** Minimum height in pixels when resizing (floating mode) */
+  minHeight?: number;
+  /** Maximum width in pixels when resizing (floating mode) */
+  maxWidth?: number;
+  /** Maximum height in pixels when resizing (floating mode) */
+  maxHeight?: number;
   /** Callback when layer position changes (for draggable layers) */
   onPositionChange?: (position: { x: number; y: number }) => void;
+  /** Callback when layer size changes (for resizable layers) */
+  onSizeChange?: (size: { width: number; height: number }) => void;
   /** Drawer behavior for mobile-friendly slide-in panels */
   drawer?: DrawerBehavior;
 

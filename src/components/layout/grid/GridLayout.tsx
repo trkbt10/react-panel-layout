@@ -10,11 +10,10 @@ import {
   buildTrackTemplateString,
   createTrackKey,
   extractInitialTrackSizes,
-  getResizableTrackInfo,
   type TrackDirection,
 } from "./trackTemplates";
 import { createTrackSizeUpdater } from "./resizeUtils";
-import type { LayerDefinition, PanelLayoutConfig } from "../../../panels";
+import type { GridTrack, LayerDefinition, PanelLayoutConfig } from "../../../panels";
 import { useEffectEvent } from "../../../hooks/useEffectEvent";
 import { useDocumentPointerEvents } from "../../../hooks/useDocumentPointerEvents";
 import { useIsomorphicLayoutEffect } from "../../../hooks/useIsomorphicLayoutEffect";
@@ -37,6 +36,104 @@ type DragState = {
   layerId: string;
   pointerId: number;
   target: HTMLElement;
+};
+
+type LayerSize = {
+  width: number;
+  height: number;
+};
+
+type CornerHandle = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+
+type ResizeState = {
+  layerId: string;
+  pointerId: number;
+  corner: CornerHandle;
+  startX: number;
+  startY: number;
+  startWidth: number;
+  startHeight: number;
+  startPosition: { x: number; y: number };
+  minWidth?: number;
+  maxWidth?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  target: HTMLElement;
+};
+
+const FLOATING_POSITION_MODES: ReadonlyArray<LayerDefinition["positionMode"]> = ["absolute", "fixed"];
+
+const isFloatingLayer = (layer: LayerDefinition): boolean => {
+  const mode = layer.positionMode ?? "grid";
+  return FLOATING_POSITION_MODES.includes(mode);
+};
+
+type TrackHandleConfig = {
+  trackIndex: number;
+  align: "start" | "end";
+};
+
+type ParsedGap = {
+  rowGap: number;
+  columnGap: number;
+};
+
+const computeTrackResizeHandles = (tracks: GridTrack[]): TrackHandleConfig[] => {
+  if (tracks.length === 0) {
+    return [];
+  }
+
+  if (tracks.length === 1) {
+    const onlyTrack = tracks[0];
+    return onlyTrack?.resizable ? [{ trackIndex: 0, align: "end" }] : [];
+  }
+
+  const handles: TrackHandleConfig[] = [];
+
+  for (let boundaryIndex = 0; boundaryIndex < tracks.length - 1; boundaryIndex += 1) {
+    const leftTrack = tracks[boundaryIndex];
+    const rightTrack = tracks[boundaryIndex + 1];
+
+    if (rightTrack?.resizable) {
+      handles.push({ trackIndex: boundaryIndex + 1, align: "start" });
+      continue;
+    }
+
+    if (leftTrack?.resizable) {
+      handles.push({ trackIndex: boundaryIndex, align: "end" });
+    }
+  }
+
+  return handles;
+};
+
+const parseGap = (gapValue?: string): ParsedGap => {
+  if (!gapValue) {
+    return { rowGap: 0, columnGap: 0 };
+  }
+
+  const tokens = gapValue
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+  const parseToken = (token: string): number => {
+    const match = token.match(/^(-?\d+(?:\.\d+)?)px$/);
+    if (!match) {
+      return 0;
+    }
+    return Number.parseFloat(match[1]);
+  };
+
+  if (tokens.length === 1) {
+    const parsed = parseToken(tokens[0]);
+    return { rowGap: parsed, columnGap: parsed };
+  }
+
+  return {
+    rowGap: parseToken(tokens[0]),
+    columnGap: parseToken(tokens[1]),
+  };
 };
 
 const getGapStyle = (gap?: string): React.CSSProperties => {
@@ -164,6 +261,169 @@ const isInteractiveElement = (target: EventTarget | null): target is HTMLElement
   return ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName);
 };
 
+const parseDimensionValue = (value: number | string | undefined): number | null => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const match = value.match(/^(-?\d+(?:\.\d+)?)px$/);
+    if (match) {
+      return Number.parseFloat(match[1]);
+    }
+  }
+
+  return null;
+};
+
+const clampDimension = (value: number, min?: number, max?: number): number => {
+  const withMinimum = min !== undefined ? Math.max(value, min) : value;
+  return max !== undefined ? Math.min(withMinimum, max) : withMinimum;
+};
+
+const findAncestor = (
+  element: HTMLElement | null,
+  predicate: (node: HTMLElement) => boolean,
+  stopPredicate?: (node: HTMLElement) => boolean,
+): HTMLElement | null => {
+  if (!element) {
+    return null;
+  }
+  if (stopPredicate?.(element)) {
+    return null;
+  }
+  if (predicate(element)) {
+    return element;
+  }
+  return findAncestor(element.parentElement, predicate, stopPredicate);
+};
+
+const findDragHandleElement = (target: EventTarget | null): HTMLElement | null => {
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  return findAncestor(
+    target,
+    (node) => node.dataset.dragHandle === "true",
+    (node) => node.dataset.dragIgnore === "true",
+  );
+};
+
+const isResizeControl = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return findAncestor(target, (node) => node.dataset.resizeCorner !== undefined) !== null;
+};
+
+const shouldRenderCornerResize = (layer: LayerDefinition): boolean => {
+  if (!layer.draggable || !layer.resizable) {
+    return false;
+  }
+  return isFloatingLayer(layer);
+};
+
+const getLayerSizeFromDefinition = (layer: LayerDefinition): LayerSize | null => {
+  const width = parseDimensionValue(layer.width);
+  const height = parseDimensionValue(layer.height);
+  if (width === null || height === null) {
+    return null;
+  }
+  return { width, height };
+};
+
+const CORNER_RESIZE_HANDLES: ReadonlyArray<{ corner: CornerHandle; className: keyof typeof styles }> = [
+  { corner: "top-left", className: "cornerHandleTopLeft" },
+  { corner: "top-right", className: "cornerHandleTopRight" },
+  { corner: "bottom-left", className: "cornerHandleBottomLeft" },
+  { corner: "bottom-right", className: "cornerHandleBottomRight" },
+];
+
+const createCornerHandleElements = (
+  layerId: string,
+  onPointerDown: (id: string, corner: CornerHandle, event: React.PointerEvent<HTMLDivElement>) => void,
+): React.ReactNode[] => {
+  return CORNER_RESIZE_HANDLES.map(({ corner, className }) => {
+    const classNames = `${styles.cornerHandle} ${styles[className]}`;
+    return (
+      <div
+        key={corner}
+        role="presentation"
+        aria-hidden="true"
+        data-resize-corner={corner}
+        className={classNames}
+        onPointerDown={(event) => {
+          onPointerDown(layerId, corner, event);
+        }}
+      />
+    );
+  });
+};
+
+const resolveCornerHandles = (
+  layerId: string,
+  shouldShow: boolean,
+  onPointerDown: (id: string, corner: CornerHandle, event: React.PointerEvent<HTMLDivElement>) => void,
+): React.ReactNode => {
+  if (!shouldShow) {
+    return null;
+  }
+  return createCornerHandleElements(layerId, onPointerDown);
+};
+
+const computeResizableLayerSizes = (
+  layers: LayerDefinition[],
+  previousSizes: Record<string, LayerSize>,
+  activeResizeLayerId: string | null,
+): { sizes: Record<string, LayerSize>; changed: boolean } => {
+  const nextSizes = layers
+    .filter(shouldRenderCornerResize)
+    .reduce<Record<string, LayerSize>>((accumulator, layer) => {
+      if (activeResizeLayerId === layer.id) {
+        const existing = previousSizes[layer.id];
+        if (existing) {
+          accumulator[layer.id] = existing;
+          return accumulator;
+        }
+      }
+
+      const parsedSize = getLayerSizeFromDefinition(layer);
+      if (!parsedSize) {
+        return accumulator;
+      }
+
+      accumulator[layer.id] = parsedSize;
+      return accumulator;
+    }, {});
+
+  const previousKeys = Object.keys(previousSizes);
+  const nextKeys = Object.keys(nextSizes);
+
+  const keysChangedByLength = previousKeys.length !== nextKeys.length;
+  const keysChangedByMissing = previousKeys.some((key) => {
+    return !Object.prototype.hasOwnProperty.call(nextSizes, key);
+  });
+  const keysChanged = keysChangedByLength ? true : keysChangedByMissing;
+
+  const sizeChanged = nextKeys.some((key) => {
+    const previous = previousSizes[key];
+    const next = nextSizes[key];
+    if (!previous || !next) {
+      return true;
+    }
+    return previous.width !== next.width || previous.height !== next.height;
+  });
+
+  const changed = keysChanged ? true : sizeChanged;
+
+  return {
+    sizes: nextSizes,
+    changed,
+  };
+};
+
 /**
  * GridLayout - Flexible grid-based layout system for node editor
  * Supports unified layer system for background, canvas, overlays, and UI elements
@@ -220,24 +480,9 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
   );
   const regularLayers = React.useMemo(() => visibleLayers.filter((layer) => !layer.drawer), [visibleLayers]);
 
-  const resizableColumns = React.useMemo(() => getResizableTrackInfo(config.columns), [config.columns]);
-  const resizableRows = React.useMemo(() => getResizableTrackInfo(config.rows), [config.rows]);
-
-  const columnHandleAreas = React.useMemo(() => {
-    const map = new Map<number, string>();
-    config.areas.forEach((row) => {
-      row.forEach((area, columnIndex) => {
-        if (!map.has(columnIndex) && area) {
-          map.set(columnIndex, area);
-        }
-      });
-    });
-    return map;
-  }, [config.areas]);
-
-  const rowHandleAreas = React.useMemo(() => {
-    return config.areas.map((row) => row[0] ?? null);
-  }, [config.areas]);
+  const gapSizes = React.useMemo(() => parseGap(config.gap), [config.gap]);
+  const columnHandles = React.useMemo(() => computeTrackResizeHandles(config.columns), [config.columns]);
+  const rowHandles = React.useMemo(() => computeTrackResizeHandles(config.rows), [config.rows]);
 
   const layerById = React.useMemo(() => {
     const map = new Map<string, LayerDefinition>();
@@ -248,11 +493,24 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
   }, [normalizedLayers]);
 
   const [layerPositions, setLayerPositions] = React.useState<Record<string, { x: number; y: number }>>({});
+  const [layerSizes, setLayerSizes] = React.useState<Record<string, LayerSize>>({});
   const [draggingLayerId, setDraggingLayerId] = React.useState<string | null>(null);
+  const [resizingLayerId, setResizingLayerId] = React.useState<string | null>(null);
   const dragStartRef = React.useRef<DragState | null>(null);
+  const resizeStartRef = React.useRef<ResizeState | null>(null);
   const notifyPositionChange = useEffectEvent((layerId: string, newPos: { x: number; y: number }) => {
     layerById.get(layerId)?.onPositionChange?.(newPos);
   });
+  const notifySizeChange = useEffectEvent((layerId: string, newSize: LayerSize) => {
+    layerById.get(layerId)?.onSizeChange?.(newSize);
+  });
+
+  useIsomorphicLayoutEffect(() => {
+    setLayerSizes((previousSizes) => {
+      const { sizes, changed } = computeResizableLayerSizes(normalizedLayers, previousSizes, resizingLayerId);
+      return changed ? sizes : previousSizes;
+    });
+  }, [normalizedLayers, resizingLayerId]);
 
   const handlePointerDown = React.useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -265,9 +523,23 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
         return;
       }
 
+      if (isResizeControl(event.target)) {
+        return;
+      }
+
       const layer = layerById.get(layerId);
       if (!layer?.draggable) {
         return;
+      }
+
+      if (isFloatingLayer(layer)) {
+        const dragHandle = findDragHandleElement(event.target);
+        if (!dragHandle) {
+          const handleExists = event.currentTarget.querySelector('[data-drag-handle="true"]');
+          if (handleExists) {
+            return;
+          }
+        }
       }
 
       event.preventDefault();
@@ -296,6 +568,52 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
     [layerById, layerPositions],
   );
 
+  const handleResizePointerDown = React.useCallback(
+    (layerId: string, corner: CornerHandle, event: React.PointerEvent<HTMLDivElement>) => {
+      const layer = layerById.get(layerId);
+      if (!layer || !shouldRenderCornerResize(layer)) {
+        return;
+      }
+
+      const sizeEntry = layerSizes[layerId] ?? getLayerSizeFromDefinition(layer);
+      if (!sizeEntry) {
+        return;
+      }
+
+      const initialPosition = layerPositions[layerId] ?? { x: 0, y: 0 };
+
+      event.stopPropagation();
+      event.preventDefault();
+
+      if (event.currentTarget.setPointerCapture) {
+        try {
+          event.currentTarget.setPointerCapture(event.pointerId);
+        } catch {
+          // Pointer capture may be unsupported; ignore gracefully.
+        }
+      }
+
+      resizeStartRef.current = {
+        layerId,
+        pointerId: event.pointerId,
+        corner,
+        startX: event.clientX,
+        startY: event.clientY,
+        startWidth: sizeEntry.width,
+        startHeight: sizeEntry.height,
+        startPosition: initialPosition,
+        minWidth: layer.minWidth,
+        maxWidth: layer.maxWidth,
+        minHeight: layer.minHeight,
+        maxHeight: layer.maxHeight,
+        target: event.currentTarget,
+      };
+
+      setResizingLayerId(layerId);
+    },
+    [layerById, layerPositions, layerSizes],
+  );
+
   const handleDragPointerMove = React.useCallback(
     (event: PointerEvent) => {
       const dragStart = dragStartRef.current;
@@ -316,6 +634,66 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
     [notifyPositionChange],
   );
 
+  const handleResizePointerMove = React.useCallback(
+    (event: PointerEvent) => {
+      const resizeStart = resizeStartRef.current;
+      if (!resizeStart || resizeStart.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const layer = layerById.get(resizeStart.layerId);
+      if (!layer) {
+        return;
+      }
+
+      const deltaX = event.clientX - resizeStart.startX;
+      const deltaY = event.clientY - resizeStart.startY;
+      const horizontalEdge = resizeStart.corner.includes("left") ? "left" : "right";
+      const verticalEdge = resizeStart.corner.includes("top") ? "top" : "bottom";
+
+      const widthCandidate =
+        horizontalEdge === "left" ? resizeStart.startWidth - deltaX : resizeStart.startWidth + deltaX;
+      const heightCandidate =
+        verticalEdge === "top" ? resizeStart.startHeight - deltaY : resizeStart.startHeight + deltaY;
+
+      const nextWidth = clampDimension(widthCandidate, resizeStart.minWidth, resizeStart.maxWidth);
+      const nextHeight = clampDimension(heightCandidate, resizeStart.minHeight, resizeStart.maxHeight);
+
+      const widthDelta = resizeStart.startWidth - nextWidth;
+      const heightDelta = resizeStart.startHeight - nextHeight;
+
+      const nextPositionX =
+        horizontalEdge === "left" ? resizeStart.startPosition.x + widthDelta : resizeStart.startPosition.x;
+      const nextPositionY =
+        verticalEdge === "top" ? resizeStart.startPosition.y + heightDelta : resizeStart.startPosition.y;
+
+      const currentSize = layerSizes[resizeStart.layerId];
+      const nextSize = { width: nextWidth, height: nextHeight };
+      const sizeChanged =
+        !currentSize || currentSize.width !== nextWidth || currentSize.height !== nextHeight;
+      if (sizeChanged) {
+        setLayerSizes((prev) => ({
+          ...prev,
+          [resizeStart.layerId]: nextSize,
+        }));
+        notifySizeChange(resizeStart.layerId, nextSize);
+      }
+
+      const currentPosition = layerPositions[resizeStart.layerId] ?? { x: 0, y: 0 };
+      const nextPosition = { x: nextPositionX, y: nextPositionY };
+      const positionChanged =
+        currentPosition.x !== nextPosition.x || currentPosition.y !== nextPosition.y;
+      if (positionChanged) {
+        setLayerPositions((prev) => ({
+          ...prev,
+          [resizeStart.layerId]: nextPosition,
+        }));
+        notifyPositionChange(resizeStart.layerId, nextPosition);
+      }
+    },
+    [layerById, layerSizes, layerPositions, notifyPositionChange, notifySizeChange],
+  );
+
   const finishDrag = React.useCallback((event: PointerEvent) => {
     const dragStart = dragStartRef.current;
     if (dragStart) {
@@ -331,10 +709,31 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
     setDraggingLayerId(null);
   }, []);
 
+  const finishResize = React.useCallback((event: PointerEvent) => {
+    const resizeStart = resizeStartRef.current;
+    if (resizeStart) {
+      if (resizeStart.pointerId === event.pointerId && resizeStart.target.releasePointerCapture) {
+        try {
+          resizeStart.target.releasePointerCapture(resizeStart.pointerId);
+        } catch {
+          // Ignore pointer capture release errors.
+        }
+      }
+      resizeStartRef.current = null;
+    }
+    setResizingLayerId(null);
+  }, []);
+
   useDocumentPointerEvents(draggingLayerId !== null, {
     onMove: handleDragPointerMove,
     onUp: finishDrag,
     onCancel: finishDrag,
+  });
+
+  useDocumentPointerEvents(resizingLayerId !== null, {
+    onMove: handleResizePointerMove,
+    onUp: finishResize,
+    onCancel: finishResize,
   });
 
   const buildDraggableLayerStyle = React.useCallback(
@@ -347,16 +746,22 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
 
       const position = layerPositions[layer.id];
       const isDragging = draggingLayerId === layer.id;
+      const isResizing = resizingLayerId === layer.id;
       const transformStyle = position ? { transform: `translate(${position.x}px, ${position.y}px)` } : {};
-      const cursorStyle = isDragging ? "grabbing" : "grab";
+      const storedSize = layerSizes[layer.id];
+      const fallbackSize = shouldRenderCornerResize(layer) ? getLayerSizeFromDefinition(layer) : null;
+      const sizeRecord = storedSize ?? fallbackSize;
+      const sizeStyle = sizeRecord ? { width: `${sizeRecord.width}px`, height: `${sizeRecord.height}px` } : {};
+      const cursorStyle = isDragging || isResizing ? { cursor: "grabbing" } : {};
 
       return {
         ...baseStyle,
+        ...sizeStyle,
         ...transformStyle,
-        cursor: cursorStyle,
+        ...cursorStyle,
       };
     },
-    [layerPositions, draggingLayerId],
+    [layerPositions, layerSizes, draggingLayerId, resizingLayerId],
   );
 
   const handleResize = React.useCallback(
@@ -368,7 +773,7 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
       }
 
       const currentSize = resolveCurrentTrackSize(trackSizes, track, direction, trackIndex);
-      setTrackSizes(createTrackSizeUpdater(direction, trackIndex, currentSize, -delta, track));
+      setTrackSizes(createTrackSizeUpdater(direction, trackIndex, currentSize, delta, track));
     },
     [config.rows, config.columns, trackSizes],
   );
@@ -380,6 +785,7 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
         className={styles.gridLayout}
         style={gridStyle}
         data-dragging={draggingLayerId ? "true" : undefined}
+        data-resizing={resizingLayerId ? "true" : undefined}
         data-visible={isIntersecting ? "true" : "false"}
       >
         {regularLayers.map((layer) => {
@@ -395,49 +801,52 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
             gridPlacementStyle.gridColumn = layer.gridColumn;
           }
 
+          const canRenderCornerResize = shouldRenderCornerResize(layer);
+          const storedLayerSize = layerSizes[layer.id];
+          const fallbackLayerSize = canRenderCornerResize ? getLayerSizeFromDefinition(layer) : null;
+          const sizeForHandle = storedLayerSize ?? fallbackLayerSize;
+          const showResizeHandles = canRenderCornerResize ? sizeForHandle !== null : false;
+          const isLayerResizing = resizingLayerId === layer.id;
+          const resizeHandleElements = resolveCornerHandles(layer.id, showResizeHandles, handleResizePointerDown);
+
           return (
             <div
               key={layer.id}
               data-layer-id={layer.id}
               data-draggable={layer.draggable}
+              data-resizable={showResizeHandles ? "true" : undefined}
+              data-resizing={isLayerResizing ? "true" : undefined}
               className={styles.gridLayer}
               style={{ ...layerStyle, ...gridPlacementStyle }}
               onPointerDown={handlePointerDown}
             >
               {layer.component}
+              {resizeHandleElements}
             </div>
           );
         })}
 
-        {resizableColumns.map(({ index }) => {
-          const gridArea = columnHandleAreas.get(index);
-          if (!gridArea) {
-            return null;
-          }
-
+        {columnHandles.map(({ trackIndex, align }) => {
           return (
             <ResizeHandleRenderer
-              key={createTrackKey("col", index)}
+              key={`${createTrackKey("col", trackIndex)}:${align}`}
               direction="col"
-              gridArea={gridArea}
-              index={index}
+              trackIndex={trackIndex}
+              align={align}
+              gap={gapSizes.columnGap}
               onResize={handleResize}
             />
           );
         })}
 
-        {resizableRows.map(({ index }) => {
-          const gridArea = rowHandleAreas[index];
-          if (!gridArea) {
-            return null;
-          }
-
+        {rowHandles.map(({ trackIndex, align }) => {
           return (
             <ResizeHandleRenderer
-              key={createTrackKey("row", index)}
+              key={`${createTrackKey("row", trackIndex)}:${align}`}
               direction="row"
-              gridArea={gridArea}
-              index={index}
+              trackIndex={trackIndex}
+              align={align}
+              gap={gapSizes.rowGap}
               onResize={handleResize}
             />
           );
@@ -449,4 +858,4 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
   );
 };
 
-/* Debug note: Consulted AGENTS.md React reference for Activity and useEffectEvent guidance while revising drag handlers; reviewed panels.tsx and DrawerLayers.tsx while removing layer className usage; referenced hooks in useDocumentPointerEvents.ts, useIsomorphicLayoutEffect.ts, and useIntersectionObserver.tsx to align with shared drag/visibility patterns; re-read GridLayout.module.css while implementing grid-area normalization. */
+/* Debug note: Consulted AGENTS.md React reference for Activity and useEffectEvent guidance while revising drag handlers; reviewed panels.tsx and DrawerLayers.tsx while removing layer className usage; referenced hooks in useDocumentPointerEvents.ts, useIsomorphicLayoutEffect.ts, and useIntersectionObserver.tsx to align with shared drag/visibility patterns; re-read GridLayout.module.css, ResizeHandleRenderer.tsx, and demo/pages/PanelLayout/IDELayout.tsx to align handle placement and boundary offsets with grid track definitions. */
