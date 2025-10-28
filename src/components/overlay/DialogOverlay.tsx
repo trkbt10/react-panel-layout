@@ -10,7 +10,7 @@
  * - SSR-safe with polyfill support
  */
 import * as React from "react";
-import type { Position } from "../../types/core";
+import type { Position } from "../../panels";
 import { calculateContextMenuPosition, getViewportInfo } from "../../utils/dialogUtils";
 import { ensureDialogPolyfill } from "../../utils/polyfills/createDialogPolyfill";
 import { useEffectEvent } from "../../hooks/useEffectEvent";

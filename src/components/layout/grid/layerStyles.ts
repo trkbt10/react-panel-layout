@@ -11,7 +11,6 @@ type LayerPosition = {
   left?: string | number;
 };
 
-
 const getPositionModeStyle = (positionMode?: LayerDefinition["positionMode"]): CSSProperties => {
   const mode = positionMode ?? "grid";
   return { position: mode === "grid" ? "relative" : mode };
@@ -22,18 +21,6 @@ const getGridAreaStyle = (layer: LayerDefinition): CSSProperties => {
   if (mode !== "grid") {
     return {};
   }
-
-  if (layer.id === "canvas") {
-    return {
-      gridArea: layer.gridArea,
-      gridRow: layer.gridRow,
-      gridColumn: layer.gridColumn,
-      minWidth: 0,
-      minHeight: 0,
-      overflow: "hidden",
-    };
-  }
-
   return {
     gridArea: layer.gridArea,
     gridRow: layer.gridRow,
@@ -74,7 +61,6 @@ const getPointerEventsStyle = (layer: LayerDefinition): CSSProperties => {
     }
     return { pointerEvents: layer.pointerEvents };
   }
-
   if (mode === "absolute" || mode === "fixed") {
     return { pointerEvents: "auto" };
   }

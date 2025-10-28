@@ -42,6 +42,7 @@ const SidebarNav: React.FC = () => {
       children: [
         { path: "/components/panel-layout", label: "Panel Layout" },
         { path: "/components/floating-panel-frame", label: "FloatingPanelFrame" },
+        { path: "/components/resizable-floating-panels", label: "Resizable Floating Panels" },
         { path: "/components/horizontal-divider", label: "HorizontalDivider" },
         { path: "/components/resize-handle", label: "ResizeHandle" },
       ],

@@ -4,6 +4,7 @@
 
 // Export type definitions
 export type {
+  Position,
   PanelPosition,
   PanelDefinition,
   EditorPanelsConfig,
@@ -15,11 +16,10 @@ export type {
   PanelLayoutProps,
 } from "./panels";
 
-export type { Position } from "./types/core";
-
 // Export main components
 export { GridLayout } from "./components/layout/grid/GridLayout";
 export type { GridLayoutProps } from "./components/layout/grid/GridLayout";
+export { useLayerDragHandle } from "./components/layout/grid/useLayerDragHandle";
 
 // Export drawer components
 export { Drawer } from "./components/drawer/Drawer";

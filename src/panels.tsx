@@ -4,12 +4,20 @@
 import * as React from "react";
 
 /**
+ * Position coordinates
+ */
+export type Position = {
+  x: number;
+  y: number;
+};
+
+/**
  * Panel position - either a named column position or floating coordinates
  * - 'left': Dock to left side
  * - 'right': Dock to right side
  * - { x, y }: Float at specific coordinates
  */
-export type PanelPosition = "left" | "right" | { x: number; y: number };
+export type PanelPosition = "left" | "right" | Position;
 
 /**
  * Configuration for a single panel
@@ -42,15 +50,9 @@ export type PanelDefinition = {
   /** Z-index for stacking order (floating mode) */
   zIndex?: number;
   /** Callback when panel position changes (floating mode) */
-  onPositionChange?: (position: { x: number; y: number }) => void;
+  onPositionChange?: (position: Position) => void;
   /** Callback when panel size changes (floating mode) */
   onSizeChange?: (size: { width: number; height: number }) => void;
-
-  // Common options
-  /** Custom CSS class name */
-  className?: string;
-  /** Custom inline styles */
-  style?: React.CSSProperties;
 };
 
 /**
@@ -224,7 +226,7 @@ export type LayerDefinition = {
   /** Maximum height in pixels when resizing (floating mode) */
   maxHeight?: number;
   /** Callback when layer position changes (for draggable layers) */
-  onPositionChange?: (position: { x: number; y: number }) => void;
+  onPositionChange?: (position: Position) => void;
   /** Callback when layer size changes (for resizable layers) */
   onSizeChange?: (size: { width: number; height: number }) => void;
   /** Drawer behavior for mobile-friendly slide-in panels */

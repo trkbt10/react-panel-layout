@@ -3,6 +3,7 @@
  * A draggable preview panel for demonstrating floating UI elements
  */
 import * as React from "react";
+import { useLayerDragHandle } from "../../components/layout/grid/useLayerDragHandle";
 
 export type DataPreviewProps = {
   width?: number;
@@ -91,6 +92,7 @@ const renderDataTab = (): React.ReactNode => {
  */
 export const DataPreview: React.FC<DataPreviewProps> = ({ width = 300, height = 400 }) => {
   const [selectedTab, setSelectedTab] = React.useState<"properties" | "data">("properties");
+  const dragHandleProps = useLayerDragHandle();
 
   const renderContent = (): React.ReactNode => {
     if (selectedTab === "properties") {
@@ -125,6 +127,7 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ width = 300, height = 
           justifyContent: "space-between",
           cursor: "grab",
         }}
+        {...dragHandleProps}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <div style={{ fontSize: "1.125rem" }}>📊</div>

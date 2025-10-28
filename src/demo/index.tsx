@@ -9,6 +9,7 @@ import { Layout } from "./Layout";
 import { PanelLayoutDemo } from "./PanelLayoutDemo";
 import { PanelLayoutPreview } from "./pages/PanelLayout";
 import { FloatingPanelFramePreview } from "./pages/FloatingPanelFrame";
+import { ResizableFloatingPanelsPreview } from "./pages/ResizableFloatingPanelsPreview";
 import { HorizontalDividerPreview } from "./pages/HorizontalDivider";
 import { ResizeHandlePreview } from "./pages/ResizeHandle";
 import "./demo.css";
@@ -87,6 +88,7 @@ function App() {
           <Route path="panel-demo" element={<PanelLayoutDemo />} />
           <Route path="components/panel-layout" element={<PanelLayoutPreview />} />
           <Route path="components/floating-panel-frame" element={<FloatingPanelFramePreview />} />
+          <Route path="components/resizable-floating-panels" element={<ResizableFloatingPanelsPreview />} />
           <Route path="components/horizontal-divider" element={<HorizontalDividerPreview />} />
           <Route path="components/resize-handle" element={<ResizeHandlePreview />} />
           <Route path="about" element={<About />} />

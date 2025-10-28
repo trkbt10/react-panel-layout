@@ -5,6 +5,7 @@ import * as React from "react";
 import { render, cleanup, act, fireEvent } from "@testing-library/react";
 import { GridLayout } from "./GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../panels";
+import { useLayerDragHandle } from "./useLayerDragHandle";
 
 const ensurePointerEvent = () => {
   if (typeof window.PointerEvent === "function") {
@@ -221,7 +222,7 @@ describe("GridLayout", () => {
     expect(contentLayer.style.gridColumn).toBe("2 / 4");
   });
 
-  it("renders four corner resize handles for floating resizable layers", () => {
+  it("renders corner and edge resize handles for floating resizable layers", () => {
     const { container } = render(
       <GridLayout
         config={baseConfig}
@@ -252,8 +253,10 @@ describe("GridLayout", () => {
       />,
     );
 
-    const handles = container.querySelectorAll('[data-resize-corner]');
-    expect(handles).toHaveLength(4);
+    const cornerHandles = container.querySelectorAll('[data-resize-corner]');
+    const edgeHandles = container.querySelectorAll('[data-resize-edge]');
+    expect(cornerHandles).toHaveLength(4);
+    expect(edgeHandles).toHaveLength(4);
   });
 
   it("requires drag gestures to originate from declared handles on floating layers", async () => {
@@ -311,6 +314,69 @@ describe("GridLayout", () => {
     });
   });
 
+  it("supports drag handles provided via the context hook", async () => {
+    const recordedPositions: Array<{ x: number; y: number }> = [];
+
+    const HandleComponent: React.FC = () => {
+      const handleProps = useLayerDragHandle();
+      return (
+        <div>
+          <div data-testid="drag-handle" {...handleProps}>
+            Header
+          </div>
+          <div data-testid="content">Content</div>
+        </div>
+      );
+    };
+
+    const { container } = render(
+      <GridLayout
+        config={baseConfig}
+        layers={[
+          {
+            id: "sidebar",
+            gridArea: "sidebar",
+            component: <div />,
+          },
+          {
+            id: "floating",
+            component: <HandleComponent />,
+            positionMode: "absolute",
+            position: { left: 0, top: 0 },
+            width: 200,
+            height: 160,
+            draggable: true,
+            resizable: true,
+            onPositionChange: (position) => {
+              recordedPositions.push(position);
+            },
+          },
+        ]}
+      />,
+    );
+
+    const handle = container.querySelector('[data-testid="drag-handle"]');
+    if (!handle) {
+      throw new Error("Expected drag handle to be rendered");
+    }
+
+    await act(async () => {
+      fireEvent.pointerDown(handle, { clientX: 0, clientY: 0, pointerId: 1 });
+    });
+
+    await act(async () => {
+      document.dispatchEvent(
+        new window.PointerEvent("pointermove", { clientX: 30, clientY: 45, bubbles: true, pointerId: 1 }),
+      );
+    });
+
+    expect(recordedPositions).not.toHaveLength(0);
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
+    });
+  });
+
   it("resizes floating panels from the bottom-right handle", async () => {
     const { container } = render(
       <GridLayout
@@ -357,6 +423,67 @@ describe("GridLayout", () => {
 
     expect(layerElement.style.width).toBe("240px");
     expect(layerElement.style.height).toBe("210px");
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true }));
+    });
+  });
+
+  it("resizes floating panels from the left edge handle", async () => {
+    const recordedPositions: Array<{ x: number; y: number }> = [];
+
+    const { container } = render(
+      <GridLayout
+        config={baseConfig}
+        layers={[
+          {
+            id: "sidebar",
+            gridArea: "sidebar",
+            component: <div />,
+          },
+          {
+            id: "floating",
+            component: (
+              <div>
+                <div data-drag-handle="true">Title</div>
+                <div>Content</div>
+              </div>
+            ),
+            positionMode: "absolute",
+            position: { left: 0, top: 0 },
+            width: 200,
+            height: 160,
+            draggable: true,
+            resizable: true,
+            onPositionChange: (position) => {
+              recordedPositions.push(position);
+            },
+          },
+        ]}
+      />,
+    );
+
+    const resizeHandle = container.querySelector('[data-resize-edge="left"]');
+    const layerElement = container.querySelector('[data-layer-id="floating"]') as HTMLElement | null;
+
+    if (!resizeHandle || !layerElement) {
+      throw new Error("Expected resizable layer and left edge handle to be rendered");
+    }
+
+    await act(async () => {
+      fireEvent.pointerDown(resizeHandle, { clientX: 0, clientY: 80 });
+    });
+
+    await act(async () => {
+      document.dispatchEvent(new window.PointerEvent("pointermove", { clientX: 40, clientY: 100, bubbles: true }));
+    });
+
+    expect(layerElement.style.width).toBe("160px");
+    expect(layerElement.style.height).toBe("160px");
+    expect(layerElement.style.transform).toBe("translate(40px, 0px)");
+    expect(recordedPositions).not.toHaveLength(0);
+    const lastRecordedPosition = recordedPositions[recordedPositions.length - 1];
+    expect(lastRecordedPosition).toEqual({ x: 40, y: 0 });
 
     await act(async () => {
       document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true }));
