@@ -153,10 +153,9 @@ export const IDELayout = () => {
     id: "data-preview",
     component: <DataPreview width={300} height={400} />,
     floating: {
-      bounds: {
-        position: { left: 720, top: 10 },
-        size: { width: 300, height: 400 },
-      },
+      position: { left: 720, top: 10 },
+      width: 300,
+      height: 400,
       draggable: true,
       zIndex: 20,
     },
@@ -229,10 +228,9 @@ const layers: LayerDefinition[] = [
     id: "data-preview",
     component: <DataPreview />,
     floating: {
-      bounds: {
-        position: { left: 720, top: 10 },
-        size: { width: 300, height: 400 },
-      },
+      position: { left: 720, top: 10 },
+      width: 300,
+      height: 400,
       draggable: true,
       zIndex: 20,
     },

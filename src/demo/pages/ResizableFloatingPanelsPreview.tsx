@@ -53,10 +53,9 @@ const layers = [
     id: "floating",
     component: <MetricsPanel />,
     floating: {
-      bounds: {
-        position: { left: 48, top: 48 },
-        size: { width: 320, height: 240 },
-      },
+      position: { left: 48, top: 48 },
+      width: 320,
+      height: 240,
       constraints: { minWidth: 240, minHeight: 180 },
       resizable: true,
       draggable: true,
@@ -175,10 +174,9 @@ const FloatingWorkspaceDemo: React.FC = () => {
       id: "metrics-panel",
       component: <MetricsPanel />,
       floating: {
-        bounds: {
-          position: { left: 48, top: 48 },
-          size: primarySize,
-        },
+        position: { left: 48, top: 48 },
+        width: primarySize.width,
+        height: primarySize.height,
         constraints: { minWidth: 240, minHeight: 180, maxWidth: 560, maxHeight: 380 },
         draggable: true,
         resizable: true,
@@ -190,10 +188,9 @@ const FloatingWorkspaceDemo: React.FC = () => {
       id: "notes-panel",
       component: <NotesPanel />,
       floating: {
-        bounds: {
-          position: { left: 420, top: 128 },
-          size: notesSize,
-        },
+        position: { left: 420, top: 128 },
+        width: notesSize.width,
+        height: notesSize.height,
         constraints: { minWidth: 220, minHeight: 180, maxWidth: 480, maxHeight: 360 },
         draggable: true,
         resizable: true,

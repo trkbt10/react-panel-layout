@@ -2,7 +2,7 @@
  * @file Types for the legacy/editor panels (non-grid) configuration.
  */
 import * as React from "react";
-import type { Position, FloatingWindowConfig } from "../window/types";
+import type { Position, FloatingWindowConfig } from "../types";
 
 // Panel position - either a named column position or floating coordinates
 export type PanelPosition = "left" | "right" | Position;
@@ -26,4 +26,3 @@ export type PanelDefinition = {
 
 // Configuration map for editor panels
 export type EditorPanelsConfig = Record<string, PanelDefinition>;
-

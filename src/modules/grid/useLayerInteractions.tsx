@@ -6,7 +6,7 @@ import { useDocumentPointerEvents } from "../../hooks/useDocumentPointerEvents";
 import { useEffectEvent } from "../../hooks/useEffectEvent";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
 import type { LayerDefinition } from "./types";
-import type { WindowPosition, WindowSize } from "../window/types";
+import type { WindowPosition, WindowSize } from "../types";
 import { buildLayerStyleObject } from "./layerStyles";
 import styles from "./useLayerInteractions.module.css";
 import type { GridLayerHandleProps, GridLayoutContextValue } from "./GridLayoutContext";
@@ -110,9 +110,9 @@ const resolveDragAnchor = (layer: LayerDefinition): { left: number; top: number 
   if (!floating) {
     throw new Error(`Floating layer "${layer.id}" is missing floating configuration required for dragging.`);
   }
-  const position = floating.bounds.position;
+  const position = floating.position;
   if (!position) {
-    throw new Error(`Floating layer "${layer.id}" must define bounds.position with left and top values.`);
+    throw new Error(`Floating layer "${layer.id}" must define position with left and top values.`);
   }
   return {
     left: ensureNumericOffset(position.left, "left", layer.id),
@@ -235,9 +235,12 @@ const getLayerSizeFromDefinition = (layer: LayerDefinition): LayerSize | null =>
   if (!floating) {
     return null;
   }
-  const size = floating.bounds.size;
+  const size =
+    typeof floating.width === "number" && typeof floating.height === "number"
+      ? { width: floating.width, height: floating.height }
+      : undefined;
   if (!size) {
-    throw new Error(`Floating layer "${layer.id}" must define bounds.size when resizable or draggable.`);
+    throw new Error(`Floating layer "${layer.id}" must define width and height when resizable or draggable.`);
   }
   return {
     width: size.width,

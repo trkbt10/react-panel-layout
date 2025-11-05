@@ -2,7 +2,7 @@
  * @file Types for the grid-based layout system.
  */
 import * as React from "react";
-import type { DrawerBehavior, FloatingWindowConfig, WindowPosition } from "../window/types";
+import type { DrawerBehavior, FloatingWindowConfig, WindowPosition } from "../types";
 
 // Grid track definition with optional resize capability
 export type GridTrack = {
@@ -36,15 +36,15 @@ export type LayerDefinition = {
   gridColumn?: string;
 
   // Absolute/Fixed/Relative positioning
+  /**
+   * Positioning mode: when omitted, derived automatically.
+   * If `floating` is present, behaves as absolute (embedded) or relative (popup).
+   */
   positionMode?: LayerPositionMode;
-  position?: WindowPosition | {
-    top?: number | string;
-    right?: number | string;
-    bottom?: number | string;
-    left?: number | string;
-  };
+  /** Absolute/fixed offsets when positionMode !== 'grid'. */
+  position?: WindowPosition;
 
-  // Stacking and dimensions
+  // Stacking and dimensions (applies when not using floating.bounds)
   zIndex?: number;
   width?: string | number;
   height?: string | number;
@@ -63,4 +63,3 @@ export type PanelLayoutProps = {
   config: PanelLayoutConfig;
   layers: LayerDefinition[];
 };
-

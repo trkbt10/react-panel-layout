@@ -4,7 +4,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import type { LayerDefinition } from "./types";
-import type { PopupWindowOptions, WindowBounds, WindowPosition } from "../window/types";
+import type { PopupWindowOptions, WindowPosition, WindowBounds } from "../types";
 import { LayerInstanceProvider } from "./LayerInstanceContext";
 
 const ensureNumericOffset = (value: number | string | undefined, key: keyof WindowPosition, layerId: string): number => {
@@ -14,10 +14,9 @@ const ensureNumericOffset = (value: number | string | undefined, key: keyof Wind
   throw new Error(`Popup layer "${layerId}" requires a numeric "${key}" value.`);
 };
 
-const resolvePopupAnchor = (bounds: WindowBounds, layerId: string): { left: number; top: number } => {
-  const position = bounds.position;
+const resolvePopupAnchor = (position: WindowPosition | undefined, layerId: string): { left: number; top: number } => {
   if (!position) {
-    throw new Error(`Popup layer "${layerId}" must define bounds.position.`);
+    throw new Error(`Popup layer "${layerId}" must define position (left/top).`);
   }
   return {
     left: ensureNumericOffset(position.left, "left", layerId),
@@ -38,14 +37,19 @@ const booleanFeature = (value: boolean | undefined): string | undefined => {
 
 const buildWindowFeatures = (
   layerId: string,
-  bounds: WindowBounds,
+  position: WindowPosition | undefined,
+  width: number | string | undefined,
+  height: number | string | undefined,
   options: PopupWindowOptions | undefined,
 ): string => {
   const features: Record<string, string> = {};
-  const anchor = resolvePopupAnchor(bounds, layerId);
+  const anchor = resolvePopupAnchor(position, layerId);
 
-  features.width = numericFeature(bounds.size.width);
-  features.height = numericFeature(bounds.size.height);
+  if (typeof width !== "number" || typeof height !== "number") {
+    throw new Error(`Popup layer "${layerId}" requires numeric width/height.`);
+  }
+  features.width = numericFeature(width);
+  features.height = numericFeature(height);
   features.left = numericFeature(anchor.left);
   features.top = numericFeature(anchor.top);
 
@@ -83,10 +87,19 @@ const buildWindowFeatures = (
     .join(",");
 };
 
-const applyBoundsToWindow = (popupWindow: Window, layerId: string, bounds: WindowBounds) => {
-  const anchor = resolvePopupAnchor(bounds, layerId);
+const applyBoundsToWindow = (
+  popupWindow: Window,
+  layerId: string,
+  position: WindowPosition | undefined,
+  width: number | string | undefined,
+  height: number | string | undefined,
+) => {
+  const anchor = resolvePopupAnchor(position, layerId);
+  if (typeof width !== "number" || typeof height !== "number") {
+    throw new Error(`Popup layer "${layerId}" requires numeric width/height.`);
+  }
   popupWindow.moveTo(Math.round(anchor.left), Math.round(anchor.top));
-  popupWindow.resizeTo(Math.round(bounds.size.width), Math.round(bounds.size.height));
+  popupWindow.resizeTo(Math.round(width), Math.round(height));
 };
 
 type PopupLayerPortalProps = {
@@ -112,10 +125,12 @@ export const PopupLayerPortal: React.FC<PopupLayerPortalProps> = ({ layer }) => 
       return;
     }
 
-    const bounds = floating.bounds;
-    const features = buildWindowFeatures(layer.id, bounds, floating.popup);
+    const features = buildWindowFeatures(layer.id, floating.position, floating.width, floating.height, floating.popup);
     const windowName = floating.popup?.name ?? layer.id;
-    const createdWindow = resolvePopupWindow(windowName, features, bounds, floating.popup);
+    const createdWindow = resolvePopupWindow(windowName, features, {
+      position: floating.position,
+      size: { width: floating.width as number, height: floating.height as number },
+    }, floating.popup);
 
     if (!createdWindow) {
       throw new Error(`Failed to open popup window for layer "${layer.id}".`);
@@ -139,7 +154,7 @@ export const PopupLayerPortal: React.FC<PopupLayerPortalProps> = ({ layer }) => 
     containerRef.current = mountNode;
     setIsMounted(true);
 
-    applyBoundsToWindow(openedWindow, layer.id, bounds);
+    applyBoundsToWindow(openedWindow, layer.id, floating.position, floating.width, floating.height);
 
     const handleBeforeUnload = () => {
       popupWindowRef.current = null;
@@ -175,8 +190,8 @@ export const PopupLayerPortal: React.FC<PopupLayerPortalProps> = ({ layer }) => 
     if (!popupWindow) {
       return;
     }
-    applyBoundsToWindow(popupWindow, layer.id, floating.bounds);
-  }, [floating.bounds.position?.left, floating.bounds.position?.top, floating.bounds.size.height, floating.bounds.size.width, layer.id]);
+    applyBoundsToWindow(popupWindow, layer.id, floating.position, floating.width, floating.height);
+  }, [floating.position?.left, floating.position?.top, floating.height, floating.width, layer.id]);
 
   if (!isMounted || !containerRef.current) {
     return null;

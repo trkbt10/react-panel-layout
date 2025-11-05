@@ -20,7 +20,7 @@ export type {
   FloatingWindowMode,
   FloatingWindowConfig,
   DrawerBehavior,
-} from "./modules/window/types";
+} from "./modules/types";
 
 // ============================================================================
 // Main Layout Component

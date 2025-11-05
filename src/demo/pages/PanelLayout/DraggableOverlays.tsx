@@ -88,10 +88,9 @@ export const DraggableOverlays = () => {
         </DraggablePanel>
       ),
       floating: {
-        bounds: {
-          position: { left: 20, top: 20 },
-          size: { width: 200, height: 250 },
-        },
+        position: { left: 20, top: 20 },
+        width: 200,
+        height: 250,
         draggable: true,
         zIndex: 10,
       },
@@ -121,10 +120,9 @@ export const DraggableOverlays = () => {
         </DraggablePanel>
       ),
       floating: {
-        bounds: {
-          position: { left: 260, top: 20 },
-          size: { width: 220, height: 200 },
-        },
+        position: { left: 260, top: 20 },
+        width: 220,
+        height: 200,
         draggable: true,
         zIndex: 11,
       },
@@ -146,10 +144,9 @@ export const DraggableOverlays = () => {
         </DraggablePanel>
       ),
       floating: {
-        bounds: {
-          position: { left: 20, top: 300 },
-          size: { width: 250, height: 180 },
-        },
+        position: { left: 20, top: 300 },
+        width: 250,
+        height: 180,
         draggable: true,
         zIndex: 12,
       },

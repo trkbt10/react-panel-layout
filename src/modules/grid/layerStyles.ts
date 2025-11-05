@@ -3,7 +3,7 @@
  */
 import type { CSSProperties } from "react";
 import type { LayerDefinition } from "./types";
-import type { WindowPosition } from "../window/types";
+import type { WindowPosition } from "../types";
 
 const resolvePositionMode = (layer: LayerDefinition): LayerDefinition["positionMode"] => {
   if (layer.positionMode) {
@@ -72,7 +72,7 @@ const getPointerEventsStyle = (layer: LayerDefinition, mode: LayerDefinition["po
 
 const resolveEffectivePosition = (layer: LayerDefinition): WindowPosition | LayerDefinition["position"] | undefined => {
   if (layer.floating) {
-    return layer.floating.bounds.position;
+    return layer.floating.position;
   }
   return layer.position;
 };
@@ -85,8 +85,8 @@ const resolveEffectiveSize = (
 } => {
   if (layer.floating) {
     return {
-      width: layer.floating.bounds.size.width,
-      height: layer.floating.bounds.size.height,
+      width: layer.floating.width,
+      height: layer.floating.height,
     };
   }
   return {

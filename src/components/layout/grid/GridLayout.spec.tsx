@@ -5,7 +5,7 @@ import * as React from "react";
 import { render, cleanup, act, fireEvent } from "@testing-library/react";
 import { GridLayout } from "./GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../modules/grid/types";
-import type { WindowPosition, WindowSize } from "../../../modules/window/types";
+import type { WindowPosition, WindowSize } from "../../../modules/types";
 import { useLayerDragHandle } from "../../../modules/grid/useLayerDragHandle";
 
 const ensurePointerEvent = () => {
@@ -95,10 +95,9 @@ describe("GridLayout", () => {
           </div>
         ),
         floating: {
-          bounds: {
-            position: { left: 0, top: 0 },
-            size: { width: 180, height: 180 },
-          },
+          position: { left: 0, top: 0 },
+          width: 180,
+          height: 180,
           draggable: true,
           onMove,
         },
@@ -253,10 +252,9 @@ describe("GridLayout", () => {
               </div>
             ),
             floating: {
-              bounds: {
-                position: { left: 0, top: 0 },
-                size: { width: 200, height: 160 },
-              },
+              position: { left: 0, top: 0 },
+              width: 200,
+              height: 160,
               draggable: true,
               resizable: true,
             },
@@ -293,10 +291,9 @@ describe("GridLayout", () => {
               </div>
             ),
             floating: {
-              bounds: {
-                position: { left: 0, top: 0 },
-                size: { width: 200, height: 160 },
-              },
+              position: { left: 0, top: 0 },
+              width: 200,
+              height: 160,
               draggable: true,
               resizable: true,
               onMove: (position) => {
@@ -356,10 +353,9 @@ describe("GridLayout", () => {
             id: "floating",
             component: <HandleComponent />,
             floating: {
-              bounds: {
-                position: { left: 0, top: 0 },
-                size: { width: 200, height: 160 },
-              },
+              position: { left: 0, top: 0 },
+              width: 200,
+              height: 160,
               draggable: true,
               resizable: true,
               onMove: (position) => {
@@ -413,10 +409,9 @@ describe("GridLayout", () => {
               </div>
             ),
             floating: {
-              bounds: {
-                position: { left: 0, top: 0 },
-                size: { width: 200, height: 160 },
-              },
+              position: { left: 0, top: 0 },
+              width: 200,
+              height: 160,
               draggable: true,
               resizable: true,
               onResize: (size) => {
@@ -474,10 +469,9 @@ describe("GridLayout", () => {
               </div>
             ),
             floating: {
-              bounds: {
-                position: { left: 0, top: 0 },
-                size: { width: 200, height: 160 },
-              },
+              position: { left: 0, top: 0 },
+              width: 200,
+              height: 160,
               draggable: true,
               resizable: true,
               onMove: (position) => {
@@ -546,10 +540,9 @@ describe("GridLayout", () => {
               component: <div>Popup Content</div>,
               floating: {
                 mode: "popup",
-                bounds: {
-                  position: { left: 120, top: 80 },
-                  size: { width: 320, height: 260 },
-                },
+                position: { left: 120, top: 80 },
+                width: 320,
+                height: 260,
                 popup: {
                   name: "popup-layer",
                   createWindow: (config) => {

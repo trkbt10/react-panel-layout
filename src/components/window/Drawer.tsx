@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import styles from "./Drawer.module.css";
-import type { DrawerBehavior } from "../../modules/window/types";
+import type { DrawerBehavior, WindowPosition } from "../../modules/types";
 
 export type DrawerProps = {
   id: string;
@@ -20,18 +20,14 @@ export type DrawerProps = {
   height?: string | number;
 };
 
-type DrawerBackdropProps = {
-  backdropOpacity: number;
-  dismissible: boolean;
-  onClose: () => void;
-};
+type DrawerBackdropProps = { style?: React.CSSProperties; dismissible: boolean; onClose: () => void };
 
-const DrawerBackdrop: React.FC<DrawerBackdropProps> = React.memo(({ backdropOpacity, dismissible, onClose }) => {
+const DrawerBackdrop: React.FC<DrawerBackdropProps> = React.memo(({ style, dismissible, onClose }) => {
   const handleClick = dismissible ? onClose : undefined;
   return (
     <div
       className={styles.drawerBackdrop}
-      style={{ backgroundColor: `rgba(0, 0, 0, ${backdropOpacity})` }}
+      style={style}
       onClick={handleClick}
     />
   );
@@ -88,7 +84,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   width,
   height,
 }) => {
-  const { placement, showBackdrop = true, backdropOpacity = 0.5, size, dismissible = true, header } = config;
+  const { dismissible = true, header, zIndex: configZ, position, backdropStyle } = config;
 
   const drawerStyle = React.useMemo((): React.CSSProperties => {
     const style: React.CSSProperties = {
@@ -97,6 +93,8 @@ export const Drawer: React.FC<DrawerProps> = ({
 
     if (zIndex !== undefined) {
       style.zIndex = zIndex;
+    } else if (configZ !== undefined) {
+      style.zIndex = configZ;
     }
 
     if (width !== undefined) {
@@ -106,16 +104,8 @@ export const Drawer: React.FC<DrawerProps> = ({
       style.height = typeof height === "number" ? `${height}px` : height;
     }
 
-    if (size !== undefined) {
-      if (placement === "top" || placement === "bottom") {
-        style.height = typeof size === "number" ? `${size}px` : size;
-      } else {
-        style.width = typeof size === "number" ? `${size}px` : size;
-      }
-    }
-
     return style;
-  }, [styleProp, zIndex, width, height, size, placement]);
+  }, [styleProp, zIndex, configZ, width, height]);
 
   const finalClassName = className ? `${styles.drawer} ${className}` : styles.drawer;
   const contentClassName = header ? styles.drawerContent : undefined;
@@ -128,21 +118,40 @@ export const Drawer: React.FC<DrawerProps> = ({
   };
 
   const renderBackdrop = () => {
-    if (!showBackdrop) {
+    if (!backdropStyle) {
       return null;
     }
     return (
       <React.Activity mode={isOpen ? "visible" : "hidden"}>
-        <DrawerBackdrop backdropOpacity={backdropOpacity} dismissible={dismissible} onClose={onClose} />
+        <DrawerBackdrop style={backdropStyle} dismissible={dismissible} onClose={onClose} />
       </React.Activity>
     );
   };
+
+  const resolvePlacement = React.useCallback((pos?: WindowPosition): "left" | "right" | "top" | "bottom" => {
+    if (!pos) {
+      return "right";
+    }
+    if (pos.left !== undefined) {
+      return "left";
+    }
+    if (pos.right !== undefined) {
+      return "right";
+    }
+    if (pos.top !== undefined) {
+      return "top";
+    }
+    if (pos.bottom !== undefined) {
+      return "bottom";
+    }
+    return "right";
+  }, []);
 
   return (
     <>
       {renderBackdrop()}
       <React.Activity mode={isOpen ? "visible" : "hidden"}>
-        <div className={finalClassName} data-layer-id={id} data-placement={placement} style={drawerStyle}>
+        <div className={finalClassName} data-layer-id={id} data-placement={resolvePlacement(position)} style={drawerStyle}>
           {renderHeader()}
           <div className={contentClassName}>{children}</div>
         </div>
