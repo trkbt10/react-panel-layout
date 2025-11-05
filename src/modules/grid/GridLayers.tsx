@@ -6,7 +6,7 @@ import type { LayerDefinition } from "./types";
 import { useGridLayoutContext } from "./GridLayoutContext";
 import { LayerInstanceProvider } from "./LayerInstanceContext";
 import { PopupLayerPortal } from "./PopupLayerPortal";
-import styles from "./GridLayout.module.css";
+import styles from "../../components/layout/grid/GridLayout.module.css";
 
 type GridLayersProps = {
   layers: LayerDefinition[];

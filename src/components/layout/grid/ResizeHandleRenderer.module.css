@@ -1,0 +1,16 @@
+.resizeHandleWrapperVertical {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  pointer-events: auto;
+}
+
+.resizeHandleWrapperHorizontal {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  pointer-events: auto;
+}
+

@@ -2,9 +2,9 @@
  * @file Internal renderer for grid resize handles.
  */
 import * as React from "react";
-import { ResizeHandle } from "../../components/resizer/ResizeHandle";
-import styles from "./GridLayout.module.css";
-import type { TrackDirection } from "./trackTemplates";
+import { ResizeHandle } from "../../resizer/ResizeHandle";
+import styles from "./ResizeHandleRenderer.module.css";
+import type { TrackDirection } from "../../../modules/grid/trackTemplates";
 
 type ResizeHandleRendererProps = {
   direction: TrackDirection;
@@ -75,3 +75,4 @@ export const ResizeHandleRenderer: React.FC<ResizeHandleRendererProps> = ({
     </div>
   );
 };
+

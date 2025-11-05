@@ -8,7 +8,7 @@ import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect
 import type { LayerDefinition } from "./types";
 import type { WindowPosition, WindowSize } from "../window/types";
 import { buildLayerStyleObject } from "./layerStyles";
-import styles from "./GridLayout.module.css";
+import styles from "./useLayerInteractions.module.css";
 import type { GridLayerHandleProps, GridLayoutContextValue } from "./GridLayoutContext";
 
 type LayerSize = {
@@ -272,7 +272,7 @@ const createResizeHandleElements = (
 ): React.ReactNode[] => {
   return RESIZE_HANDLE_CONFIGS.map((config) => {
     const variantClass = config.variant === "corner" ? styles.cornerHandle : styles.edgeHandle;
-    const classNames = `${styles.resizeHandle} ${variantClass} ${styles[config.className]}`;
+    const classNames = `${styles.resizeHandle} ${variantClass}`;
     const datasetProps =
       config.variant === "corner" ? { "data-resize-corner": config.key } : { "data-resize-edge": config.key };
     return (

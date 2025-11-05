@@ -1,0 +1,85 @@
+.resizeHandle {
+  position: absolute;
+  pointer-events: auto;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+}
+
+.cornerHandle {
+  width: var(--grid-layer-corner-hit-size, 14px);
+  height: var(--grid-layer-corner-hit-size, 14px);
+  background: transparent;
+  border: none;
+  z-index: 2;
+}
+
+/* Corner handle placement via data attribute */
+.cornerHandle[data-resize-corner="top-left"] {
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  cursor: nwse-resize;
+}
+
+.cornerHandle[data-resize-corner="top-right"] {
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  cursor: nesw-resize;
+}
+
+.cornerHandle[data-resize-corner="bottom-left"] {
+  bottom: 0;
+  left: 0;
+  transform: translate(-50%, 50%);
+  cursor: nesw-resize;
+}
+
+.cornerHandle[data-resize-corner="bottom-right"] {
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+  cursor: nwse-resize;
+}
+
+/* Edge handle placement via data attribute */
+.edgeHandle[data-resize-edge="left"] {
+  top: var(--grid-layer-edge-vertical-offset, 14px);
+  bottom: var(--grid-layer-edge-vertical-offset, 14px);
+  left: 0;
+  width: var(--grid-layer-edge-hit-thickness, 12px);
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  z-index: 1;
+}
+
+.edgeHandle[data-resize-edge="right"] {
+  top: var(--grid-layer-edge-vertical-offset, 14px);
+  bottom: var(--grid-layer-edge-vertical-offset, 14px);
+  right: 0;
+  width: var(--grid-layer-edge-hit-thickness, 12px);
+  transform: translateX(50%);
+  cursor: ew-resize;
+  z-index: 1;
+}
+
+.edgeHandle[data-resize-edge="top"] {
+  left: var(--grid-layer-edge-horizontal-offset, 14px);
+  right: var(--grid-layer-edge-horizontal-offset, 14px);
+  top: 0;
+  height: var(--grid-layer-edge-hit-thickness, 12px);
+  transform: translateY(-50%);
+  cursor: ns-resize;
+  z-index: 1;
+}
+
+.edgeHandle[data-resize-edge="bottom"] {
+  left: var(--grid-layer-edge-horizontal-offset, 14px);
+  right: var(--grid-layer-edge-horizontal-offset, 14px);
+  bottom: 0;
+  height: var(--grid-layer-edge-hit-thickness, 12px);
+  transform: translateY(50%);
+  cursor: ns-resize;
+  z-index: 1;
+}

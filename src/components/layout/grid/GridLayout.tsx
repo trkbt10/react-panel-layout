@@ -5,10 +5,10 @@ import * as React from "react";
 import { useIntersectionObserver } from "../../../hooks/useIntersectionObserver";
 import type { LayerDefinition, PanelLayoutConfig } from "../../../modules/grid/types";
 import { DrawerLayers } from "../../../components/window/DrawerLayers";
-import styles from "../../../modules/grid/GridLayout.module.css";
+import styles from "./GridLayout.module.css";
 import { GridLayoutProvider } from "../../../modules/grid/GridLayoutContext";
 import { GridLayers } from "../../../modules/grid/GridLayers";
-import { ResizeHandleRenderer } from "../../../modules/grid/ResizeHandleRenderer";
+import { ResizeHandleRenderer } from "./ResizeHandleRenderer";
 import { useGridPlacements } from "../../../modules/grid/useGridPlacements";
 import { useGridTracks } from "../../../modules/grid/useGridTracks";
 import { useLayerInteractions } from "../../../modules/grid/useLayerInteractions";
@@ -37,9 +37,9 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
         ref={gridRef}
         className={styles.gridLayout}
         style={gridStyle}
-        data-dragging={draggingLayerId ? "true" : undefined}
-        data-resizing={resizingLayerId ? "true" : undefined}
-        data-visible={isIntersecting ? "true" : "false"}
+        data-dragging={Boolean(draggingLayerId)}
+        data-resizing={Boolean(resizingLayerId)}
+        data-visible={isIntersecting}
       >
         <GridLayers layers={regularLayers} />
 
