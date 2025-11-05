@@ -9,7 +9,7 @@ import type { LayerDefinition } from "../../panel-system/types";
 import type { WindowPosition, WindowSize } from "../types";
 import { buildLayerStyleObject } from "./layerStyles";
 import type { GridLayerHandleProps, GridLayoutContextValue } from "./GridLayoutContext";
-import { ResizeHandles, type ResizeHandleConfig } from "./ResizeHandles";
+import { ResizeHandles, type ResizeHandleConfig } from "../../components/layout/grid/ResizeHandles";
 
 type LayerSize = {
   width: number;

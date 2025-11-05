@@ -2,7 +2,7 @@
  * @file Presentational resize handles for floating layers (corner + edge).
  */
 import * as React from "react";
-import styles from "./useLayerInteractions.module.css";
+import styles from "./ResizeHandles.module.css";
 
 export type HorizontalEdge = "left" | "right";
 export type VerticalEdge = "top" | "bottom";
@@ -13,31 +13,23 @@ export type ResizeHandleConfig =
       variant: "corner";
       horizontal: HorizontalEdge;
       vertical: VerticalEdge;
-      className: keyof typeof styles;
     }
   | {
-    key: "left" | "right" | "top" | "bottom";
-    variant: "edge";
-    horizontal?: HorizontalEdge;
-    vertical?: VerticalEdge;
-    className: keyof typeof styles;
-  };
+      key: "left" | "right" | "top" | "bottom";
+      variant: "edge";
+      horizontal?: HorizontalEdge;
+      vertical?: VerticalEdge;
+    };
 
-export const RESIZE_HANDLE_CONFIGS: ReadonlyArray<ResizeHandleConfig> = [
-  { key: "top-left", variant: "corner", horizontal: "left", vertical: "top", className: "cornerHandleTopLeft" },
-  { key: "top-right", variant: "corner", horizontal: "right", vertical: "top", className: "cornerHandleTopRight" },
-  { key: "bottom-left", variant: "corner", horizontal: "left", vertical: "bottom", className: "cornerHandleBottomLeft" },
-  {
-    key: "bottom-right",
-    variant: "corner",
-    horizontal: "right",
-    vertical: "bottom",
-    className: "cornerHandleBottomRight",
-  },
-  { key: "left", variant: "edge", horizontal: "left", className: "edgeHandleLeft" },
-  { key: "right", variant: "edge", horizontal: "right", className: "edgeHandleRight" },
-  { key: "top", variant: "edge", vertical: "top", className: "edgeHandleTop" },
-  { key: "bottom", variant: "edge", vertical: "bottom", className: "edgeHandleBottom" },
+const RESIZE_HANDLE_CONFIGS: ReadonlyArray<ResizeHandleConfig> = [
+  { key: "top-left", variant: "corner", horizontal: "left", vertical: "top" },
+  { key: "top-right", variant: "corner", horizontal: "right", vertical: "top" },
+  { key: "bottom-left", variant: "corner", horizontal: "left", vertical: "bottom" },
+  { key: "bottom-right", variant: "corner", horizontal: "right", vertical: "bottom" },
+  { key: "left", variant: "edge", horizontal: "left" },
+  { key: "right", variant: "edge", horizontal: "right" },
+  { key: "top", variant: "edge", vertical: "top" },
+  { key: "bottom", variant: "edge", vertical: "bottom" },
 ];
 
 export type ResizeHandlesProps = {
