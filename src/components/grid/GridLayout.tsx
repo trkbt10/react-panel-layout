@@ -3,12 +3,11 @@
  */
 import * as React from "react";
 import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
-import type { LayerDefinition, PanelLayoutConfig } from "../../panel-system/types";
+import type { LayerDefinition, PanelLayoutConfig } from "../../types";
 import { DrawerLayers } from "../window/DrawerLayers";
 import styles from "./GridLayout.module.css";
 import { GridLayerList } from "./GridLayerList";
 import { GridTrackResizeHandle } from "./GridTrackResizeHandle";
-import { createTrackKey } from "../../modules/grid/trackTemplates";
 import { PanelSystemProvider, usePanelSystem } from "../../PanelSystemContext";
 import { useGridPlacements } from "../../modules/grid/useGridPlacements";
 import { useGridTracks } from "../../modules/grid/useGridTracks";
@@ -60,7 +59,7 @@ const GridLayoutInner: React.FC<{
 
         {columnHandles.map(({ trackIndex, align }) => (
           <GridTrackResizeHandle
-            key={`${createTrackKey("col", trackIndex)}:${align}`}
+            key={`col-${trackIndex}:${align}`}
             direction="col"
             trackIndex={trackIndex}
             align={align}
@@ -71,7 +70,7 @@ const GridLayoutInner: React.FC<{
 
         {rowHandles.map(({ trackIndex, align }) => (
           <GridTrackResizeHandle
-            key={`${createTrackKey("row", trackIndex)}:${align}`}
+            key={`row-${trackIndex}:${align}`}
             direction="row"
             trackIndex={trackIndex}
             align={align}

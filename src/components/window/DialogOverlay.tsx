@@ -2,7 +2,7 @@
  * @file Dialog-based overlay component with automatic positioning
  */
 import * as React from "react";
-import type { Position } from "../../modules/types";
+import type { Position } from "../../types";
 import { calculateContextMenuPosition, getViewportInfo } from "../../utils/dialogUtils";
 import { ensureDialogPolyfill } from "../../utils/polyfills/createDialogPolyfill";
 import { useEffectEvent } from "../../hooks/useEffectEvent";

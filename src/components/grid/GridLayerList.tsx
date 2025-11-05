@@ -2,11 +2,13 @@
  * @file Layer list rendering inside the grid layout.
  */
 import * as React from "react";
-import type { LayerDefinition } from "../../panel-system/types";
+import type { LayerDefinition } from "../../types";
 import { useGridLayoutContext } from "../../modules/grid/GridLayoutContext";
 import { LayerInstanceProvider } from "../../modules/grid/LayerInstanceContext";
-import { PopupLayerPortal } from "../../modules/window/PopupLayerPortal";
+import { PopupLayerPortal } from "../window/PopupLayerPortal";
 import styles from "./GridLayerList.module.css";
+import { GridLayerResizeHandles } from "./GridLayerResizeHandles";
+import type { ResizeHandleConfig } from "../../modules/grid/GridLayoutContext";
 
 type GridLayerListProps = {
   layers: LayerDefinition[];
@@ -14,6 +16,20 @@ type GridLayerListProps = {
 
 export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
   const { handleLayerPointerDown, getLayerRenderState } = useGridLayoutContext();
+
+  const renderResizeHandles = React.useCallback(
+    (
+      show: boolean,
+      onPointerDown: (config: ResizeHandleConfig, event: React.PointerEvent<HTMLDivElement>) => void,
+      layerId: string,
+    ): React.ReactNode => {
+      if (!show) {
+        return null;
+      }
+      return <GridLayerResizeHandles layerId={layerId} onPointerDown={onPointerDown} />;
+    },
+    [],
+  );
 
   return (
     <>
@@ -23,7 +39,7 @@ export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
           return <PopupLayerPortal key={layer.id} layer={layer} />;
         }
 
-        const { style, isResizable, isResizing, resizeHandles } = getLayerRenderState(layer);
+        const { style, isResizable, isResizing, onResizeHandlePointerDown } = getLayerRenderState(layer);
         const gridPlacementStyle: React.CSSProperties = {};
         if (layer.gridArea) {
           gridPlacementStyle.gridArea = layer.gridArea;
@@ -47,7 +63,7 @@ export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
             onPointerDown={handleLayerPointerDown}
           >
             <LayerInstanceProvider layerId={layer.id}>{layer.component}</LayerInstanceProvider>
-            {resizeHandles}
+            {renderResizeHandles(isResizable, (config, event) => onResizeHandlePointerDown(config, event), layer.id)}
           </div>
         );
       })}

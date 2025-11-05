@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { GridLayout } from "../../components/grid/GridLayout";
-import type { LayerDefinition, PanelLayoutConfig } from "../../panel-system/types";
+import type { LayerDefinition, PanelLayoutConfig } from "../../types";
 import {
   FloatingPanelFrame,
   FloatingPanelHeader,

@@ -3,9 +3,8 @@
  */
 import * as React from "react";
 import { createPortal } from "react-dom";
-import type { LayerDefinition } from "../../panel-system/types";
-import type { PopupWindowOptions, WindowPosition, WindowBounds } from "../types";
-import { LayerInstanceProvider } from "../grid/LayerInstanceContext";
+import type { LayerDefinition, PopupWindowOptions, WindowPosition, WindowBounds } from "../../types";
+import { LayerInstanceProvider } from "../../modules/grid/LayerInstanceContext";
 
 const ensureNumericOffset = (value: number | string | undefined, key: keyof WindowPosition, layerId: string): number => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -204,6 +203,7 @@ export const PopupLayerPortal: React.FC<PopupLayerPortalProps> = ({ layer }) => 
 
   return createPortal(<LayerInstanceProvider layerId={layer.id}>{layer.component}</LayerInstanceProvider>, containerRef.current);
 };
+
 const resolvePopupWindow = (
   windowName: string,
   features: string,

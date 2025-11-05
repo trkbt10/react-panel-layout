@@ -4,7 +4,7 @@
 import * as React from "react";
 import { Outlet, Link, useLocation } from "react-router";
 import { GridLayout } from "../components/grid/GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../panel-system/types";
+import type { PanelLayoutConfig, LayerDefinition } from "../types";
 import styles from "./Layout.module.css";
 
 type NavGroupChild = {

@@ -5,11 +5,11 @@ import * as React from "react";
 import { useDocumentPointerEvents } from "../../hooks/useDocumentPointerEvents";
 import { useEffectEvent } from "../../hooks/useEffectEvent";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
-import type { LayerDefinition } from "../../panel-system/types";
-import type { WindowPosition, WindowSize } from "../types";
-import { buildLayerStyleObject } from "./layerStyles";
-import type { GridLayerHandleProps, GridLayoutContextValue } from "./GridLayoutContext";
-import { GridLayerResizeHandles, type ResizeHandleConfig } from "../../components/grid/GridLayerResizeHandles";
+import type { LayerDefinition, WindowPosition, WindowSize } from "../../types";
+// Inline style computation previously in layerStyles to keep hook-local logic
+import type { CSSProperties } from "react";
+import type { GridLayerHandleProps, GridLayoutContextValue, ResizeHandleConfig } from "./GridLayoutContext";
+// UI components should not be imported here; expose pointer handlers instead.
 
 type LayerSize = {
   width: number;
@@ -48,6 +48,113 @@ type ResizeState = {
   minHeight?: number;
   maxHeight?: number;
   target: HTMLElement;
+};
+
+// ------------------------------------------------------------------------------------------
+// Inline layer style computation (was layerStyles.ts)
+// ------------------------------------------------------------------------------------------
+const resolvePositionMode = (layer: LayerDefinition): LayerDefinition["positionMode"] => {
+  if (layer.positionMode) {
+    return layer.positionMode;
+  }
+  if (layer.floating) {
+    const floatingMode = layer.floating.mode ?? "embedded";
+    return floatingMode === "embedded" ? "absolute" : "relative";
+  }
+  return "grid";
+};
+
+const getPositionModeStyle = (mode: LayerDefinition["positionMode"]): CSSProperties => {
+  return { position: mode === "grid" ? "relative" : mode };
+};
+
+const getGridAreaStyle = (layer: LayerDefinition, mode: LayerDefinition["positionMode"]): CSSProperties => {
+  if (mode !== "grid") {
+    return {};
+  }
+  return {
+    gridArea: layer.gridArea,
+    gridRow: layer.gridRow,
+    gridColumn: layer.gridColumn,
+  };
+};
+
+const getAbsolutePositionStyle = (position?: WindowPosition | LayerDefinition["position"]): CSSProperties => {
+  if (!position) {
+    return {};
+  }
+
+  return {
+    top: position.top,
+    right: position.right,
+    bottom: position.bottom,
+    left: position.left,
+  };
+};
+
+const getZIndexStyle = (zIndex?: number): CSSProperties => {
+  return zIndex !== undefined ? { zIndex } : {};
+};
+
+const getDimensionsStyle = (width?: number | string, height?: number | string): CSSProperties => {
+  return {
+    width,
+    height,
+  };
+};
+
+const getPointerEventsStyle = (layer: LayerDefinition, mode: LayerDefinition["positionMode"]): CSSProperties => {
+  if (layer.pointerEvents !== undefined) {
+    if (typeof layer.pointerEvents === "boolean") {
+      return { pointerEvents: layer.pointerEvents ? "auto" : "none" };
+    }
+    return { pointerEvents: layer.pointerEvents };
+  }
+
+  if (mode === "absolute" || mode === "fixed") {
+    return { pointerEvents: "auto" };
+  }
+
+  return {};
+};
+
+const resolveEffectivePosition = (
+  layer: LayerDefinition,
+): WindowPosition | LayerDefinition["position"] | undefined => {
+  return layer.position;
+};
+
+const resolveEffectiveSize = (
+  layer: LayerDefinition,
+): {
+  width?: number | string;
+  height?: number | string;
+} => {
+  return {
+    width: layer.width,
+    height: layer.height,
+  };
+};
+
+const resolveEffectiveZIndex = (layer: LayerDefinition): number | undefined => {
+  return layer.zIndex;
+};
+
+const buildLayerStyleObject = (layer: LayerDefinition): CSSProperties => {
+  const resolvedMode = resolvePositionMode(layer);
+  const effectivePosition = resolveEffectivePosition(layer);
+  const effectiveSize = resolveEffectiveSize(layer);
+  const effectiveZIndex = resolveEffectiveZIndex(layer);
+
+  return {
+    ...layer.style,
+    ...getPositionModeStyle(resolvedMode),
+    ...getGridAreaStyle(layer, resolvedMode),
+    ...getAbsolutePositionStyle(effectivePosition),
+    ...getZIndexStyle(effectiveZIndex),
+    ...getDimensionsStyle(effectiveSize.width, effectiveSize.height),
+    ...getPointerEventsStyle(layer, resolvedMode),
+  };
 };
 
 const resolveFloatingMode = (layer: LayerDefinition): "embedded" | "popup" | null => {
@@ -229,20 +336,7 @@ const getLayerSizeFromDefinition = (layer: LayerDefinition): LayerSize | null =>
   };
 };
 
-const resolveResizeHandles = (
-  layerId: string,
-  shouldShow: boolean,
-  onPointerDown: (
-    id: string,
-    config: ResizeHandleConfig,
-    event: React.PointerEvent<HTMLDivElement>,
-  ) => void,
-): React.ReactNode => {
-  if (!shouldShow) {
-    return null;
-  }
-  return <GridLayerResizeHandles layerId={layerId} onPointerDown={onPointerDown} />;
-};
+// No-op placeholder: rendering is handled in component layer
 
 const computeResizableLayerSizes = (
   layers: LayerDefinition[],
@@ -642,29 +736,32 @@ export const useLayerInteractions = ({
   );
 
   const getResizeHandleState = React.useCallback(
-    (layer: LayerDefinition): { handles: React.ReactNode; isResizable: boolean } => {
-      const canRenderCornerResize = shouldRenderFloatingResize(layer);
-      if (!canRenderCornerResize) {
-        return { handles: null, isResizable: false };
+    (layer: LayerDefinition): { isResizable: boolean; onPointerDown?: (config: ResizeHandleConfig, event: React.PointerEvent<HTMLDivElement>) => void } => {
+      const canResize = shouldRenderFloatingResize(layer);
+      if (!canResize) {
+        return { isResizable: false };
       }
 
       const storedLayerSize = layerSizes[layer.id];
       const fallbackLayerSize = getLayerSizeFromDefinition(layer);
       const sizeForHandle = storedLayerSize ?? fallbackLayerSize;
-      const showResizeHandles = sizeForHandle !== null;
-      const handles = resolveResizeHandles(layer.id, showResizeHandles, handleResizePointerDown);
+      const show = sizeForHandle !== null;
+      if (!show) {
+        return { isResizable: false };
+      }
 
-      return {
-        handles,
-        isResizable: showResizeHandles,
+      const onPointerDown = (config: ResizeHandleConfig, event: React.PointerEvent<HTMLDivElement>) => {
+        handleResizePointerDown(layer.id, config, event);
       };
+
+      return { isResizable: true, onPointerDown };
     },
     [handleResizePointerDown, layerSizes],
   );
 
   const getLayerRenderState = React.useCallback(
     (layer: LayerDefinition) => {
-      const { handles, isResizable } = getResizeHandleState(layer);
+      const { isResizable, onPointerDown } = getResizeHandleState(layer);
       const style = buildDraggableLayerStyle(layer);
       const isResizing = resizingLayerId === layer.id;
 
@@ -672,7 +769,11 @@ export const useLayerInteractions = ({
         style,
         isResizable,
         isResizing,
-        resizeHandles: handles,
+        onResizeHandlePointerDown: (config: ResizeHandleConfig, event: React.PointerEvent<HTMLDivElement>) => {
+          if (onPointerDown) {
+            onPointerDown(config, event);
+          }
+        },
       };
     },
     [buildDraggableLayerStyle, getResizeHandleState, resizingLayerId],

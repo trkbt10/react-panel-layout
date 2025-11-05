@@ -6,13 +6,13 @@
 // Core Type Definitions
 // ============================================================================
 export type {
+  // Grid / panel
   GridTrack,
   PanelLayoutConfig,
   LayerPositionMode,
   LayerDefinition,
   PanelLayoutProps,
-} from "./panel-system/types";
-export type {
+  // Window / popup / drawer
   Position,
   WindowOffset,
   WindowPosition,
@@ -25,7 +25,7 @@ export type {
   FloatingWindowMode,
   FloatingWindowConfig,
   DrawerBehavior,
-} from "./modules/types";
+} from "./types";
 
 // ============================================================================
 // Main Layout Component

@@ -5,7 +5,7 @@
  * interactions are composed by UI layers (e.g., GridLayout) on top of this.
  */
 import * as React from "react";
-import type { PanelLayoutConfig, LayerDefinition } from "./panel-system/types";
+import type { PanelLayoutConfig, LayerDefinition } from "./types";
 
 export type PanelSystemContextValue = {
   config: PanelLayoutConfig;

@@ -2,7 +2,7 @@
  * @file DrawerLayers component
  */
 import * as React from "react";
-import type { LayerDefinition } from "../../panel-system/types";
+import type { LayerDefinition } from "../../types";
 import { Drawer } from "./Drawer";
 import { useDrawerState } from "../../modules/window/useDrawerState";
 

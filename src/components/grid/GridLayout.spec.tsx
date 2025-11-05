@@ -4,8 +4,7 @@
 import * as React from "react";
 import { render, cleanup, act, fireEvent } from "@testing-library/react";
 import { GridLayout } from "./GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../../panel-system/types";
-import type { WindowPosition, WindowSize } from "../../modules/types";
+import type { PanelLayoutConfig, LayerDefinition, WindowPosition, WindowSize } from "../../types";
 import { useLayerDragHandle } from "../../modules/grid/useLayerDragHandle";
 
 const ensurePointerEvent = () => {

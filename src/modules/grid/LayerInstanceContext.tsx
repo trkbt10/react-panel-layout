@@ -1,7 +1,10 @@
 /**
- * @file Context exposing the current grid layer id to child components.
+ * @file Context exposing the current grid layer id and helpers to child components.
  */
 import * as React from "react";
+import type { LayerDefinition } from "../../types";
+import { usePanelSystem } from "../../PanelSystemContext";
+import { useGridLayoutContext, type GridLayerHandleProps } from "./GridLayoutContext";
 
 type LayerInstanceContextValue = {
   layerId: string;
@@ -24,3 +27,30 @@ export const useLayerInstance = (): LayerInstanceContextValue => {
   return value;
 };
 
+/**
+ * Convenience: read the current layer definition from the core registry.
+ */
+export const useCurrentLayerDefinition = (): LayerDefinition => {
+  const { layerId } = useLayerInstance();
+  const { layers } = usePanelSystem();
+  const def = layers.layerById.get(layerId);
+  if (!def) {
+    throw new Error(`Layer definition not found for id: ${layerId}`);
+  }
+  return def;
+};
+
+/**
+ * Convenience: get drag handle props, pre-bound to the current layer.
+ */
+export const useCurrentLayerHandleProps = (): GridLayerHandleProps => {
+  const { layerId } = useLayerInstance();
+  const { getLayerHandleProps } = useGridLayoutContext();
+  return React.useMemo(() => getLayerHandleProps(layerId), [getLayerHandleProps, layerId]);
+};
+
+/**
+ * Compatibility helper for existing code using useLayerDragHandle.
+ * Prefer useCurrentLayerHandleProps for direct access.
+ */
+export const useLayerDragHandleProps = useCurrentLayerHandleProps;

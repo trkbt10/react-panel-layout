@@ -34,11 +34,7 @@ const RESIZE_HANDLE_CONFIGS: ReadonlyArray<ResizeHandleConfig> = [
 
 export type GridLayerResizeHandlesProps = {
   layerId: string;
-  onPointerDown: (
-    id: string,
-    config: ResizeHandleConfig,
-    event: React.PointerEvent<HTMLDivElement>,
-  ) => void;
+  onPointerDown: (config: ResizeHandleConfig, event: React.PointerEvent<HTMLDivElement>) => void;
 };
 
 export const GridLayerResizeHandles: React.FC<GridLayerResizeHandlesProps> = ({ layerId, onPointerDown }) => {
@@ -56,7 +52,8 @@ export const GridLayerResizeHandles: React.FC<GridLayerResizeHandlesProps> = ({ 
             aria-hidden="true"
             className={classNames}
             {...datasetProps}
-            onPointerDown={(event) => onPointerDown(layerId, config, event)}
+            data-layer-id={layerId}
+            onPointerDown={(event) => onPointerDown(config, event)}
           />
         );
       })}

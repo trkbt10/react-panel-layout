@@ -3,14 +3,7 @@
  */
 import * as React from "react";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
-import type { GridTrack, PanelLayoutConfig } from "../../panel-system/types";
-import { createTrackSizeUpdater } from "./resizeUtils";
-import {
-  buildTrackTemplateString,
-  createTrackKey,
-  extractInitialTrackSizes,
-  type TrackDirection,
-} from "./trackTemplates";
+import type { GridTrack, PanelLayoutConfig } from "../../types";
 
 export type TrackHandleConfig = {
   trackIndex: number;
@@ -20,6 +13,70 @@ export type TrackHandleConfig = {
 type ParsedGap = {
   rowGap: number;
   columnGap: number;
+};
+
+// Inline track template utilities (previously in helpers)
+type TrackDirection = "row" | "col";
+
+const createTrackKey = (direction: TrackDirection, index: number): string => {
+  return `${direction}-${index}`;
+};
+
+const getTrackSize = (
+  track: GridTrack,
+  trackSizes: Record<string, number>,
+  direction: TrackDirection,
+  index: number,
+): string => {
+  const key = createTrackKey(direction, index);
+  const currentSize = trackSizes[key];
+  if (currentSize !== undefined) {
+    return `${currentSize}px`;
+  }
+  return track.size;
+};
+
+const buildTrackTemplateString = (
+  tracks: GridTrack[],
+  trackSizes: Record<string, number>,
+  direction: TrackDirection,
+): string => {
+  return tracks.map((track, index) => getTrackSize(track, trackSizes, direction, index)).join(" ");
+};
+
+const extractInitialTrackSizes = (tracks: GridTrack[], direction: TrackDirection): Record<string, number> => {
+  return tracks.reduce<Record<string, number>>((acc, track, index) => {
+    if (track.resizable && track.size.endsWith("px")) {
+      acc[createTrackKey(direction, index)] = parseInt(track.size, 10);
+    }
+    return acc;
+  }, {});
+};
+
+// Inline resize utils
+const applyConstraints = (size: number, minSize?: number, maxSize?: number): number => {
+  const withMinConstraint = minSize !== undefined ? Math.max(size, minSize) : size;
+  const withMaxConstraint = maxSize !== undefined ? Math.min(withMinConstraint, maxSize) : withMinConstraint;
+  return withMaxConstraint;
+};
+
+const calculateNewTrackSize = (currentSize: number, delta: number, track: GridTrack): number => {
+  const newSize = currentSize + delta;
+  return applyConstraints(newSize, track.minSize, track.maxSize);
+};
+
+const createTrackSizeUpdater = (
+  direction: TrackDirection,
+  index: number,
+  currentSize: number,
+  delta: number,
+  track: GridTrack,
+) => {
+  const key = createTrackKey(direction, index);
+  return (prev: Record<string, number>): Record<string, number> => {
+    const newSize = calculateNewTrackSize(currentSize, delta, track);
+    return { ...prev, [key]: newSize };
+  };
 };
 
 const computeTrackResizeHandles = (tracks: GridTrack[]): TrackHandleConfig[] => {

@@ -2,17 +2,31 @@
  * @file Context provider for grid layer rendering helpers.
  */
 import * as React from "react";
-import type { LayerDefinition } from "../../panel-system/types";
+import type { LayerDefinition } from "../../types";
 
 export type GridLayerHandleProps = React.HTMLAttributes<HTMLElement> & {
   "data-drag-handle": "true";
 };
 
+export type ResizeHandleConfig =
+  | {
+      key: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+      variant: "corner";
+      horizontal: "left" | "right";
+      vertical: "top" | "bottom";
+    }
+  | {
+      key: "left" | "right" | "top" | "bottom";
+      variant: "edge";
+      horizontal?: "left" | "right";
+      vertical?: "top" | "bottom";
+    };
+
 export type GridLayerRenderState = {
   style: React.CSSProperties;
   isResizable: boolean;
   isResizing: boolean;
-  resizeHandles: React.ReactNode;
+  onResizeHandlePointerDown: (config: ResizeHandleConfig, event: React.PointerEvent<HTMLDivElement>) => void;
 };
 
 export type GridLayoutContextValue = {

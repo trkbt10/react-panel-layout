@@ -4,7 +4,7 @@
 import * as React from "react";
 import { ResizeHandle } from "../resizer/ResizeHandle";
 import styles from "./GridTrackResizeHandle.module.css";
-import type { TrackDirection } from "../../modules/grid/trackTemplates";
+type TrackDirection = "row" | "col";
 
 type GridTrackResizeHandleProps = {
   direction: TrackDirection;

@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import styles from "./Drawer.module.css";
-import type { DrawerBehavior, WindowPosition } from "../../modules/types";
+import type { DrawerBehavior, WindowPosition } from "../../types";
 
 export type DrawerProps = {
   id: string;
