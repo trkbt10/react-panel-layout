@@ -3,9 +3,9 @@
  */
 import * as React from "react";
 import { createPortal } from "react-dom";
-import type { LayerDefinition } from "./types";
+import type { LayerDefinition } from "../../panel-system/types";
 import type { PopupWindowOptions, WindowPosition, WindowBounds } from "../types";
-import { LayerInstanceProvider } from "./LayerInstanceContext";
+import { LayerInstanceProvider } from "../grid/LayerInstanceContext";
 
 const ensureNumericOffset = (value: number | string | undefined, key: keyof WindowPosition, layerId: string): number => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -125,12 +125,17 @@ export const PopupLayerPortal: React.FC<PopupLayerPortalProps> = ({ layer }) => 
       return;
     }
 
-    const features = buildWindowFeatures(layer.id, floating.position, floating.width, floating.height, floating.popup);
+    const features = buildWindowFeatures(layer.id, layer.position, layer.width, layer.height, floating.popup);
     const windowName = floating.popup?.name ?? layer.id;
-    const createdWindow = resolvePopupWindow(windowName, features, {
-      position: floating.position,
-      size: { width: floating.width as number, height: floating.height as number },
-    }, floating.popup);
+    const createdWindow = resolvePopupWindow(
+      windowName,
+      features,
+      {
+        position: layer.position,
+        size: { width: layer.width as number, height: layer.height as number },
+      },
+      floating.popup,
+    );
 
     if (!createdWindow) {
       throw new Error(`Failed to open popup window for layer "${layer.id}".`);
@@ -154,7 +159,7 @@ export const PopupLayerPortal: React.FC<PopupLayerPortalProps> = ({ layer }) => 
     containerRef.current = mountNode;
     setIsMounted(true);
 
-    applyBoundsToWindow(openedWindow, layer.id, floating.position, floating.width, floating.height);
+    applyBoundsToWindow(openedWindow, layer.id, layer.position, layer.width, layer.height);
 
     const handleBeforeUnload = () => {
       popupWindowRef.current = null;
@@ -190,8 +195,8 @@ export const PopupLayerPortal: React.FC<PopupLayerPortalProps> = ({ layer }) => 
     if (!popupWindow) {
       return;
     }
-    applyBoundsToWindow(popupWindow, layer.id, floating.position, floating.width, floating.height);
-  }, [floating.position?.left, floating.position?.top, floating.height, floating.width, layer.id]);
+    applyBoundsToWindow(popupWindow, layer.id, layer.position, layer.width, layer.height);
+  }, [layer.position?.left, layer.position?.top, layer.height, layer.width, layer.id]);
 
   if (!isMounted || !containerRef.current) {
     return null;

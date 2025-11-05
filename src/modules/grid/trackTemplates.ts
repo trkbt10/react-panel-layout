@@ -1,7 +1,7 @@
 /**
  * @file Utilities for managing grid track configuration and sizing.
  */
-import type { GridTrack } from "./types";
+import type { GridTrack } from "../../panel-system/types";
 
 export type TrackDirection = "row" | "col";
 

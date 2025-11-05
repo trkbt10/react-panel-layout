@@ -1,8 +1,8 @@
 /**
- * @file Types for the grid-based layout system.
+ * @file Core panel system type definitions (independent of grid module).
  */
 import * as React from "react";
-import type { DrawerBehavior, FloatingWindowConfig, WindowPosition } from "../types";
+import type { DrawerBehavior, FloatingWindowConfig, WindowPosition } from "../modules/types";
 
 // Grid track definition with optional resize capability
 export type GridTrack = {
@@ -24,7 +24,7 @@ export type PanelLayoutConfig = {
 // Layer positioning mode
 export type LayerPositionMode = "grid" | "absolute" | "relative" | "fixed";
 
-// Layer definition for grid-based layout system
+// Layer definition for panel system
 export type LayerDefinition = {
   id: string;
   component: React.ReactNode;
@@ -49,6 +49,8 @@ export type LayerDefinition = {
   width?: string | number;
   height?: string | number;
   pointerEvents?: boolean | "auto" | "none";
+  /** Optional backdrop style (used by DrawerBehaviour) */
+  backdropStyle?: React.CSSProperties;
 
   // Behaviors
   drawer?: DrawerBehavior;
@@ -58,8 +60,9 @@ export type LayerDefinition = {
   style?: React.CSSProperties;
 };
 
-// Props for the top-level grid layout component
+// Props for top-level layout components
 export type PanelLayoutProps = {
   config: PanelLayoutConfig;
   layers: LayerDefinition[];
 };
+

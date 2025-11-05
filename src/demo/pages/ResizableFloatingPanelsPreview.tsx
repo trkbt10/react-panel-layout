@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { GridLayout } from "../../components/layout/grid/GridLayout";
-import type { LayerDefinition, PanelLayoutConfig } from "../../modules/grid/types";
+import type { LayerDefinition, PanelLayoutConfig } from "../../panel-system/types";
 import {
   FloatingPanelFrame,
   FloatingPanelHeader,
@@ -52,14 +52,14 @@ const layers = [
   {
     id: "floating",
     component: <MetricsPanel />,
+    position: { left: 48, top: 48 },
+    width: 320,
+    height: 240,
+    zIndex: 10,
     floating: {
-      position: { left: 48, top: 48 },
-      width: 320,
-      height: 240,
       constraints: { minWidth: 240, minHeight: 180 },
       resizable: true,
       draggable: true,
-      zIndex: 10,
     },
   },
 ];`;
@@ -173,28 +173,28 @@ const FloatingWorkspaceDemo: React.FC = () => {
     {
       id: "metrics-panel",
       component: <MetricsPanel />,
+      position: { left: 48, top: 48 },
+      width: primarySize.width,
+      height: primarySize.height,
+      zIndex: 10,
       floating: {
-        position: { left: 48, top: 48 },
-        width: primarySize.width,
-        height: primarySize.height,
         constraints: { minWidth: 240, minHeight: 180, maxWidth: 560, maxHeight: 380 },
         draggable: true,
         resizable: true,
-        zIndex: 10,
         onResize: handlePrimarySizeChange,
       },
     },
     {
       id: "notes-panel",
       component: <NotesPanel />,
+      position: { left: 420, top: 128 },
+      width: notesSize.width,
+      height: notesSize.height,
+      zIndex: 12,
       floating: {
-        position: { left: 420, top: 128 },
-        width: notesSize.width,
-        height: notesSize.height,
         constraints: { minWidth: 220, minHeight: 180, maxWidth: 480, maxHeight: 360 },
         draggable: true,
         resizable: true,
-        zIndex: 12,
         onResize: handleNotesSizeChange,
       },
     },

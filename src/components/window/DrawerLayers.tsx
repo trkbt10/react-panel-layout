@@ -2,7 +2,7 @@
  * @file DrawerLayers component
  */
 import * as React from "react";
-import type { LayerDefinition } from "../../modules/grid/types";
+import type { LayerDefinition } from "../../panel-system/types";
 import { Drawer } from "./Drawer";
 import { useDrawerState } from "../../modules/window/useDrawerState";
 
@@ -48,6 +48,8 @@ export const DrawerLayers: React.FC<DrawerLayersProps> = ({ layers }) => {
             zIndex={layer.zIndex}
             width={layer.width}
             height={layer.height}
+            position={layer.position}
+            backdropStyle={layer.backdropStyle}
           >
             {layer.component}
           </Drawer>

@@ -1,18 +1,19 @@
 /**
- * @file Top-level grid layout component that composes shared hooks and context.
+ * @file Top-level grid layout component that consumes PanelSystemContext core.
  */
 import * as React from "react";
 import { useIntersectionObserver } from "../../../hooks/useIntersectionObserver";
-import type { LayerDefinition, PanelLayoutConfig } from "../../../modules/grid/types";
+import type { LayerDefinition, PanelLayoutConfig } from "../../../panel-system/types";
 import { DrawerLayers } from "../../../components/window/DrawerLayers";
 import styles from "./GridLayout.module.css";
-import { GridLayoutProvider } from "../../../modules/grid/GridLayoutContext";
-import { GridLayers } from "../../../modules/grid/GridLayers";
+import { GridLayerList } from "./GridLayerList";
 import { ResizeHandleRenderer } from "./ResizeHandleRenderer";
+import { createTrackKey } from "../../../modules/grid/trackTemplates";
+import { PanelSystemProvider, usePanelSystem } from "../../../PanelSystemContext";
 import { useGridPlacements } from "../../../modules/grid/useGridPlacements";
 import { useGridTracks } from "../../../modules/grid/useGridTracks";
 import { useLayerInteractions } from "../../../modules/grid/useLayerInteractions";
-import { createTrackKey } from "../../../modules/grid/trackTemplates";
+import { GridLayoutProvider } from "../../../modules/grid/GridLayoutContext";
 
 export type GridLayoutProps = {
   config: PanelLayoutConfig;
@@ -24,15 +25,27 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
   const gridRef = React.useRef<HTMLDivElement | null>(null);
   const { isIntersecting } = useIntersectionObserver(gridRef, { threshold: 0 });
 
-  const { normalizedLayers, visibleLayers, regularLayers, layerById } = useGridPlacements(config, layers);
-  const { columnHandles, rowHandles, gapSizes, gridStyle, handleResize } = useGridTracks(config, styleProp);
+  return (
+    <PanelSystemProvider config={config} layers={layers} style={styleProp}>
+      <GridLayoutInner gridRef={gridRef} isIntersecting={isIntersecting} />
+    </PanelSystemProvider>
+  );
+};
+
+const GridLayoutInner: React.FC<{
+  gridRef: React.RefObject<HTMLDivElement | null>;
+  isIntersecting: boolean;
+}> = ({ gridRef, isIntersecting }) => {
+  const { config, style, layers } = usePanelSystem();
+  const { normalizedLayers, visibleLayers, regularLayers, layerById } = useGridPlacements(config, layers.defs);
+  const { columnHandles, rowHandles, gapSizes, gridStyle, handleResize } = useGridTracks(config, style);
   const { providerValue, draggingLayerId, resizingLayerId } = useLayerInteractions({
     layers: normalizedLayers,
     layerById,
   });
 
   return (
-    <GridLayoutProvider value={providerValue}>
+    <>
       <div
         ref={gridRef}
         className={styles.gridLayout}
@@ -41,38 +54,36 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
         data-resizing={Boolean(resizingLayerId)}
         data-visible={isIntersecting}
       >
-        <GridLayers layers={regularLayers} />
+        <GridLayoutProvider value={providerValue}>
+          <GridLayerList layers={regularLayers} />
+        </GridLayoutProvider>
 
-        {columnHandles.map(({ trackIndex, align }) => {
-          return (
-            <ResizeHandleRenderer
-              key={`${createTrackKey("col", trackIndex)}:${align}`}
-              direction="col"
-              trackIndex={trackIndex}
-              align={align}
-              gap={gapSizes.columnGap}
-              onResize={handleResize}
-            />
-          );
-        })}
+        {columnHandles.map(({ trackIndex, align }) => (
+          <ResizeHandleRenderer
+            key={`${createTrackKey("col", trackIndex)}:${align}`}
+            direction="col"
+            trackIndex={trackIndex}
+            align={align}
+            gap={gapSizes.columnGap}
+            onResize={handleResize}
+          />
+        ))}
 
-        {rowHandles.map(({ trackIndex, align }) => {
-          return (
-            <ResizeHandleRenderer
-              key={`${createTrackKey("row", trackIndex)}:${align}`}
-              direction="row"
-              trackIndex={trackIndex}
-              align={align}
-              gap={gapSizes.rowGap}
-              onResize={handleResize}
-            />
-          );
-        })}
+        {rowHandles.map(({ trackIndex, align }) => (
+          <ResizeHandleRenderer
+            key={`${createTrackKey("row", trackIndex)}:${align}`}
+            direction="row"
+            trackIndex={trackIndex}
+            align={align}
+            gap={gapSizes.rowGap}
+            onResize={handleResize}
+          />
+        ))}
       </div>
 
       <DrawerLayers layers={visibleLayers} />
-    </GridLayoutProvider>
+    </>
   );
 };
 
-/* Debug note: Refactored without consulting additional files beyond new hooks and context within this directory. */
+/* Debug note: Refactored to consume PanelSystemContext core for consistent separation. */

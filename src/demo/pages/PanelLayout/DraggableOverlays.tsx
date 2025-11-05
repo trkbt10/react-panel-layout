@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { GridLayout } from "../../../components/layout/grid/GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../../../modules/grid/types";
+import type { PanelLayoutConfig, LayerDefinition } from "../../../panel-system/types";
 
 const DraggablePanel: React.FC<{ title: string; color: string; children?: React.ReactNode }> = ({
   title,
@@ -87,12 +87,12 @@ export const DraggableOverlays = () => {
           </div>
         </DraggablePanel>
       ),
+      position: { left: 20, top: 20 },
+      width: 200,
+      height: 250,
+      zIndex: 10,
       floating: {
-        position: { left: 20, top: 20 },
-        width: 200,
-        height: 250,
         draggable: true,
-        zIndex: 10,
       },
     },
     {
@@ -119,12 +119,12 @@ export const DraggableOverlays = () => {
           </div>
         </DraggablePanel>
       ),
+      position: { left: 260, top: 20 },
+      width: 220,
+      height: 200,
+      zIndex: 11,
       floating: {
-        position: { left: 260, top: 20 },
-        width: 220,
-        height: 200,
         draggable: true,
-        zIndex: 11,
       },
     },
     {
@@ -143,12 +143,12 @@ export const DraggableOverlays = () => {
           </div>
         </DraggablePanel>
       ),
+      position: { left: 20, top: 300 },
+      width: 250,
+      height: 180,
+      zIndex: 12,
       floating: {
-        position: { left: 20, top: 300 },
-        width: 250,
-        height: 180,
         draggable: true,
-        zIndex: 12,
       },
     },
   ];

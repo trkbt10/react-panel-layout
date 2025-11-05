@@ -5,8 +5,13 @@
 // ============================================================================
 // Core Type Definitions
 // ============================================================================
-export type { PanelPosition, PanelDefinition, EditorPanelsConfig } from "./modules/panels/types";
-export type { GridTrack, PanelLayoutConfig, LayerPositionMode, LayerDefinition, PanelLayoutProps } from "./modules/grid/types";
+export type {
+  GridTrack,
+  PanelLayoutConfig,
+  LayerPositionMode,
+  LayerDefinition,
+  PanelLayoutProps,
+} from "./panel-system/types";
 export type {
   Position,
   WindowOffset,

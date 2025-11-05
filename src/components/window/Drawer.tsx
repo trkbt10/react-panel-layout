@@ -18,6 +18,8 @@ export type DrawerProps = {
   zIndex?: number;
   width?: string | number;
   height?: string | number;
+  position?: WindowPosition;
+  backdropStyle?: React.CSSProperties;
 };
 
 type DrawerBackdropProps = { style?: React.CSSProperties; dismissible: boolean; onClose: () => void };
@@ -83,8 +85,10 @@ export const Drawer: React.FC<DrawerProps> = ({
   zIndex,
   width,
   height,
+  position,
+  backdropStyle,
 }) => {
-  const { dismissible = true, header, zIndex: configZ, position, backdropStyle } = config;
+  const { dismissible = true, header } = config;
 
   const drawerStyle = React.useMemo((): React.CSSProperties => {
     const style: React.CSSProperties = {
@@ -93,8 +97,6 @@ export const Drawer: React.FC<DrawerProps> = ({
 
     if (zIndex !== undefined) {
       style.zIndex = zIndex;
-    } else if (configZ !== undefined) {
-      style.zIndex = configZ;
     }
 
     if (width !== undefined) {
@@ -105,7 +107,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     }
 
     return style;
-  }, [styleProp, zIndex, configZ, width, height]);
+  }, [styleProp, zIndex, width, height]);
 
   const finalClassName = className ? `${styles.drawer} ${className}` : styles.drawer;
   const contentClassName = header ? styles.drawerContent : undefined;

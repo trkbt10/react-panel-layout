@@ -5,11 +5,11 @@ import * as React from "react";
 import { useDocumentPointerEvents } from "../../hooks/useDocumentPointerEvents";
 import { useEffectEvent } from "../../hooks/useEffectEvent";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
-import type { LayerDefinition } from "./types";
+import type { LayerDefinition } from "../../panel-system/types";
 import type { WindowPosition, WindowSize } from "../types";
 import { buildLayerStyleObject } from "./layerStyles";
-import styles from "./useLayerInteractions.module.css";
 import type { GridLayerHandleProps, GridLayoutContextValue } from "./GridLayoutContext";
+import { ResizeHandles, type ResizeHandleConfig } from "./ResizeHandles";
 
 type LayerSize = {
   width: number;
@@ -30,22 +30,6 @@ type DragState = {
 
 type HorizontalEdge = "left" | "right";
 type VerticalEdge = "top" | "bottom";
-
-type ResizeHandleConfig =
-  | {
-      key: "top-left" | "top-right" | "bottom-left" | "bottom-right";
-      variant: "corner";
-      horizontal: HorizontalEdge;
-      vertical: VerticalEdge;
-      className: keyof typeof styles;
-    }
-  | {
-      key: "left" | "right" | "top" | "bottom";
-      variant: "edge";
-      horizontal?: HorizontalEdge;
-      vertical?: VerticalEdge;
-      className: keyof typeof styles;
-    };
 
 type ResizeState = {
   layerId: string;
@@ -110,7 +94,7 @@ const resolveDragAnchor = (layer: LayerDefinition): { left: number; top: number 
   if (!floating) {
     throw new Error(`Floating layer "${layer.id}" is missing floating configuration required for dragging.`);
   }
-  const position = floating.position;
+  const position = layer.position;
   if (!position) {
     throw new Error(`Floating layer "${layer.id}" must define position with left and top values.`);
   }
@@ -235,10 +219,7 @@ const getLayerSizeFromDefinition = (layer: LayerDefinition): LayerSize | null =>
   if (!floating) {
     return null;
   }
-  const size =
-    typeof floating.width === "number" && typeof floating.height === "number"
-      ? { width: floating.width, height: floating.height }
-      : undefined;
+  const size = getNumericLayerSize(layer);
   if (!size) {
     throw new Error(`Floating layer "${layer.id}" must define width and height when resizable or draggable.`);
   }
@@ -246,51 +227,6 @@ const getLayerSizeFromDefinition = (layer: LayerDefinition): LayerSize | null =>
     width: size.width,
     height: size.height,
   };
-};
-
-const RESIZE_HANDLE_CONFIGS: ReadonlyArray<ResizeHandleConfig> = [
-  { key: "top-left", variant: "corner", horizontal: "left", vertical: "top", className: "cornerHandleTopLeft" },
-  { key: "top-right", variant: "corner", horizontal: "right", vertical: "top", className: "cornerHandleTopRight" },
-  { key: "bottom-left", variant: "corner", horizontal: "left", vertical: "bottom", className: "cornerHandleBottomLeft" },
-  {
-    key: "bottom-right",
-    variant: "corner",
-    horizontal: "right",
-    vertical: "bottom",
-    className: "cornerHandleBottomRight",
-  },
-  { key: "left", variant: "edge", horizontal: "left", className: "edgeHandleLeft" },
-  { key: "right", variant: "edge", horizontal: "right", className: "edgeHandleRight" },
-  { key: "top", variant: "edge", vertical: "top", className: "edgeHandleTop" },
-  { key: "bottom", variant: "edge", vertical: "bottom", className: "edgeHandleBottom" },
-];
-
-const createResizeHandleElements = (
-  layerId: string,
-  onPointerDown: (
-    id: string,
-    config: ResizeHandleConfig,
-    event: React.PointerEvent<HTMLDivElement>,
-  ) => void,
-): React.ReactNode[] => {
-  return RESIZE_HANDLE_CONFIGS.map((config) => {
-    const variantClass = config.variant === "corner" ? styles.cornerHandle : styles.edgeHandle;
-    const classNames = `${styles.resizeHandle} ${variantClass}`;
-    const datasetProps =
-      config.variant === "corner" ? { "data-resize-corner": config.key } : { "data-resize-edge": config.key };
-    return (
-      <div
-        key={config.key}
-        role="presentation"
-        aria-hidden="true"
-        className={classNames}
-        {...datasetProps}
-        onPointerDown={(event) => {
-          onPointerDown(layerId, config, event);
-        }}
-      />
-    );
-  });
 };
 
 const resolveResizeHandles = (
@@ -305,7 +241,7 @@ const resolveResizeHandles = (
   if (!shouldShow) {
     return null;
   }
-  return createResizeHandleElements(layerId, onPointerDown);
+  return <ResizeHandles layerId={layerId} onPointerDown={onPointerDown} />;
 };
 
 const computeResizableLayerSizes = (
@@ -771,3 +707,9 @@ export const useLayerInteractions = ({
 };
 
 /* Debug note: Reviewed GridLayout.module.css and LayerInstanceContext to keep drag handle integration consistent. */
+const getNumericLayerSize = (layer: LayerDefinition): LayerSize | undefined => {
+  if (typeof layer.width === "number" && typeof layer.height === "number") {
+    return { width: layer.width, height: layer.height };
+  }
+  return undefined;
+};

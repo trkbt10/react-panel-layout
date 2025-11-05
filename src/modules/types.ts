@@ -71,16 +71,11 @@ export type FloatingWindowMode = "embedded" | "popup";
 // Unified configuration for floating windows (embedded or popup)
 export type FloatingWindowConfig = {
   mode?: FloatingWindowMode;
-  position?: WindowPosition;
-  width?: number | string;
-  height?: number | string;
-  zIndex?: number;
   draggable?: boolean;
   resizable?: boolean;
   constraints?: WindowConstraints;
   onMove?: (position: WindowPosition) => void;
   onResize?: (size: WindowSize) => void;
-  style?: React.CSSProperties;
   popup?: PopupWindowOptions;
 };
 
@@ -91,20 +86,9 @@ export type DrawerBehavior = {
   open?: boolean;
   /** Whether clicking backdrop dismisses the drawer */
   dismissible?: boolean;
-  /** Optional z-index override */
-  zIndex?: number;
   onStateChange?: (open: boolean) => void;
   header?: {
     title?: string;
     showCloseButton?: boolean;
   };
-  /** Position offsets used to infer edge placement */
-  position?: WindowPosition;
-  /** Dimensions of the drawer when open */
-  width?: number | string;
-  height?: number | string;
-  /** Backdrop style (if provided, backdrop is rendered) */
-  backdropStyle?: React.CSSProperties;
-  /** Content style */
-  style?: React.CSSProperties;
 };

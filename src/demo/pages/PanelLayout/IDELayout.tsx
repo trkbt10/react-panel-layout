@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { GridLayout } from "../../../components/layout/grid/GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../../../modules/grid/types";
+import type { PanelLayoutConfig, LayerDefinition } from "../../../panel-system/types";
 import { DataPreview } from "../../components/DataPreview";
 
 const DemoPanel: React.FC<{ title: string; bgColor?: string; children?: React.ReactNode }> = ({
@@ -152,12 +152,12 @@ export const IDELayout = () => {
   {
     id: "data-preview",
     component: <DataPreview width={300} height={400} />,
+    position: { left: 720, top: 10 },
+    width: 300,
+    height: 400,
+    zIndex: 20,
     floating: {
-      position: { left: 720, top: 10 },
-      width: 300,
-      height: 400,
       draggable: true,
-      zIndex: 20,
     },
     visible: true,
   },
@@ -227,12 +227,12 @@ const layers: LayerDefinition[] = [
   {
     id: "data-preview",
     component: <DataPreview />,
+    position: { left: 720, top: 10 },
+    width: 300,
+    height: 400,
+    zIndex: 20,
     floating: {
-      position: { left: 720, top: 10 },
-      width: 300,
-      height: 400,
       draggable: true,
-      zIndex: 20,
     },
   },
 ];

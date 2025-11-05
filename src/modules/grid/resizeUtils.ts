@@ -1,7 +1,7 @@
 /**
  * @file Helpers for managing resizable grid tracks.
  */
-import type { GridTrack } from "./types";
+import type { GridTrack } from "../../panel-system/types";
 import { createTrackKey, type TrackDirection } from "./trackTemplates";
 
 export const applyConstraints = (size: number, minSize?: number, maxSize?: number): number => {

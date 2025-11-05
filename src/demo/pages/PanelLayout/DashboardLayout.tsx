@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { GridLayout } from "../../../components/layout/grid/GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../../../modules/grid/types";
+import type { PanelLayoutConfig, LayerDefinition } from "../../../panel-system/types";
 
 const DashboardCard: React.FC<{ title: string; value: string; icon: string; color: string }> = ({
   title,

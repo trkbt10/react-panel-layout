@@ -2,7 +2,7 @@
  * @file Context provider for grid layer rendering helpers.
  */
 import * as React from "react";
-import type { LayerDefinition } from "./types";
+import type { LayerDefinition } from "../../panel-system/types";
 
 export type GridLayerHandleProps = React.HTMLAttributes<HTMLElement> & {
   "data-drag-handle": "true";

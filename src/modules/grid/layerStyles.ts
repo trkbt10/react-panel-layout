@@ -2,7 +2,7 @@
  * @file Helper utilities for computing layer styles in the grid layout.
  */
 import type { CSSProperties } from "react";
-import type { LayerDefinition } from "./types";
+import type { LayerDefinition } from "../../panel-system/types";
 import type { WindowPosition } from "../types";
 
 const resolvePositionMode = (layer: LayerDefinition): LayerDefinition["positionMode"] => {
@@ -71,9 +71,6 @@ const getPointerEventsStyle = (layer: LayerDefinition, mode: LayerDefinition["po
 };
 
 const resolveEffectivePosition = (layer: LayerDefinition): WindowPosition | LayerDefinition["position"] | undefined => {
-  if (layer.floating) {
-    return layer.floating.position;
-  }
   return layer.position;
 };
 
@@ -83,12 +80,6 @@ const resolveEffectiveSize = (
   width?: number | string;
   height?: number | string;
 } => {
-  if (layer.floating) {
-    return {
-      width: layer.floating.width,
-      height: layer.floating.height,
-    };
-  }
   return {
     width: layer.width,
     height: layer.height,
@@ -96,9 +87,6 @@ const resolveEffectiveSize = (
 };
 
 const resolveEffectiveZIndex = (layer: LayerDefinition): number | undefined => {
-  if (layer.floating && layer.floating.zIndex !== undefined) {
-    return layer.floating.zIndex;
-  }
   return layer.zIndex;
 };
 

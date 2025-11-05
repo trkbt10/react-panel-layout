@@ -2,17 +2,17 @@
  * @file Layer list rendering inside the grid layout.
  */
 import * as React from "react";
-import type { LayerDefinition } from "./types";
-import { useGridLayoutContext } from "./GridLayoutContext";
-import { LayerInstanceProvider } from "./LayerInstanceContext";
-import { PopupLayerPortal } from "./PopupLayerPortal";
-import styles from "../../components/layout/grid/GridLayout.module.css";
+import type { LayerDefinition } from "../../../panel-system/types";
+import { useGridLayoutContext } from "../../../modules/grid/GridLayoutContext";
+import { LayerInstanceProvider } from "../../../modules/grid/LayerInstanceContext";
+import { PopupLayerPortal } from "../../../modules/window/PopupLayerPortal";
+import styles from "./GridLayerList.module.css";
 
-type GridLayersProps = {
+type GridLayerListProps = {
   layers: LayerDefinition[];
 };
 
-export const GridLayers: React.FC<GridLayersProps> = ({ layers }) => {
+export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
   const { handleLayerPointerDown, getLayerRenderState } = useGridLayoutContext();
 
   return (
@@ -39,9 +39,9 @@ export const GridLayers: React.FC<GridLayersProps> = ({ layers }) => {
           <div
             key={layer.id}
             data-layer-id={layer.id}
-            data-draggable={layer.floating?.draggable ? "true" : undefined}
-            data-resizable={isResizable ? "true" : undefined}
-            data-resizing={isResizing ? "true" : undefined}
+            data-draggable={Boolean(layer.floating?.draggable)}
+            data-resizable={isResizable}
+            data-resizing={isResizing}
             className={styles.gridLayer}
             style={{ ...style, ...gridPlacementStyle }}
             onPointerDown={handleLayerPointerDown}
@@ -54,3 +54,4 @@ export const GridLayers: React.FC<GridLayersProps> = ({ layers }) => {
     </>
   );
 };
+
