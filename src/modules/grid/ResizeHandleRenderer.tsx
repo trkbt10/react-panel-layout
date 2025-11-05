@@ -2,7 +2,7 @@
  * @file Internal renderer for grid resize handles.
  */
 import * as React from "react";
-import { ResizeHandle } from "../../panels/ResizeHandle";
+import { ResizeHandle } from "../resizer/ResizeHandle";
 import styles from "./GridLayout.module.css";
 import type { TrackDirection } from "./trackTemplates";
 

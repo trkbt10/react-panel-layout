@@ -2,7 +2,7 @@
  * @file Three panel layout with HorizontalDivider
  */
 import * as React from "react";
-import { HorizontalDivider } from "../../../components/panels/HorizontalDivider";
+import { HorizontalDivider } from "../../../modules/resizer/HorizontalDivider";
 import styles from "./samples.module.css";
 
 export const ThreePanelLayout: React.FC = () => {

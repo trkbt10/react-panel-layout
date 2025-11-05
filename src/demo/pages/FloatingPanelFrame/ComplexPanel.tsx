@@ -9,7 +9,7 @@ import {
   FloatingPanelMeta,
   FloatingPanelControls,
   FloatingPanelContent,
-} from "../../../components/panels/FloatingPanelFrame";
+} from "../../../modules/paneling/FloatingPanelFrame";
 import styles from "./samples.module.css";
 
 export const ComplexPanel: React.FC<{ onClose?: () => void }> = ({ onClose }) => (

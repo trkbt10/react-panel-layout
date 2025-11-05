@@ -51,3 +51,4 @@ FloatingPanelTitle.displayName = "FloatingPanelTitle";
 FloatingPanelMeta.displayName = "FloatingPanelMeta";
 FloatingPanelControls.displayName = "FloatingPanelControls";
 FloatingPanelContent.displayName = "FloatingPanelContent";
+

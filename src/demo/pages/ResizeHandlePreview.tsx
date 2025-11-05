@@ -2,7 +2,7 @@
  * @file ResizeHandle component preview page
  */
 import * as React from "react";
-import { ResizeHandle } from "../../components/panels/ResizeHandle";
+import { ResizeHandle } from "../../modules/resizer/ResizeHandle";
 import { Section, Story } from "../components/Story";
 import { CodeBlock } from "../components/CodeBlock";
 import styles from "./ResizeHandlePreview.module.css";

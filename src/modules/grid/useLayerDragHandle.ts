@@ -13,3 +13,4 @@ export const useLayerDragHandle = (): GridLayerHandleProps => {
     return getLayerHandleProps(layerId);
   }, [getLayerHandleProps, layerId]);
 };
+

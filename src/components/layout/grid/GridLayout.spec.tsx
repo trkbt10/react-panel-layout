@@ -5,7 +5,7 @@ import * as React from "react";
 import { render, cleanup, act, fireEvent } from "@testing-library/react";
 import { GridLayout } from "./GridLayout";
 import type { PanelLayoutConfig, LayerDefinition, WindowPosition, WindowSize } from "../../../panels";
-import { useLayerDragHandle } from "./useLayerDragHandle";
+import { useLayerDragHandle } from "../../../modules/grid/useLayerDragHandle";
 
 const ensurePointerEvent = () => {
   if (typeof window.PointerEvent === "function") {
@@ -87,7 +87,12 @@ describe("GridLayout", () => {
       {
         id: "layer-1",
         gridArea: "main",
-        component: <div data-testid="layer" />,
+        component: (
+          <div>
+            <div data-testid="drag-handle" data-drag-handle="true" />
+            <div data-testid="layer" />
+          </div>
+        ),
         floating: {
           bounds: {
             position: { left: 0, top: 0 },
@@ -126,13 +131,13 @@ describe("GridLayout", () => {
       />,
     );
 
-    const draggableLayer = container.querySelector('[data-layer-id="layer-1"]');
-    if (!draggableLayer) {
-      throw new Error("Expected draggable layer to be rendered");
+    const dragHandle = container.querySelector('[data-testid="drag-handle"]');
+    if (!dragHandle) {
+      throw new Error("Expected drag handle to be rendered");
     }
 
     await act(async () => {
-      fireEvent.pointerDown(draggableLayer, { clientX: 0, clientY: 0 });
+      fireEvent.pointerDown(dragHandle, { clientX: 0, clientY: 0 });
     });
 
     await act(async () => {

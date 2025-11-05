@@ -2,8 +2,8 @@
  * @file Track sizing and resize handle hooks for the grid layout.
  */
 import * as React from "react";
-import { useIsomorphicLayoutEffect } from "../../../hooks/useIsomorphicLayoutEffect";
-import type { GridTrack, PanelLayoutConfig } from "../../../panels";
+import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
+import type { GridTrack, PanelLayoutConfig } from "../../panels";
 import { createTrackSizeUpdater } from "./resizeUtils";
 import {
   buildTrackTemplateString,
@@ -177,3 +177,4 @@ export const useGridTracks = (
     handleResize,
   };
 };
+

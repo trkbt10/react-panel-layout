@@ -9,8 +9,8 @@ import {
   FloatingPanelHeader,
   FloatingPanelTitle,
   FloatingPanelContent,
-} from "../../components/panels/FloatingPanelFrame";
-import { useLayerDragHandle } from "../../components/layout/grid/useLayerDragHandle";
+} from "../../modules/paneling/FloatingPanelFrame";
+import { useLayerDragHandle } from "../../modules/grid/useLayerDragHandle";
 import { Section, Story } from "../components/Story";
 import { CodeBlock } from "../components/CodeBlock";
 import styles from "./ResizableFloatingPanelsPreview.module.css";

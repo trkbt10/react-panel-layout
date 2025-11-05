@@ -37,10 +37,10 @@ export type { GridLayoutProps } from "./components/layout/grid/GridLayout";
 // ============================================================================
 // Drawer Components
 // ============================================================================
-export { Drawer } from "./components/drawer/Drawer";
-export type { DrawerProps } from "./components/drawer/Drawer";
-export { DrawerLayers } from "./components/drawer/DrawerLayers";
-export type { DrawerLayersProps } from "./components/drawer/DrawerLayers";
+export { Drawer } from "./modules/window/Drawer";
+export type { DrawerProps } from "./modules/window/Drawer";
+export { DrawerLayers } from "./modules/window/DrawerLayers";
+export type { DrawerLayersProps } from "./modules/window/DrawerLayers";
 
 // ============================================================================
 // Panel Components
@@ -52,7 +52,7 @@ export {
   FloatingPanelMeta,
   FloatingPanelControls,
   FloatingPanelContent,
-} from "./components/panels/FloatingPanelFrame";
+} from "./modules/paneling/FloatingPanelFrame";
 export type {
   FloatingPanelFrameProps,
   FloatingPanelHeaderProps,
@@ -60,15 +60,15 @@ export type {
   FloatingPanelMetaProps,
   FloatingPanelControlsProps,
   FloatingPanelContentProps,
-} from "./components/panels/FloatingPanelFrame";
+} from "./modules/paneling/FloatingPanelFrame";
 
-export { HorizontalDivider } from "./components/panels/HorizontalDivider";
-export type { HorizontalDividerProps } from "./components/panels/HorizontalDivider";
+export { HorizontalDivider } from "./modules/resizer/HorizontalDivider";
+export type { HorizontalDividerProps } from "./modules/resizer/HorizontalDivider";
 
-export { ResizeHandle } from "./components/panels/ResizeHandle";
-export type { ResizeHandleProps } from "./components/panels/ResizeHandle";
+export { ResizeHandle } from "./modules/resizer/ResizeHandle";
+export type { ResizeHandleProps } from "./modules/resizer/ResizeHandle";
 
 // ============================================================================
 // Public Hooks
 // ============================================================================
-export { useLayerDragHandle } from "./components/layout/grid/useLayerDragHandle";
+export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";

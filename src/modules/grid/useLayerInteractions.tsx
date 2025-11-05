@@ -2,10 +2,10 @@
  * @file Drag and resize interaction management for floating grid layers.
  */
 import * as React from "react";
-import { useDocumentPointerEvents } from "../../../hooks/useDocumentPointerEvents";
-import { useEffectEvent } from "../../../hooks/useEffectEvent";
-import { useIsomorphicLayoutEffect } from "../../../hooks/useIsomorphicLayoutEffect";
-import type { LayerDefinition, WindowPosition, WindowSize } from "../../../panels";
+import { useDocumentPointerEvents } from "../../hooks/useDocumentPointerEvents";
+import { useEffectEvent } from "../../hooks/useEffectEvent";
+import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
+import type { LayerDefinition, WindowPosition, WindowSize } from "../../panels";
 import { buildLayerStyleObject } from "./layerStyles";
 import styles from "./GridLayout.module.css";
 import type { GridLayerHandleProps, GridLayoutContextValue } from "./GridLayoutContext";
@@ -368,67 +368,83 @@ export const useLayerInteractions = ({
   draggingLayerId: string | null;
   resizingLayerId: string | null;
 } => {
-  const [layerPositions, setLayerPositions] = React.useState<Record<string, { x: number; y: number }>>({});
-  const [layerSizes, setLayerSizes] = React.useState<Record<string, LayerSize>>({});
   const [draggingLayerId, setDraggingLayerId] = React.useState<string | null>(null);
   const [resizingLayerId, setResizingLayerId] = React.useState<string | null>(null);
+
+  const [layerPositions, setLayerPositions] = React.useState<Record<string, { x: number; y: number }>>({});
+  const [layerSizes, setLayerSizes] = React.useState<Record<string, LayerSize>>({});
+
   const dragStartRef = React.useRef<DragState | null>(null);
   const resizeStartRef = React.useRef<ResizeState | null>(null);
 
-  const notifyFloatingMove = useEffectEvent((layerId: string, nextPosition: WindowPosition) => {
-    layerById.get(layerId)?.floating?.onMove?.(nextPosition);
+  const notifyFloatingMove = useEffectEvent((layerId: string, position: WindowPosition) => {
+    const layer = layerById.get(layerId);
+    const floating = layer?.floating;
+    floating?.onMove?.(position);
   });
-  const notifyFloatingResize = useEffectEvent((layerId: string, newSize: WindowSize) => {
-    layerById.get(layerId)?.floating?.onResize?.(newSize);
+
+  const notifyFloatingResize = useEffectEvent((layerId: string, size: WindowSize) => {
+    const layer = layerById.get(layerId);
+    const floating = layer?.floating;
+    floating?.onResize?.(size);
   });
 
   useIsomorphicLayoutEffect(() => {
-    setLayerSizes((previousSizes) => {
-      const { sizes, changed } = computeResizableLayerSizes(layers, previousSizes, resizingLayerId);
-      return changed ? sizes : previousSizes;
-    });
+    const { sizes, changed } = computeResizableLayerSizes(layers, layerSizes, resizingLayerId);
+    if (!changed) {
+      return;
+    }
+    setLayerSizes(sizes);
   }, [layers, resizingLayerId]);
 
   const beginLayerDrag = React.useCallback(
-    (layerId: string, layer: LayerDefinition, captureElement: HTMLElement, event: React.PointerEvent<HTMLElement>) => {
-      const floating = getEmbeddedFloatingConfig(layer);
-      if (!floating || floating.draggable !== true) {
-        return;
-      }
-      const baseAnchor = resolveDragAnchor(layer);
+    (layerId: string, layer: LayerDefinition, target: HTMLElement, event: React.PointerEvent) => {
+      const anchor = resolveDragAnchor(layer);
+      const translation = layerPositions[layerId] ?? { x: 0, y: 0 };
+      const dragState: DragState = {
+        pointerStartX: event.clientX,
+        pointerStartY: event.clientY,
+        initialTranslationX: translation.x,
+        initialTranslationY: translation.y,
+        baseLeft: anchor.left,
+        baseTop: anchor.top,
+        layerId,
+        pointerId: event.pointerId,
+        target: target as HTMLElement,
+      };
 
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (captureElement.setPointerCapture) {
+      if (dragState.target.setPointerCapture) {
         try {
-          captureElement.setPointerCapture(event.pointerId);
+          dragState.target.setPointerCapture(dragState.pointerId);
         } catch {
-          // Ignore failures; pointer capture is not mandatory.
+          // Ignore pointer capture errors
         }
       }
 
+      dragStartRef.current = dragState;
       setDraggingLayerId(layerId);
-      const existingPos = layerPositions[layerId] ?? { x: 0, y: 0 };
-      dragStartRef.current = {
-        pointerStartX: event.clientX,
-        pointerStartY: event.clientY,
-        initialTranslationX: existingPos.x,
-        initialTranslationY: existingPos.y,
-        baseLeft: baseAnchor.left,
-        baseTop: baseAnchor.top,
-        layerId,
-        pointerId: event.pointerId,
-        target: captureElement,
-      };
     },
     [layerPositions],
   );
 
   const handleLayerPointerDown = React.useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
-      const layerId = event.currentTarget.dataset.layerId;
+      const target = event.target;
+      const dragHandle = findDragHandleElement(target);
+      if (!dragHandle) {
+        return;
+      }
+
+      const layerId = dragHandle.closest('[data-layer-id]')?.getAttribute("data-layer-id");
       if (!layerId) {
+        return;
+      }
+      const layer = layerById.get(layerId);
+      if (!layer) {
+        return;
+      }
+      const floating = getEmbeddedFloatingConfig(layer);
+      if (!floating || floating.draggable !== true) {
         return;
       }
 
@@ -440,21 +456,14 @@ export const useLayerInteractions = ({
         return;
       }
 
-      const layer = layerById.get(layerId);
-      const floating = layer ? getEmbeddedFloatingConfig(layer) : null;
-      if (!layer || !floating || floating.draggable !== true) {
-        return;
-      }
-
-      const dragHandle = findDragHandleElement(event.target);
-      if (!dragHandle) {
-        const handleExists = event.currentTarget.querySelector('[data-drag-handle="true"]');
-        if (handleExists) {
+      if (dragHandle) {
+        const layerElement = findLayerElementById(dragHandle as HTMLElement, layerId);
+        if (!layerElement) {
           return;
         }
+        beginLayerDrag(layerId, layer, layerElement, event);
+        return;
       }
-
-      beginLayerDrag(layerId, layer, event.currentTarget, event);
     },
     [beginLayerDrag, layerById],
   );

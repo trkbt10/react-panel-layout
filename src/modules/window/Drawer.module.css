@@ -1,0 +1,62 @@
+.drawerBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.drawer {
+  position: fixed;
+  background: var(--node-editor-surface, #fff);
+  box-shadow: var(--node-editor-card-box-shadow, 0 2px 10px rgba(0,0,0,0.08));
+  will-change: transform;
+}
+
+.drawer[data-placement="left"] {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+}
+.drawer[data-placement="right"] {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  transform: translateX(100%);
+}
+.drawer[data-placement="top"] {
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(-100%);
+}
+.drawer[data-placement="bottom"] {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(100%);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 8px;
+  border-bottom: 1px solid var(--node-editor-border-color, #e5e7eb);
+}
+
+.drawerHeaderTitle {
+  font-weight: 600;
+}
+
+.drawerHeaderCloseButton {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.drawerContent {
+  padding: 12px;
+}
+

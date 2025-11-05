@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import styles from "./ResizeHandle.module.css";
-import { useResizeDrag } from "../../hooks/useResizeDrag";
+import { useResizeDrag } from "./hooks/useResizeDrag";
 
 export type ResizeHandleProps = {
   /** Direction of resize */
@@ -30,3 +30,4 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({ direction, onResize 
     />
   );
 };
+

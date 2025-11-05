@@ -2,7 +2,7 @@
  * @file HorizontalDivider component preview page
  */
 import * as React from "react";
-import { HorizontalDivider } from "../../components/panels/HorizontalDivider";
+import { HorizontalDivider } from "../../modules/resizer/HorizontalDivider";
 import { Section, Story } from "../components/Story";
 import { CodeBlock } from "../components/CodeBlock";
 import styles from "./HorizontalDividerPreview.module.css";

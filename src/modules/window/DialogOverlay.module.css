@@ -1,0 +1,11 @@
+.contextDialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.contextContent {
+  position: fixed;
+  z-index: 10000;
+}
+

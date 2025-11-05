@@ -2,7 +2,7 @@
  * @file Hooks for deriving grid placements and layer collections.
  */
 import * as React from "react";
-import type { LayerDefinition, PanelLayoutConfig } from "../../../panels";
+import type { LayerDefinition, PanelLayoutConfig } from "../../panels";
 
 type GridPlacement = {
   gridArea: string;
@@ -141,3 +141,4 @@ export const useGridPlacements = (
     layerById,
   };
 };
+

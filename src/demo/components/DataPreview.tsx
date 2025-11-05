@@ -3,7 +3,7 @@
  * A draggable preview panel for demonstrating floating UI elements
  */
 import * as React from "react";
-import { useLayerDragHandle } from "../../components/layout/grid/useLayerDragHandle";
+import { useLayerDragHandle } from "../../modules/grid/useLayerDragHandle";
 
 export type DataPreviewProps = {
   width?: number;

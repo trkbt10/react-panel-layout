@@ -2,37 +2,21 @@
  * @file Drawer component
  *
  * Mobile-friendly slide-in panel with backdrop support.
- * Features:
- * - Multiple placement options (left, right, top, bottom)
- * - Configurable backdrop with opacity
- * - Optional header with title and close button
- * - Smooth enter/exit animations via React 19 <Activity>
- * - Dismissible via backdrop click or close button
  */
 import * as React from "react";
 import styles from "./Drawer.module.css";
 import { DrawerBehavior } from "../../panels";
 
 export type DrawerProps = {
-  /** Unique identifier for the drawer */
   id: string;
-  /** Drawer behavior configuration */
   config: DrawerBehavior;
-  /** Whether the drawer is open */
   isOpen: boolean;
-  /** Callback to close the drawer */
   onClose: () => void;
-  /** Drawer content */
   children: React.ReactNode;
-  /** Additional className */
   className?: string;
-  /** Additional inline styles */
   style?: React.CSSProperties;
-  /** Z-index override */
   zIndex?: number;
-  /** Width override */
   width?: string | number;
-  /** Height override */
   height?: string | number;
 };
 
@@ -42,11 +26,6 @@ type DrawerBackdropProps = {
   onClose: () => void;
 };
 
-/**
- * Backdrop overlay for drawer
- * Memoized to prevent unnecessary re-renders
- * Visibility is controlled by React.Activity in parent component
- */
 const DrawerBackdrop: React.FC<DrawerBackdropProps> = React.memo(({ backdropOpacity, dismissible, onClose }) => {
   const handleClick = dismissible ? onClose : undefined;
   return (
@@ -64,10 +43,6 @@ type DrawerHeaderProps = {
   onClose: () => void;
 };
 
-/**
- * Drawer header with optional title and close button
- * Memoized to prevent unnecessary re-renders
- */
 const DrawerHeader: React.FC<DrawerHeaderProps> = React.memo(({ header, dismissible, onClose }) => {
   if (!header) {
     return null;
@@ -101,29 +76,6 @@ const DrawerHeader: React.FC<DrawerHeaderProps> = React.memo(({ header, dismissi
   );
 });
 
-/**
- * Drawer component - slide-in panel with backdrop
- *
- * Renders a drawer panel with configurable placement, size, and behavior.
- * Uses React 19's <Activity> for smooth enter/exit animations.
- *
- * @example
- * ```tsx
- * <Drawer
- *   id="sidebar"
- *   config={{
- *     placement: "left",
- *     size: 300,
- *     dismissible: true,
- *     header: { title: "Menu" }
- *   }}
- *   isOpen={isOpen}
- *   onClose={() => setIsOpen(false)}
- * >
- *   <MenuContent />
- * </Drawer>
- * ```
- */
 export const Drawer: React.FC<DrawerProps> = ({
   id,
   config,
@@ -138,18 +90,15 @@ export const Drawer: React.FC<DrawerProps> = ({
 }) => {
   const { placement, showBackdrop = true, backdropOpacity = 0.5, size, dismissible = true, header } = config;
 
-  // Compute drawer styles with memoization
   const drawerStyle = React.useMemo((): React.CSSProperties => {
     const style: React.CSSProperties = {
       ...styleProp,
     };
 
-    // Apply z-index override
     if (zIndex !== undefined) {
       style.zIndex = zIndex;
     }
 
-    // Apply dimension overrides
     if (width !== undefined) {
       style.width = typeof width === "number" ? `${width}px` : width;
     }
@@ -157,7 +106,6 @@ export const Drawer: React.FC<DrawerProps> = ({
       style.height = typeof height === "number" ? `${height}px` : height;
     }
 
-    // Apply size based on placement
     if (size !== undefined) {
       if (placement === "top" || placement === "bottom") {
         style.height = typeof size === "number" ? `${size}px` : size;
@@ -202,3 +150,4 @@ export const Drawer: React.FC<DrawerProps> = ({
     </>
   );
 };
+

@@ -8,7 +8,7 @@ import {
   FloatingPanelTitle,
   FloatingPanelControls,
   FloatingPanelContent,
-} from "../../../components/panels/FloatingPanelFrame";
+} from "../../../modules/paneling/FloatingPanelFrame";
 import styles from "./samples.module.css";
 
 export const ScrollablePanel: React.FC<{ onClose?: () => void }> = ({ onClose }) => (

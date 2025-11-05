@@ -4,15 +4,15 @@
 import * as React from "react";
 import { useIntersectionObserver } from "../../../hooks/useIntersectionObserver";
 import type { LayerDefinition, PanelLayoutConfig } from "../../../panels";
-import { DrawerLayers } from "../../drawer/DrawerLayers";
-import styles from "./GridLayout.module.css";
-import { GridLayoutProvider } from "./GridLayoutContext";
-import { GridLayers } from "./GridLayers";
-import { ResizeHandleRenderer } from "./ResizeHandleRenderer";
-import { useGridPlacements } from "./useGridPlacements";
-import { useGridTracks } from "./useGridTracks";
-import { useLayerInteractions } from "./useLayerInteractions";
-import { createTrackKey } from "./trackTemplates";
+import { DrawerLayers } from "../../../modules/window/DrawerLayers";
+import styles from "../../../modules/grid/GridLayout.module.css";
+import { GridLayoutProvider } from "../../../modules/grid/GridLayoutContext";
+import { GridLayers } from "../../../modules/grid/GridLayers";
+import { ResizeHandleRenderer } from "../../../modules/grid/ResizeHandleRenderer";
+import { useGridPlacements } from "../../../modules/grid/useGridPlacements";
+import { useGridTracks } from "../../../modules/grid/useGridTracks";
+import { useLayerInteractions } from "../../../modules/grid/useLayerInteractions";
+import { createTrackKey } from "../../../modules/grid/trackTemplates";
 
 export type GridLayoutProps = {
   config: PanelLayoutConfig;
