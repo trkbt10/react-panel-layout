@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { GridLayout } from "../../../components/layout/grid/GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../../../panels";
+import type { PanelLayoutConfig, LayerDefinition } from "../../../modules/grid/types";
 import { DataPreview } from "../../components/DataPreview";
 
 const DemoPanel: React.FC<{ title: string; bgColor?: string; children?: React.ReactNode }> = ({

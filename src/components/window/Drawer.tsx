@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import styles from "./Drawer.module.css";
-import { DrawerBehavior } from "../../panels";
+import type { DrawerBehavior } from "../../modules/window/types";
 
 export type DrawerProps = {
   id: string;
@@ -150,4 +150,3 @@ export const Drawer: React.FC<DrawerProps> = ({
     </>
   );
 };
-

@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { useEffectEvent } from "../../hooks/useEffectEvent";
-import type { LayerDefinition } from "../../panels";
+import type { LayerDefinition } from "../grid/types";
 
 export const useDrawerState = (layers: LayerDefinition[]) => {
   const [drawerStates, setDrawerStates] = React.useState<Record<string, boolean>>(() => {

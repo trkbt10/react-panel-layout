@@ -3,7 +3,8 @@
  */
 import * as React from "react";
 import { createPortal } from "react-dom";
-import type { LayerDefinition, PopupWindowOptions, WindowBounds, WindowPosition } from "../../panels";
+import type { LayerDefinition } from "./types";
+import type { PopupWindowOptions, WindowBounds, WindowPosition } from "../window/types";
 import { LayerInstanceProvider } from "./LayerInstanceContext";
 
 const ensureNumericOffset = (value: number | string | undefined, key: keyof WindowPosition, layerId: string): number => {
@@ -195,4 +196,3 @@ const resolvePopupWindow = (
   }
   return window.open("", windowName, features);
 };
-

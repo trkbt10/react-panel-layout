@@ -2,8 +2,8 @@
  * @file Shared logic for draggable resize handles.
  */
 import * as React from "react";
-import { useDragPointerEvents } from "../../../hooks/useDocumentPointerEvents";
-import { useEffectEvent } from "../../../hooks/useEffectEvent";
+import { useDragPointerEvents } from "../../hooks/useDocumentPointerEvents";
+import { useEffectEvent } from "../../hooks/useEffectEvent";
 
 export type ResizeDragAxis = "x" | "y";
 

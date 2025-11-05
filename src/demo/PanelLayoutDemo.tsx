@@ -4,7 +4,7 @@
  */
 import * as React from "react";
 import { GridLayout } from "../components/layout/grid/GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../panels";
+import type { PanelLayoutConfig, LayerDefinition } from "../modules/grid/types";
 import { DataPreview } from "./components/DataPreview";
 import { Section, Story } from "./components/Story";
 import { CodeBlock } from "./components/CodeBlock";

@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { GridLayout } from "../../../components/layout/grid/GridLayout";
-import type { PanelLayoutConfig, LayerDefinition } from "../../../panels";
+import type { PanelLayoutConfig, LayerDefinition } from "../../../modules/grid/types";
 
 const GridCell: React.FC<{ title: string; color: string }> = ({ title, color }) => {
   return (

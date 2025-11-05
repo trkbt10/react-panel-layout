@@ -7,7 +7,7 @@ import {
   FloatingPanelHeader,
   FloatingPanelTitle,
   FloatingPanelContent,
-} from "../../../modules/paneling/FloatingPanelFrame";
+} from "../../../components/paneling/FloatingPanelFrame";
 
 export const BasicPanel = () => (
   <FloatingPanelFrame style={{ width: "400px", maxWidth: "100%" }}>

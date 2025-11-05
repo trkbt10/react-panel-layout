@@ -9,7 +9,7 @@ import {
   FloatingPanelMeta,
   FloatingPanelControls,
   FloatingPanelContent,
-} from "../../modules/paneling/FloatingPanelFrame";
+} from "../../components/paneling/FloatingPanelFrame";
 import { Section, Story, StoryActionButton } from "../components/Story";
 import { CodeBlock } from "../components/CodeBlock";
 import styles from "./FloatingPanelFramePreview.module.css";

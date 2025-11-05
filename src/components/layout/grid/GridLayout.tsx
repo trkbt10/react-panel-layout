@@ -3,8 +3,8 @@
  */
 import * as React from "react";
 import { useIntersectionObserver } from "../../../hooks/useIntersectionObserver";
-import type { LayerDefinition, PanelLayoutConfig } from "../../../panels";
-import { DrawerLayers } from "../../../modules/window/DrawerLayers";
+import type { LayerDefinition, PanelLayoutConfig } from "../../../modules/grid/types";
+import { DrawerLayers } from "../../../components/window/DrawerLayers";
 import styles from "../../../modules/grid/GridLayout.module.css";
 import { GridLayoutProvider } from "../../../modules/grid/GridLayoutContext";
 import { GridLayers } from "../../../modules/grid/GridLayers";

@@ -8,7 +8,7 @@ import {
   FloatingPanelTitle,
   FloatingPanelMeta,
   FloatingPanelContent,
-} from "../../../modules/paneling/FloatingPanelFrame";
+} from "../../../components/paneling/FloatingPanelFrame";
 import styles from "./samples.module.css";
 
 export const PanelWithMeta = () => (

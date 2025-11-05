@@ -2,7 +2,7 @@
  * @file Vertical resize handle demo
  */
 import * as React from "react";
-import { ResizeHandle } from "../../../modules/resizer/ResizeHandle";
+import { ResizeHandle } from "../../../components/resizer/ResizeHandle";
 import styles from "./samples.module.css";
 
 export const VerticalResizeDemo: React.FC = () => {

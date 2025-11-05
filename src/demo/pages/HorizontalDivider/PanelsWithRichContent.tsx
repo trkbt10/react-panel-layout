@@ -2,7 +2,7 @@
  * @file Panels with rich content using HorizontalDivider
  */
 import * as React from "react";
-import { HorizontalDivider } from "../../../modules/resizer/HorizontalDivider";
+import { HorizontalDivider } from "../../../components/resizer/HorizontalDivider";
 import styles from "./samples.module.css";
 
 export const PanelsWithRichContent: React.FC = () => {

@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import styles from "./HorizontalDivider.module.css";
-import { useResizeDrag } from "./hooks/useResizeDrag";
+import { useResizeDrag } from "../../modules/resizer/useResizeDrag";
 
 export type HorizontalDividerProps = {
   onResize: (deltaX: number) => void;
@@ -24,4 +24,3 @@ export const HorizontalDivider: React.FC<HorizontalDividerProps> = ({ onResize }
     />
   );
 };
-

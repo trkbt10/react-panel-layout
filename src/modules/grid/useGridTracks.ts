@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
-import type { GridTrack, PanelLayoutConfig } from "../../panels";
+import type { GridTrack, PanelLayoutConfig } from "./types";
 import { createTrackSizeUpdater } from "./resizeUtils";
 import {
   buildTrackTemplateString,
@@ -177,4 +177,3 @@ export const useGridTracks = (
     handleResize,
   };
 };
-

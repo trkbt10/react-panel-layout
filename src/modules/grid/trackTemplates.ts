@@ -1,7 +1,7 @@
 /**
  * @file Utilities for managing grid track configuration and sizing.
  */
-import type { GridTrack } from "../../panels";
+import type { GridTrack } from "./types";
 
 export type TrackDirection = "row" | "col";
 
@@ -41,4 +41,3 @@ export const extractInitialTrackSizes = (tracks: GridTrack[], direction: TrackDi
     return acc;
   }, {});
 };
-

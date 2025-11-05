@@ -5,17 +5,10 @@
 // ============================================================================
 // Core Type Definitions
 // ============================================================================
+export type { PanelPosition, PanelDefinition, EditorPanelsConfig } from "./modules/panels/types";
+export type { GridTrack, PanelLayoutConfig, LayerPositionMode, LayerDefinition, PanelLayoutProps } from "./modules/grid/types";
 export type {
   Position,
-  PanelPosition,
-  PanelDefinition,
-  EditorPanelsConfig,
-  GridTrack,
-  PanelLayoutConfig,
-  LayerPositionMode,
-  DrawerBehavior,
-  LayerDefinition,
-  PanelLayoutProps,
   WindowOffset,
   WindowPosition,
   WindowSize,
@@ -26,7 +19,8 @@ export type {
   PopupWindowFactoryConfig,
   FloatingWindowMode,
   FloatingWindowConfig,
-} from "./panels";
+  DrawerBehavior,
+} from "./modules/window/types";
 
 // ============================================================================
 // Main Layout Component
@@ -37,10 +31,10 @@ export type { GridLayoutProps } from "./components/layout/grid/GridLayout";
 // ============================================================================
 // Drawer Components
 // ============================================================================
-export { Drawer } from "./modules/window/Drawer";
-export type { DrawerProps } from "./modules/window/Drawer";
-export { DrawerLayers } from "./modules/window/DrawerLayers";
-export type { DrawerLayersProps } from "./modules/window/DrawerLayers";
+export { Drawer } from "./components/window/Drawer";
+export type { DrawerProps } from "./components/window/Drawer";
+export { DrawerLayers } from "./components/window/DrawerLayers";
+export type { DrawerLayersProps } from "./components/window/DrawerLayers";
 
 // ============================================================================
 // Panel Components
@@ -52,7 +46,7 @@ export {
   FloatingPanelMeta,
   FloatingPanelControls,
   FloatingPanelContent,
-} from "./modules/paneling/FloatingPanelFrame";
+} from "./components/paneling/FloatingPanelFrame";
 export type {
   FloatingPanelFrameProps,
   FloatingPanelHeaderProps,
@@ -60,13 +54,13 @@ export type {
   FloatingPanelMetaProps,
   FloatingPanelControlsProps,
   FloatingPanelContentProps,
-} from "./modules/paneling/FloatingPanelFrame";
+} from "./components/paneling/FloatingPanelFrame";
 
-export { HorizontalDivider } from "./modules/resizer/HorizontalDivider";
-export type { HorizontalDividerProps } from "./modules/resizer/HorizontalDivider";
+export { HorizontalDivider } from "./components/resizer/HorizontalDivider";
+export type { HorizontalDividerProps } from "./components/resizer/HorizontalDivider";
 
-export { ResizeHandle } from "./modules/resizer/ResizeHandle";
-export type { ResizeHandleProps } from "./modules/resizer/ResizeHandle";
+export { ResizeHandle } from "./components/resizer/ResizeHandle";
+export type { ResizeHandleProps } from "./components/resizer/ResizeHandle";
 
 // ============================================================================
 // Public Hooks

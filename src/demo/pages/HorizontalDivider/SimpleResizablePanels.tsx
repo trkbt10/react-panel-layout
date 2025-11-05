@@ -2,7 +2,7 @@
  * @file Simple resizable panels with HorizontalDivider
  */
 import * as React from "react";
-import { HorizontalDivider } from "../../../modules/resizer/HorizontalDivider";
+import { HorizontalDivider } from "../../../components/resizer/HorizontalDivider";
 import styles from "./samples.module.css";
 
 export const SimpleResizablePanels: React.FC = () => {

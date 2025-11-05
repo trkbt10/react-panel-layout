@@ -2,9 +2,9 @@
  * @file DrawerLayers component
  */
 import * as React from "react";
-import type { LayerDefinition } from "../../panels";
+import type { LayerDefinition } from "../../modules/grid/types";
 import { Drawer } from "./Drawer";
-import { useDrawerState } from "./useDrawerState";
+import { useDrawerState } from "../../modules/window/useDrawerState";
 
 export type DrawerLayersProps = {
   layers: LayerDefinition[];
@@ -56,4 +56,3 @@ export const DrawerLayers: React.FC<DrawerLayersProps> = ({ layers }) => {
     </>
   );
 };
-

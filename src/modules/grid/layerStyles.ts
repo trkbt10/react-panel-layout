@@ -2,7 +2,8 @@
  * @file Helper utilities for computing layer styles in the grid layout.
  */
 import type { CSSProperties } from "react";
-import type { LayerDefinition, WindowPosition } from "../../panels";
+import type { LayerDefinition } from "./types";
+import type { WindowPosition } from "../window/types";
 
 const resolvePositionMode = (layer: LayerDefinition): LayerDefinition["positionMode"] => {
   if (layer.positionMode) {
@@ -120,4 +121,3 @@ export const buildLayerStyleObject = (layer: LayerDefinition): CSSProperties => 
     ...getPointerEventsStyle(layer, resolvedMode),
   };
 };
-

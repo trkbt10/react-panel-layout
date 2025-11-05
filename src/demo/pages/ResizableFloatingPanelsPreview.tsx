@@ -3,13 +3,13 @@
  */
 import * as React from "react";
 import { GridLayout } from "../../components/layout/grid/GridLayout";
-import type { LayerDefinition, PanelLayoutConfig } from "../../panels";
+import type { LayerDefinition, PanelLayoutConfig } from "../../modules/grid/types";
 import {
   FloatingPanelFrame,
   FloatingPanelHeader,
   FloatingPanelTitle,
   FloatingPanelContent,
-} from "../../modules/paneling/FloatingPanelFrame";
+} from "../../components/paneling/FloatingPanelFrame";
 import { useLayerDragHandle } from "../../modules/grid/useLayerDragHandle";
 import { Section, Story } from "../components/Story";
 import { CodeBlock } from "../components/CodeBlock";
