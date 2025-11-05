@@ -5,9 +5,6 @@
   overflow: hidden;
 }
 
-/* Layer styles moved to modules/grid/GridLayers.module.css */
-
-
 /* Touch-action for drag/resize prevention */
 .gridLayout[data-dragging="true"],
 .gridLayout[data-dragging="true"] *,
@@ -18,3 +15,4 @@
   -webkit-user-select: none;
   user-select: none;
 }
+

@@ -2,7 +2,7 @@
  * @file Presentational resize handles for floating layers (corner + edge).
  */
 import * as React from "react";
-import styles from "./ResizeHandles.module.css";
+import styles from "./GridLayerResizeHandles.module.css";
 
 export type HorizontalEdge = "left" | "right";
 export type VerticalEdge = "top" | "bottom";
@@ -32,7 +32,7 @@ const RESIZE_HANDLE_CONFIGS: ReadonlyArray<ResizeHandleConfig> = [
   { key: "bottom", variant: "edge", vertical: "bottom" },
 ];
 
-export type ResizeHandlesProps = {
+export type GridLayerResizeHandlesProps = {
   layerId: string;
   onPointerDown: (
     id: string,
@@ -41,7 +41,7 @@ export type ResizeHandlesProps = {
   ) => void;
 };
 
-export const ResizeHandles: React.FC<ResizeHandlesProps> = ({ layerId, onPointerDown }) => {
+export const GridLayerResizeHandles: React.FC<GridLayerResizeHandlesProps> = ({ layerId, onPointerDown }) => {
   return (
     <>
       {RESIZE_HANDLE_CONFIGS.map((config) => {
@@ -63,4 +63,3 @@ export const ResizeHandles: React.FC<ResizeHandlesProps> = ({ layerId, onPointer
     </>
   );
 };
-

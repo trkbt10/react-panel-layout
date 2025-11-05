@@ -9,7 +9,7 @@ import type { LayerDefinition } from "../../panel-system/types";
 import type { WindowPosition, WindowSize } from "../types";
 import { buildLayerStyleObject } from "./layerStyles";
 import type { GridLayerHandleProps, GridLayoutContextValue } from "./GridLayoutContext";
-import { ResizeHandles, type ResizeHandleConfig } from "../../components/layout/grid/ResizeHandles";
+import { GridLayerResizeHandles, type ResizeHandleConfig } from "../../components/grid/GridLayerResizeHandles";
 
 type LayerSize = {
   width: number;
@@ -241,7 +241,7 @@ const resolveResizeHandles = (
   if (!shouldShow) {
     return null;
   }
-  return <ResizeHandles layerId={layerId} onPointerDown={onPointerDown} />;
+  return <GridLayerResizeHandles layerId={layerId} onPointerDown={onPointerDown} />;
 };
 
 const computeResizableLayerSizes = (

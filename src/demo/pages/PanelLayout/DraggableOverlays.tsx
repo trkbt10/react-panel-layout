@@ -2,7 +2,7 @@
  * @file Draggable overlays sample
  */
 import * as React from "react";
-import { GridLayout } from "../../../components/layout/grid/GridLayout";
+import { GridLayout } from "../../../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../panel-system/types";
 
 const DraggablePanel: React.FC<{ title: string; color: string; children?: React.ReactNode }> = ({
@@ -160,7 +160,7 @@ export const DraggableOverlays = () => {
   );
 };
 
-export const code = `import { GridLayout } from "./components/layout/grid/GridLayout";
+export const code = `import { GridLayout } from "./components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "./panels";
 
 const config: PanelLayoutConfig = {

@@ -2,10 +2,10 @@
  * @file Layer list rendering inside the grid layout.
  */
 import * as React from "react";
-import type { LayerDefinition } from "../../../panel-system/types";
-import { useGridLayoutContext } from "../../../modules/grid/GridLayoutContext";
-import { LayerInstanceProvider } from "../../../modules/grid/LayerInstanceContext";
-import { PopupLayerPortal } from "../../../modules/window/PopupLayerPortal";
+import type { LayerDefinition } from "../../panel-system/types";
+import { useGridLayoutContext } from "../../modules/grid/GridLayoutContext";
+import { LayerInstanceProvider } from "../../modules/grid/LayerInstanceContext";
+import { PopupLayerPortal } from "../../modules/window/PopupLayerPortal";
 import styles from "./GridLayerList.module.css";
 
 type GridLayerListProps = {
@@ -54,4 +54,3 @@ export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
     </>
   );
 };
-

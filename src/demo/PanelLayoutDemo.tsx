@@ -3,7 +3,7 @@
  * Demonstrates the GridLayout component with various panel configurations
  */
 import * as React from "react";
-import { GridLayout } from "../components/layout/grid/GridLayout";
+import { GridLayout } from "../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../panel-system/types";
 import { DataPreview } from "./components/DataPreview";
 import { Section, Story } from "./components/Story";
@@ -181,7 +181,7 @@ const featuredLayers: LayerDefinition[] = [
   },
 ];
 
-const featuredCode = `import { GridLayout } from "../components/layout/grid/GridLayout";
+const featuredCode = `import { GridLayout } from "../components/grid/GridLayout";
 import { DataPreview } from "./components/DataPreview";
 
 const config: PanelLayoutConfig = {

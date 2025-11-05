@@ -2,7 +2,7 @@
  * @file Resizable floating panels preview page
  */
 import * as React from "react";
-import { GridLayout } from "../../components/layout/grid/GridLayout";
+import { GridLayout } from "../../components/grid/GridLayout";
 import type { LayerDefinition, PanelLayoutConfig } from "../../panel-system/types";
 import {
   FloatingPanelFrame,

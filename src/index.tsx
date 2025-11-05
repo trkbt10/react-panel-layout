@@ -30,8 +30,8 @@ export type {
 // ============================================================================
 // Main Layout Component
 // ============================================================================
-export { GridLayout } from "./components/layout/grid/GridLayout";
-export type { GridLayoutProps } from "./components/layout/grid/GridLayout";
+export { GridLayout } from "./components/grid/GridLayout";
+export type { GridLayoutProps } from "./components/grid/GridLayout";
 
 // ============================================================================
 // Drawer Components

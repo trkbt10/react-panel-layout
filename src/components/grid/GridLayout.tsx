@@ -2,18 +2,18 @@
  * @file Top-level grid layout component that consumes PanelSystemContext core.
  */
 import * as React from "react";
-import { useIntersectionObserver } from "../../../hooks/useIntersectionObserver";
-import type { LayerDefinition, PanelLayoutConfig } from "../../../panel-system/types";
-import { DrawerLayers } from "../../../components/window/DrawerLayers";
+import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
+import type { LayerDefinition, PanelLayoutConfig } from "../../panel-system/types";
+import { DrawerLayers } from "../window/DrawerLayers";
 import styles from "./GridLayout.module.css";
 import { GridLayerList } from "./GridLayerList";
-import { ResizeHandleRenderer } from "./ResizeHandleRenderer";
-import { createTrackKey } from "../../../modules/grid/trackTemplates";
-import { PanelSystemProvider, usePanelSystem } from "../../../PanelSystemContext";
-import { useGridPlacements } from "../../../modules/grid/useGridPlacements";
-import { useGridTracks } from "../../../modules/grid/useGridTracks";
-import { useLayerInteractions } from "../../../modules/grid/useLayerInteractions";
-import { GridLayoutProvider } from "../../../modules/grid/GridLayoutContext";
+import { GridTrackResizeHandle } from "./GridTrackResizeHandle";
+import { createTrackKey } from "../../modules/grid/trackTemplates";
+import { PanelSystemProvider, usePanelSystem } from "../../PanelSystemContext";
+import { useGridPlacements } from "../../modules/grid/useGridPlacements";
+import { useGridTracks } from "../../modules/grid/useGridTracks";
+import { useLayerInteractions } from "../../modules/grid/useLayerInteractions";
+import { GridLayoutProvider } from "../../modules/grid/GridLayoutContext";
 
 export type GridLayoutProps = {
   config: PanelLayoutConfig;
@@ -59,7 +59,7 @@ const GridLayoutInner: React.FC<{
         </GridLayoutProvider>
 
         {columnHandles.map(({ trackIndex, align }) => (
-          <ResizeHandleRenderer
+          <GridTrackResizeHandle
             key={`${createTrackKey("col", trackIndex)}:${align}`}
             direction="col"
             trackIndex={trackIndex}
@@ -70,7 +70,7 @@ const GridLayoutInner: React.FC<{
         ))}
 
         {rowHandles.map(({ trackIndex, align }) => (
-          <ResizeHandleRenderer
+          <GridTrackResizeHandle
             key={`${createTrackKey("row", trackIndex)}:${align}`}
             direction="row"
             trackIndex={trackIndex}
