@@ -101,3 +101,4 @@ export const addTabToGroupAtIndex = (
   const groups = { ...state.groups, [groupId]: { ...group, tabs, activeTabId } };
   return { ...state, groups };
 };
+

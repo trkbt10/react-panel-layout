@@ -69,3 +69,4 @@ export type PanelSystemProps = {
   className?: string;
   style?: React.CSSProperties;
 };
+

@@ -2,7 +2,7 @@
  * @file Unit tests for panel-system state operations (flattened path).
  */
 import { buildInitialState, splitGroup, moveTab, focusGroupIndex, nextGroup, prevGroup } from "./index";
-import type { TabDefinition } from "./types";
+import type { TabDefinition } from "./core/types";
 
 const makeTab = (id: string, title?: string): TabDefinition => ({ id, title: title ?? id, render: () => id });
 
@@ -47,4 +47,3 @@ describe("panel-system state", () => {
     expect(s5.focusedGroupId).toBe(s5.groupOrder[1]);
   });
 });
-

@@ -2,8 +2,8 @@
  * @file Adapters bridging panel-system model to existing GridLayout definitions.
  * Strategy: Use a 1x1 relative grid and place groups as absolute layers using computed rects.
  */
-import type { LayerDefinition, PanelLayoutConfig } from "../../types";
-import type { GroupId, PanelSystemState, PanelTree } from "./types";
+import type { LayerDefinition, PanelLayoutConfig } from "../../../types";
+import type { GroupId, PanelSystemState, PanelTree } from "../core/types";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 

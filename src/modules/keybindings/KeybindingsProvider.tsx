@@ -3,7 +3,7 @@
  * Belongs to modules: distributes a single source of keybindings to UI.
  */
 import * as React from "react";
-import type { PanelCommands } from "../panels/types";
+import type { PanelCommands } from "../panels/core/types";
 
 export type KeyCombo = string; // e.g., "Mod-Shift-\\", "Mod-1"
 
@@ -109,4 +109,3 @@ export const registerDefaultBindings = (api: KeybindingsContextValue, commands: 
     commands.focusPrevGroup();
   });
 };
-

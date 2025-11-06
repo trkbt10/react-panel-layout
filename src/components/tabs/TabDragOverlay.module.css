@@ -1,0 +1,25 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+.preview {
+  position: absolute;
+  transform: translate(12px, 12px);
+  background: rgba(34, 36, 42, 0.95);
+  color: #e9ebf0;
+  border: 1px solid rgba(120, 160, 255, 0.6);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  white-space: nowrap;
+}
+.insertGuide {
+  position: absolute;
+  width: 2px;
+  border-radius: 1px;
+  background: rgba(120, 160, 255, 0.95);
+  box-shadow: 0 0 0 2px rgba(120, 160, 255, 0.2);
+}

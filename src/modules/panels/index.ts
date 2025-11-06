@@ -1,15 +1,27 @@
 /**
  * @file Public state operations aggregator (flattened under src/modules/panels).
  */
-export type { PanelId, GroupId, SplitDirection, TabDefinition, GroupModel, PanelTree, PanelSystemState, DropZone, DraggingTab, PanelCommands, PanelSystemProps } from "./types";
+export type {
+  PanelId,
+  GroupId,
+  SplitDirection,
+  TabDefinition,
+  GroupModel,
+  PanelTree,
+  PanelSystemState,
+  DropZone,
+  DraggingTab,
+  PanelCommands,
+  PanelSystemProps,
+} from "./core/types";
 
-export { collectGroupsInOrder, splitLeaf, closeLeaf, isGroup } from "./tree";
-export { createEmptyGroup, addTabToGroup, removeTabFromGroup, moveTab, setActiveTab, reorderTabWithinGroup, addTabToGroupAtIndex } from "./groups";
-export { setFocusedGroup, focusGroupIndex, nextGroup, prevGroup, refreshGroupOrder } from "./focus";
+export { collectGroupsInOrder, splitLeaf, closeLeaf, isGroup, setSplitRatio } from "./core/tree";
+export { createEmptyGroup, addTabToGroup, removeTabFromGroup, moveTab, setActiveTab, reorderTabWithinGroup, addTabToGroupAtIndex } from "./core/groups";
+export { setFocusedGroup, focusGroupIndex, nextGroup, prevGroup, refreshGroupOrder } from "./core/focus";
 
-import type { GroupId as Gid, PanelSystemState as PState, SplitDirection as Dir, TabDefinition } from "./types";
-import { splitLeaf, collectGroupsInOrder } from "./tree";
-import { createEmptyGroup } from "./groups";
+import type { GroupId as Gid, PanelSystemState as PState, SplitDirection as Dir, TabDefinition } from "./core/types";
+import { splitLeaf, collectGroupsInOrder } from "./core/tree";
+import { createEmptyGroup } from "./core/groups";
 
 export type IdFactory = () => Gid;
 

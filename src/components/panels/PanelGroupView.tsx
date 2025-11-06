@@ -2,7 +2,7 @@
  * @file Group view rendering for PanelSystem (tabbar + active content).
  */
 import * as React from "react";
-import type { GroupModel } from "../../modules/panels/types";
+import type { GroupModel } from "../../modules/panels/core/types";
 import groupStyles from "./PanelGroupView.module.css";
 
 export type PanelGroupViewProps = {

@@ -3,8 +3,8 @@
  * Handles content (panel area) split/move and tabbar reordering/cross-move.
  */
 import * as React from "react";
-import type { DropZone, GroupId, PanelId } from "../../modules/panels/types";
-import { pickDropZone } from "./DropSuggestOverlay";
+import type { DropZone, GroupId, PanelId } from "../core/types";
+import { pickDropZone } from "./dnd";
 
 export type SuggestInfo = { rect: DOMRectReadOnly; zone: DropZone } | null;
 
@@ -16,15 +16,19 @@ type Phase =
 type State = {
   phase: Phase;
   suggest: SuggestInfo;
+  pointer: { x: number; y: number } | null;
+  tabbarHover: { groupId: GroupId; index: number; rect: DOMRectReadOnly; insertX: number } | null;
 };
 
 type Action =
   | { type: "START_CONTENT"; payload: { x: number; y: number; groupId: GroupId; tabId: PanelId } }
   | { type: "START_TAB"; payload: { x: number; y: number; groupId: GroupId; tabId: PanelId } }
   | { type: "SET_SUGGEST"; payload: SuggestInfo }
+  | { type: "SET_POINTER"; payload: { x: number; y: number } | null }
+  | { type: "SET_TABBAR_HOVER"; payload: { groupId: GroupId; index: number; rect: DOMRectReadOnly; insertX: number } | null }
   | { type: "RESET" };
 
-const initialState: State = { phase: { kind: "idle" }, suggest: null };
+const initialState: State = { phase: { kind: "idle" }, suggest: null, pointer: null, tabbarHover: null };
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -32,20 +36,26 @@ const reducer = (state: State, action: Action): State => {
       return {
         phase: { kind: "content", startX: action.payload.x, startY: action.payload.y, fromGroupId: action.payload.groupId, tabId: action.payload.tabId },
         suggest: null,
+        pointer: null,
+        tabbarHover: null,
       };
     case "START_TAB":
       return {
         phase: { kind: "tab", startX: action.payload.x, startY: action.payload.y, fromGroupId: action.payload.groupId, tabId: action.payload.tabId },
         suggest: null,
+        pointer: null,
+        tabbarHover: null,
       };
     case "SET_SUGGEST":
       return { ...state, suggest: action.payload };
+    case "SET_POINTER":
+      return { ...state, pointer: action.payload };
+    case "SET_TABBAR_HOVER":
+      return { ...state, tabbarHover: action.payload };
     case "RESET":
       return initialState;
-    default: {
-      // exhaustive
+    default:
       return state;
-    }
   }
 };
 
@@ -55,6 +65,8 @@ export type InteractionsContextValue = {
   onStartTabDrag: (tabId: PanelId, groupId: GroupId, e: React.PointerEvent) => void;
   isTabDragging: boolean;
   draggingTabId: PanelId | null;
+  dragPointer: { x: number; y: number } | null;
+  tabbarHover: { groupId: GroupId; index: number; rect: DOMRectReadOnly; insertX: number } | null;
 };
 
 const InteractionsContext = React.createContext<InteractionsContextValue | null>(null);
@@ -77,7 +89,6 @@ export type InteractionsProviderProps = React.PropsWithChildren<{
 export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ containerRef, dragThresholdPx, onCommitContentDrop, onCommitTabDrop, children }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
-  // Manage global pointer listeners for current phase; snapshot via deps on phase only
   React.useEffect(() => {
     if (state.phase.kind === "idle") {
       return;
@@ -99,14 +110,14 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
         if (state.phase.kind === "content") {
           dispatch({ type: "SET_SUGGEST", payload: null });
         }
+        dispatch({ type: "SET_POINTER", payload: null });
+        dispatch({ type: "SET_TABBAR_HOVER", payload: null });
         return;
       }
-
+      dispatch({ type: "SET_POINTER", payload: { x, y } });
       if (phase.kind === "content") {
         const groups = Array.from(container.querySelectorAll<HTMLElement>("[data-group-id]"));
-        const candidate = groups
-          .map((el) => ({ el, rect: el.getBoundingClientRect() }))
-          .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+        const candidate = groups.map((el) => ({ el, rect: el.getBoundingClientRect() })).find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (!candidate) {
           dispatch({ type: "SET_SUGGEST", payload: null });
           return;
@@ -115,13 +126,38 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
         dispatch({ type: "SET_SUGGEST", payload: { rect: candidate.rect, zone } });
         return;
       }
-
       if (phase.kind === "tab") {
-        // While dragging a tab, show split suggest over content areas
-        const contents = Array.from(container.querySelectorAll<HTMLElement>("[data-dnd-zone='content']"));
-        const candidate = contents
+        // Compute tabbar hover for reorder/cross-group
+        const tabbars = Array.from(container.querySelectorAll<HTMLElement>("[data-tabbar='true']"));
+        const tabbarHit = tabbars
           .map((el) => ({ el, rect: el.getBoundingClientRect() }))
           .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+        if (tabbarHit) {
+          const tabButtons = Array.from(tabbarHit.el.querySelectorAll<HTMLButtonElement>("[role='tab']"));
+          const btnRects = tabButtons.map((b) => b.getBoundingClientRect());
+          const centers = btnRects.map((r) => r.left + r.width / 2);
+          const firstIdx = centers.findIndex((c) => x < c);
+          const targetIndex = firstIdx === -1 ? centers.length : firstIdx;
+          const computeInsertX = (): number => {
+            if (btnRects.length === 0) {
+              return tabbarHit.rect.left + 8;
+            }
+            if (targetIndex === 0) {
+              return btnRects[0].left;
+            }
+            if (targetIndex === btnRects.length) {
+              return btnRects[btnRects.length - 1].right;
+            }
+            return (btnRects[targetIndex - 1].right + btnRects[targetIndex].left) / 2;
+          };
+          const insertX = computeInsertX();
+          dispatch({ type: "SET_TABBAR_HOVER", payload: { groupId: (tabbarHit.el.getAttribute("data-group-id") as GroupId)!, index: targetIndex, rect: tabbarHit.rect, insertX } });
+        } else {
+          dispatch({ type: "SET_TABBAR_HOVER", payload: null });
+        }
+        // Compute content suggest for split/move
+        const contents = Array.from(container.querySelectorAll<HTMLElement>("[data-dnd-zone='content']"));
+        const candidate = contents.map((el) => ({ el, rect: el.getBoundingClientRect() })).find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (!candidate) {
           dispatch({ type: "SET_SUGGEST", payload: null });
           return;
@@ -130,7 +166,6 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
         dispatch({ type: "SET_SUGGEST", payload: { rect: candidate.rect, zone } });
       }
     };
-
     const onUp = (ev: PointerEvent): void => {
       const container = containerRef.current;
       const snapshot = state;
@@ -148,12 +183,9 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
       if (dx < dragThresholdPx && dy < dragThresholdPx) {
         return;
       }
-
       if (snapshot.phase.kind === "content") {
         const groups = Array.from(container.querySelectorAll<HTMLElement>("[data-group-id]"));
-        const hit = groups
-          .map((el) => ({ el, rect: el.getBoundingClientRect() }))
-          .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+        const hit = groups.map((el) => ({ el, rect: el.getBoundingClientRect() })).find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (!hit) {
           return;
         }
@@ -165,9 +197,7 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
         onCommitContentDrop({ fromGroupId: snapshot.phase.fromGroupId, tabId: snapshot.phase.tabId, targetGroupId, zone });
         return;
       }
-
       if (snapshot.phase.kind === "tab") {
-        // Prefer drop into tabbar if hovered, otherwise allow drop into content for split
         const tabbars = Array.from(container.querySelectorAll<HTMLElement>("[data-tabbar='true']"));
         const tabbarHit = tabbars
           .map((el) => ({ el, rect: el.getBoundingClientRect() }))
@@ -202,7 +232,6 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
         }
       }
     };
-
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp, { once: true });
     return () => {
@@ -215,6 +244,8 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
     suggest: state.suggest,
     isTabDragging: state.phase.kind === "tab",
     draggingTabId: state.phase.kind === "tab" ? state.phase.tabId : null,
+    dragPointer: state.pointer,
+    tabbarHover: state.tabbarHover,
     onStartContentDrag: (groupId, tabId, e) => {
       if (e.button !== 0) {
         return;
@@ -229,7 +260,7 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
       (e.currentTarget as Element).setPointerCapture(e.pointerId);
       dispatch({ type: "START_TAB", payload: { x: e.clientX, y: e.clientY, groupId, tabId } });
     },
-  }), [state.suggest]);
+  }), [state.suggest, state.pointer, state.tabbarHover, state.phase]);
 
   return <InteractionsContext.Provider value={value}>{children}</InteractionsContext.Provider>;
 };

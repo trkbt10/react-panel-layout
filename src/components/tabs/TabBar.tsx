@@ -3,8 +3,8 @@
  */
 import * as React from "react";
 import styles from "./TabBar.module.css";
-import type { GroupModel, PanelId, GroupId } from "../../modules/panels/types";
-import { usePanelInteractions } from "../panels/InteractionsContext";
+import type { GroupModel, PanelId, GroupId } from "../../modules/panels/core/types";
+import { usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
 
 export type TabBarProps = {
   group: GroupModel;

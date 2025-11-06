@@ -83,4 +83,4 @@ export type {
   GroupModel as VSCodePanelGroupModel,
   TabDefinition as VSCodePanelTab,
   SplitDirection as VSCodeSplitDirection,
-} from "./modules/panels/types";
+} from "./modules/panels/core/types";

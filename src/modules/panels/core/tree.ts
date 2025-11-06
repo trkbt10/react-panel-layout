@@ -124,3 +124,20 @@ export const closeLeaf = (root: PanelTree, groupId: GroupId): { tree: PanelTree;
   return { tree: newTree, survivorGroupId: survivorId };
 };
 
+/**
+ * Set split ratio at a specific split node path. Clamps ratio into (0.05 .. 0.95) to avoid zero-size panes.
+ */
+export const setSplitRatio = (root: PanelTree, splitPath: NodePath, ratio: number): PanelTree => {
+  const clamp = (v: number): number => {
+    const min = 0.05;
+    const max = 0.95;
+    return Math.max(min, Math.min(max, v));
+  };
+  const node = getAtPath(root, splitPath);
+  if (isGroup(node)) {
+    return root;
+  }
+  const next = { ...node, ratio: clamp(ratio) } as PanelTree;
+  return setAtPath(root, splitPath, next);
+};
+
