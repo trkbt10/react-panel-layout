@@ -1,0 +1,11 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.suggestRect {
+  position: absolute;
+  border: 2px dashed rgba(90, 150, 255, 0.9);
+  background: rgba(90, 150, 255, 0.15);
+  border-radius: 6px;
+}

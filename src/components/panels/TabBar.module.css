@@ -1,0 +1,26 @@
+.tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px 4px 0 0;
+  color: #d5d7de;
+  background: transparent;
+  user-select: none;
+}
+.tabActive {
+  background: #2b2d35;
+}
+.tabTitle {
+  font-size: 12px;
+}
+.spacer {
+  flex: 1 1 auto;
+}
+.tabbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: var(--tabbar-bg, #1e1f24);
+  border-bottom: 1px solid var(--panel-border, rgba(0,0,0,0.3));
+}

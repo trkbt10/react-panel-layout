@@ -71,3 +71,16 @@ export type { ResizeHandleProps } from "./components/resizer/ResizeHandle";
 // Public Hooks
 // ============================================================================
 export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";
+
+// ============================================================================
+// VSCode-like Panel System (tabs + splits)
+// ============================================================================
+export { PanelSystem } from "./components/panels/PanelSystem";
+export { buildInitialState as buildPanelInitialState } from "./components/panels/PanelSystem";
+export type {
+  PanelSystemProps as VSCodePanelSystemProps,
+  PanelSystemState as VSCodePanelSystemState,
+  GroupModel as VSCodePanelGroupModel,
+  TabDefinition as VSCodePanelTab,
+  SplitDirection as VSCodeSplitDirection,
+} from "./modules/panels/types";
