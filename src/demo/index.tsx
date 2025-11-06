@@ -4,14 +4,11 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router";
 import { Layout } from "./Layout";
 import { PanelLayoutDemo } from "./PanelLayoutDemo";
-import { PanelLayoutPreview } from "./pages/PanelLayout";
-import { FloatingPanelFramePreview } from "./pages/FloatingPanelFrame";
-import { ResizableFloatingPanelsPreview } from "./pages/ResizableFloatingPanelsPreview";
-import { HorizontalDividerPreview } from "./pages/HorizontalDivider";
-import { ResizeHandlePreview } from "./pages/ResizeHandle";
+import { demoCategories } from "./routes";
+import * as React from "react";
 import "./demo.css";
 
 function Home() {
@@ -80,17 +77,27 @@ function About() {
 }
 
 function App() {
+  const CategoryOutlet: React.FC = () => {
+    return <Outlet />;
+  };
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="panel-demo" element={<PanelLayoutDemo />} />
-          <Route path="components/panel-layout" element={<PanelLayoutPreview />} />
-          <Route path="components/floating-panel-frame" element={<FloatingPanelFramePreview />} />
-          <Route path="components/resizable-floating-panels" element={<ResizableFloatingPanelsPreview />} />
-          <Route path="components/horizontal-divider" element={<HorizontalDividerPreview />} />
-          <Route path="components/resize-handle" element={<ResizeHandlePreview />} />
+          {demoCategories.map((cat) => (
+            <Route key={cat.id} path={cat.base.slice(1)} element={<CategoryOutlet />}>
+              {cat.pages.map((page) => (
+                <Route
+                  key={page.id}
+                  path={page.path}
+                  element={<React.Suspense fallback={null}>{page.element}</React.Suspense>}
+                />
+              ))}
+            </Route>
+          ))}
           <Route path="about" element={<About />} />
         </Route>
       </Routes>

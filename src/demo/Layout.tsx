@@ -6,49 +6,15 @@ import { Outlet, Link, useLocation } from "react-router";
 import { GridLayout } from "../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../types";
 import styles from "./Layout.module.css";
-
-type NavGroupChild = {
-  path: string;
-  label: string;
-};
-
-type NavLinkItem = {
-  path: string;
-  label: string;
-  icon: string;
-};
-
-type NavGroupItem = {
-  label: string;
-  icon: string;
-  children: NavGroupChild[];
-};
-
-type NavItem = NavLinkItem | NavGroupItem;
-
-const isNavGroupItem = (item: NavItem): item is NavGroupItem => {
-  return "children" in item;
-};
+import { demoCategories } from "./routes";
 
 const SidebarNav: React.FC = () => {
   const location = useLocation();
-
-  const navItems: NavItem[] = [
+  const topLinks = [
     { path: "/", label: "Home", icon: "🏠" },
     { path: "/panel-demo", label: "Panel Layout Demo", icon: "📐" },
-    {
-      label: "Component Previews",
-      icon: "🧩",
-      children: [
-        { path: "/components/panel-layout", label: "Panel Layout" },
-        { path: "/components/floating-panel-frame", label: "FloatingPanelFrame" },
-        { path: "/components/resizable-floating-panels", label: "Resizable Floating Panels" },
-        { path: "/components/horizontal-divider", label: "HorizontalDivider" },
-        { path: "/components/resize-handle", label: "ResizeHandle" },
-      ],
-    },
     { path: "/about", label: "About", icon: "ℹ️" },
-  ];
+  ] as const;
 
   return (
     <div className={styles.sidebar}>
@@ -57,38 +23,37 @@ const SidebarNav: React.FC = () => {
         <p className={styles.sidebarSubtitle}>Component Library</p>
       </div>
       <nav className={styles.nav}>
-        {navItems.map((item, index) => {
-          if (isNavGroupItem(item)) {
-            return (
-              <div key={index} className={styles.navGroup}>
-                <div className={styles.navGroupLabel}>
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </div>
-                <div className={styles.navGroupChildren}>
-                  {item.children.map((child) => {
-                    const isActive = location.pathname === child.path;
-                    return (
-                      <Link
-                        key={child.path}
-                        to={child.path}
-                        className={`${styles.navChildLink} ${isActive ? styles.active : ""}`}
-                      >
-                        {child.label}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          }
-
+        {topLinks.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <Link key={item.path} to={item.path} className={`${styles.navLink} ${isActive ? styles.active : ""}`}>
               <span className={styles.navIcon}>{item.icon}</span>
               <span>{item.label}</span>
             </Link>
+          );
+        })}
+
+        {demoCategories.map((category) => {
+          const isOpen = location.pathname.startsWith(category.base);
+          return (
+            <details key={category.id} className={styles.navCategory} open={isOpen}>
+              <summary className={styles.navCategorySummary}>
+                <span className={styles.navIcon}>{category.icon}</span>
+                <span>{category.label}</span>
+              </summary>
+              <div className={styles.navGroupChildren}>
+                {/* Category index link (optional) could be added here */}
+                {category.pages.map((page) => {
+                  const fullPath = `${category.base}/${page.path}`;
+                  const isActive = location.pathname === fullPath;
+                  return (
+                    <Link key={page.id} to={fullPath} className={`${styles.navChildLink} ${isActive ? styles.active : ""}`}>
+                      {page.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </details>
           );
         })}
       </nav>

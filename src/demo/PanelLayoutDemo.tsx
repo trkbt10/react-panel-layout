@@ -9,10 +9,7 @@ import { DataPreview } from "./components/DataPreview";
 import { Section, Story } from "./components/Story";
 import { CodeBlock } from "./components/CodeBlock";
 import styles from "./pages/FloatingPanelFramePreview.module.css";
-import { IDELayout, code as ideLayoutCode } from "./pages/PanelLayout/IDELayout";
-import { DashboardLayout, code as dashboardLayoutCode } from "./pages/PanelLayout/DashboardLayout";
-import { DraggableOverlays, code as draggableOverlaysCode } from "./pages/PanelLayout/DraggableOverlays";
-import { SimpleGrid, code as simpleGridCode } from "./pages/PanelLayout/SimpleGrid";
+// Keep only the featured workspace sample on this page to ensure single-sample per page.
 import "./demo.css";
 
 /**
@@ -224,44 +221,6 @@ const layers: LayerDefinition[] = [
 
 <GridLayout config={config} layers={layers} />;`;
 
-type LayoutStory = {
-  id: string;
-  title: string;
-  description: string;
-  render: () => React.ReactNode;
-  code: string;
-};
-
-const layoutStories: LayoutStory[] = [
-  {
-    id: "simple-grid",
-    title: "Simple Grid",
-    description: "Balanced 2x2 layout ideal for dashboards or split-screen editors.",
-    render: () => <SimpleGrid />,
-    code: simpleGridCode,
-  },
-  {
-    id: "ide-layout",
-    title: "IDE Workspace",
-    description: "Editor-style layout with resizable sidebar and inspector panels.",
-    render: () => <IDELayout />,
-    code: ideLayoutCode,
-  },
-  {
-    id: "dashboard-layout",
-    title: "Dashboard Overview",
-    description: "Metric cards and chart grid using multi-row spans.",
-    render: () => <DashboardLayout />,
-    code: dashboardLayoutCode,
-  },
-  {
-    id: "draggable-overlays",
-    title: "Draggable Overlays",
-    description: "Canvas with floating panels demonstrating drag interactions.",
-    render: () => <DraggableOverlays />,
-    code: draggableOverlaysCode,
-  },
-];
 
 /**
  * Panel Layout Demo Component
@@ -285,18 +244,7 @@ export const PanelLayoutDemo: React.FC = () => {
         <CodeBlock code={featuredCode} title="Creative Studio Code" />
       </Section>
 
-      <Section title="Layout Gallery">
-        {layoutStories.map(({ id, title, description, render, code }) => {
-          return (
-            <React.Fragment key={id}>
-              <Story title={title} description={description}>
-                {render()}
-              </Story>
-              <CodeBlock code={code} title={`${title} Code`} />
-            </React.Fragment>
-          );
-        })}
-      </Section>
+      {/* Intentionally no gallery here; each sample has its own page under Components / PanelLayout. */}
     </div>
   );
 };
