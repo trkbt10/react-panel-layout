@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { Section, Story } from "../../components/Story";
-import { CodeBlock } from "../../components/CodeBlock";
+import { CodePreview } from "../../components/CodePreview";
 import { VerticalResizeDemo, code as verticalCode } from "./VerticalResizeDemo";
 import { HorizontalResizeDemo, code as horizontalCode } from "./HorizontalResizeDemo";
 import { BothDirectionsDemo, code as bothDirectionsCode } from "./BothDirectionsDemo";
@@ -23,7 +23,7 @@ export const ResizeHandlePreview: React.FC = () => {
         >
           <VerticalResizeDemo />
         </Story>
-        <CodeBlock code={verticalCode} title="Vertical Resize Code" />
+        <CodePreview code={verticalCode} title="Vertical Resize Code" />
       </Section>
 
       <Section title="Horizontal Resize Handle">
@@ -33,7 +33,7 @@ export const ResizeHandlePreview: React.FC = () => {
         >
           <HorizontalResizeDemo />
         </Story>
-        <CodeBlock code={horizontalCode} title="Horizontal Resize Code" />
+        <CodePreview code={horizontalCode} title="Horizontal Resize Code" />
       </Section>
 
       <Section title="Combined Resize Handles">
@@ -43,14 +43,14 @@ export const ResizeHandlePreview: React.FC = () => {
         >
           <BothDirectionsDemo />
         </Story>
-        <CodeBlock code={bothDirectionsCode} title="Both Directions Code" />
+        <CodePreview code={bothDirectionsCode} title="Both Directions Code" />
       </Section>
 
       <Section title="Nested Panels">
         <Story title="Complex Layout" description="Multiple resize handles in a nested panel layout">
           <NestedPanelsDemo />
         </Story>
-        <CodeBlock code={nestedPanelsCode} title="Nested Panels Code" />
+        <CodePreview code={nestedPanelsCode} title="Nested Panels Code" />
       </Section>
 
       <Section title="Usage Notes">

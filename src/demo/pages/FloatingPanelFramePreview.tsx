@@ -11,7 +11,7 @@ import {
   FloatingPanelContent,
 } from "../../components/paneling/FloatingPanelFrame";
 import { Section, Story, StoryActionButton } from "../components/Story";
-import { CodeBlock } from "../components/CodeBlock";
+import { CodePreview } from "../components/CodePreview";
 import styles from "./FloatingPanelFramePreview.module.css";
 
 // ============================================================================
@@ -248,7 +248,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           <BasicPanel />
         </Story>
-        <CodeBlock code={BASIC_PANEL_CODE} title="Basic Panel Code" />
+        <CodePreview code={BASIC_PANEL_CODE} title="Basic Panel Code" />
       </Section>
 
       <Section title="Panel with Meta Information">
@@ -258,7 +258,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           <PanelWithMeta />
         </Story>
-        <CodeBlock code={PANEL_WITH_META_CODE} title="Panel with Meta Code" />
+        <CodePreview code={PANEL_WITH_META_CODE} title="Panel with Meta Code" />
       </Section>
 
       <Section title="Panel with Controls">

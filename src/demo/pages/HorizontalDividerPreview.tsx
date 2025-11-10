@@ -4,7 +4,7 @@
 import * as React from "react";
 import { HorizontalDivider } from "../../components/resizer/HorizontalDivider";
 import { Section, Story } from "../components/Story";
-import { CodeBlock } from "../components/CodeBlock";
+import { CodePreview } from "../components/CodePreview";
 import styles from "./HorizontalDividerPreview.module.css";
 
 // ============================================================================
@@ -180,7 +180,7 @@ export const HorizontalDividerPreview: React.FC = () => {
         >
           <SimpleResizablePanels />
         </Story>
-        <CodeBlock code={SIMPLE_RESIZABLE_CODE} title="Simple Resizable Panels Code" />
+        <CodePreview code={SIMPLE_RESIZABLE_CODE} title="Simple Resizable Panels Code" />
       </Section>
 
       <Section title="With Content">
@@ -190,7 +190,7 @@ export const HorizontalDividerPreview: React.FC = () => {
         >
           <PanelsWithRichContent />
         </Story>
-        <CodeBlock code={RICH_CONTENT_CODE} title="Panels with Rich Content Code" />
+        <CodePreview code={RICH_CONTENT_CODE} title="Panels with Rich Content Code" />
       </Section>
 
       <Section title="Three-Panel Layout">

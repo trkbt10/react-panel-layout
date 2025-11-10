@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { ScrollablePanel, code as scrollablePanelCode } from "../ScrollablePanel";
-import { CodeBlock } from "../../../components/CodeBlock";
+import { CodePreview } from "../../../components/CodePreview";
 
 const Page: React.FC = () => {
   const [open, setOpen] = React.useState(true);
@@ -19,10 +19,7 @@ const Page: React.FC = () => {
     <div style={{ padding: "1.5rem", maxWidth: 1200 }}>
       <h1 style={{ margin: "0 0 1rem 0" }}>FloatingPanelFrame / Scrollable</h1>
       <div style={{ marginBottom: "1rem" }}>{renderBody()}</div>
-      <details>
-        <summary style={{ cursor: "pointer", marginBottom: "0.5rem" }}>Show Code</summary>
-        <CodeBlock code={scrollablePanelCode} title="Scrollable Panel Code" />
-      </details>
+      <CodePreview code={scrollablePanelCode} title="Scrollable Panel Code" />
     </div>
   );
 };

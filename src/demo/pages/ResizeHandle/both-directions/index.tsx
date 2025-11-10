@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { BothDirectionsDemo, code as bothCode } from "../BothDirectionsDemo";
-import { CodeBlock } from "../../../components/CodeBlock";
+import { CodePreview } from "../../../components/CodePreview";
 
 const Page: React.FC = () => {
   return (
@@ -12,10 +12,7 @@ const Page: React.FC = () => {
       <div style={{ marginBottom: "1rem" }}>
         <BothDirectionsDemo />
       </div>
-      <details>
-        <summary style={{ cursor: "pointer", marginBottom: "0.5rem" }}>Show Code</summary>
-        <CodeBlock code={bothCode} title="Both Directions Code" />
-      </details>
+      <CodePreview code={bothCode} title="Both Directions Code" />
     </div>
   );
 };

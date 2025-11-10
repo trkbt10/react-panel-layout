@@ -7,7 +7,7 @@ import { GridLayout } from "../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../types";
 import { DataPreview } from "./components/DataPreview";
 import { Section, Story } from "./components/Story";
-import { CodeBlock } from "./components/CodeBlock";
+import { CodePreview } from "./components/CodePreview";
 import styles from "./pages/FloatingPanelFramePreview.module.css";
 // Keep only the featured workspace sample on this page to ensure single-sample per page.
 import "./demo.css";
@@ -239,9 +239,11 @@ export const PanelLayoutDemo: React.FC = () => {
           title="Creative Studio"
           description="Primary demo used across the documentation with toolbar, canvas, inspector, and draggable overlays."
         >
-          <GridLayout config={featuredConfig} layers={featuredLayers} />
+          <div style={{ width: "100%", height: "600px" }}>
+            <GridLayout config={featuredConfig} layers={featuredLayers} />
+          </div>
         </Story>
-        <CodeBlock code={featuredCode} title="Creative Studio Code" />
+        <CodePreview code={featuredCode} title="Creative Studio Code" />
       </Section>
 
       {/* Intentionally no gallery here; each sample has its own page under Components / PanelLayout. */}

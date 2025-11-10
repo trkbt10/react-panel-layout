@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { ThreePanelLayout, code as threePanelCode } from "../ThreePanelLayout";
-import { CodeBlock } from "../../../components/CodeBlock";
+import { CodePreview } from "../../../components/CodePreview";
 
 const Page: React.FC = () => {
   return (
@@ -12,10 +12,7 @@ const Page: React.FC = () => {
       <div style={{ marginBottom: "1rem" }}>
         <ThreePanelLayout />
       </div>
-      <details>
-        <summary style={{ cursor: "pointer", marginBottom: "0.5rem" }}>Show Code</summary>
-        <CodeBlock code={threePanelCode} title="Three Panel Layout Code" />
-      </details>
+      <CodePreview code={threePanelCode} title="Three Panel Layout Code" />
     </div>
   );
 };

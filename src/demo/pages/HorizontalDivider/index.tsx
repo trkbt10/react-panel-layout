@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { Section, Story } from "../../components/Story";
-import { CodeBlock } from "../../components/CodeBlock";
+import { CodePreview } from "../../components/CodePreview";
 import { SimpleResizablePanels, code as simpleCode } from "./SimpleResizablePanels";
 import { PanelsWithRichContent, code as richContentCode } from "./PanelsWithRichContent";
 import { ThreePanelLayout, code as threePanelCode } from "./ThreePanelLayout";
@@ -21,7 +21,7 @@ export const HorizontalDividerPreview: React.FC = () => {
         >
           <SimpleResizablePanels />
         </Story>
-        <CodeBlock code={simpleCode} title="Simple Resizable Panels Code" />
+        <CodePreview code={simpleCode} title="Simple Resizable Panels Code" />
       </Section>
 
       <Section title="With Content">
@@ -31,7 +31,7 @@ export const HorizontalDividerPreview: React.FC = () => {
         >
           <PanelsWithRichContent />
         </Story>
-        <CodeBlock code={richContentCode} title="Panels with Rich Content Code" />
+        <CodePreview code={richContentCode} title="Panels with Rich Content Code" />
       </Section>
 
       <Section title="Three-Panel Layout">
@@ -41,7 +41,7 @@ export const HorizontalDividerPreview: React.FC = () => {
         >
           <ThreePanelLayout />
         </Story>
-        <CodeBlock code={threePanelCode} title="Three-Panel Layout Code" />
+        <CodePreview code={threePanelCode} title="Three-Panel Layout Code" />
       </Section>
 
       <Section title="Interactive Demo">

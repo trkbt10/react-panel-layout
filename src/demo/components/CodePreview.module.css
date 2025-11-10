@@ -1,0 +1,37 @@
+.codePreview {
+  margin-top: 1rem;
+}
+
+.summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  transition: background 0.2s;
+  user-select: none;
+  list-style: none;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary::before {
+  content: "▶";
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+}
+
+.summary:hover {
+  background: #e8e8e8;
+}
+
+details[open] .summary::before {
+  transform: rotate(90deg);
+}

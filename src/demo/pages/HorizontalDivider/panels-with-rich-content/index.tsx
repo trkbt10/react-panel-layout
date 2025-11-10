@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { PanelsWithRichContent, code as richContentCode } from "../PanelsWithRichContent";
-import { CodeBlock } from "../../../components/CodeBlock";
+import { CodePreview } from "../../../components/CodePreview";
 
 const Page: React.FC = () => {
   return (
@@ -12,10 +12,7 @@ const Page: React.FC = () => {
       <div style={{ marginBottom: "1rem" }}>
         <PanelsWithRichContent />
       </div>
-      <details>
-        <summary style={{ cursor: "pointer", marginBottom: "0.5rem" }}>Show Code</summary>
-        <CodeBlock code={richContentCode} title="Panels with Rich Content Code" />
-      </details>
+      <CodePreview code={richContentCode} title="Panels with Rich Content Code" />
     </div>
   );
 };

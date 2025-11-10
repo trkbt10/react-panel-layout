@@ -12,7 +12,7 @@ import {
 } from "../../components/paneling/FloatingPanelFrame";
 import { useLayerDragHandle } from "../../modules/grid/useLayerDragHandle";
 import { Section, Story } from "../components/Story";
-import { CodeBlock } from "../components/CodeBlock";
+import { CodePreview } from "../components/CodePreview";
 import styles from "./ResizableFloatingPanelsPreview.module.css";
 
 const EDGE_RESIZE_DEMO_CODE = `import {
@@ -223,7 +223,7 @@ export const ResizableFloatingPanelsPreview: React.FC = () => {
         >
           <FloatingWorkspaceDemo />
         </Story>
-        <CodeBlock code={EDGE_RESIZE_DEMO_CODE} />
+        <CodePreview code={EDGE_RESIZE_DEMO_CODE} title="Edge Resize Demo Code" />
       </Section>
     </div>
   );

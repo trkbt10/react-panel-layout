@@ -3,19 +3,16 @@
  */
 import * as React from "react";
 import { SimpleGrid, code as simpleGridCode } from "../SimpleGrid";
-import { CodeBlock } from "../../../components/CodeBlock";
+import { CodePreview } from "../../../components/CodePreview";
 
 const Page: React.FC = () => {
   return (
     <div style={{ padding: "1.5rem", maxWidth: 1200 }}>
       <h1 style={{ margin: "0 0 1rem 0" }}>PanelLayout / Simple Grid</h1>
-      <div style={{ marginBottom: "1rem" }}>
+      <div style={{ marginBottom: "1rem", height: "400px" }}>
         <SimpleGrid />
       </div>
-      <details>
-        <summary style={{ cursor: "pointer", marginBottom: "0.5rem" }}>Show Code</summary>
-        <CodeBlock code={simpleGridCode} title="Simple Grid Code" />
-      </details>
+      <CodePreview code={simpleGridCode} title="Simple Grid Code" />
     </div>
   );
 };

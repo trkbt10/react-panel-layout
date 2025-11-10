@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { PanelWithMeta, code as panelWithMetaCode } from "../PanelWithMeta";
-import { CodeBlock } from "../../../components/CodeBlock";
+import { CodePreview } from "../../../components/CodePreview";
 
 const Page: React.FC = () => {
   return (
@@ -12,10 +12,7 @@ const Page: React.FC = () => {
       <div style={{ marginBottom: "1rem" }}>
         <PanelWithMeta />
       </div>
-      <details>
-        <summary style={{ cursor: "pointer", marginBottom: "0.5rem" }}>Show Code</summary>
-        <CodeBlock code={panelWithMetaCode} title="Panel with Meta Code" />
-      </details>
+      <CodePreview code={panelWithMetaCode} title="Panel with Meta Code" />
     </div>
   );
 };

@@ -4,7 +4,7 @@
 import * as React from "react";
 import { ResizeHandle } from "../../components/resizer/ResizeHandle";
 import { Section, Story } from "../components/Story";
-import { CodeBlock } from "../components/CodeBlock";
+import { CodePreview } from "../components/CodePreview";
 import styles from "./ResizeHandlePreview.module.css";
 
 // ============================================================================
@@ -224,7 +224,7 @@ export const ResizeHandlePreview: React.FC = () => {
         >
           <VerticalResizeDemo />
         </Story>
-        <CodeBlock code={VERTICAL_RESIZE_CODE} title="Vertical Resize Code" />
+        <CodePreview code={VERTICAL_RESIZE_CODE} title="Vertical Resize Code" />
       </Section>
 
       <Section title="Horizontal Resize Handle">
@@ -234,7 +234,7 @@ export const ResizeHandlePreview: React.FC = () => {
         >
           <HorizontalResizeDemo />
         </Story>
-        <CodeBlock code={HORIZONTAL_RESIZE_CODE} title="Horizontal Resize Code" />
+        <CodePreview code={HORIZONTAL_RESIZE_CODE} title="Horizontal Resize Code" />
       </Section>
 
       <Section title="Combined Resize Handles">

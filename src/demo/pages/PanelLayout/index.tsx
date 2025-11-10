@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { Section, Story } from "../../components/Story";
-import { CodeBlock } from "../../components/CodeBlock";
+import { CodePreview } from "../../components/CodePreview";
 import { IDELayout, code as ideLayoutCode } from "./IDELayout";
 import { SimpleGrid, code as simpleGridCode } from "./SimpleGrid";
 import { DashboardLayout, code as dashboardLayoutCode } from "./DashboardLayout";
@@ -17,9 +17,11 @@ export const PanelLayoutPreview: React.FC = () => {
 
       <Section title="Simple Grid Layout">
         <Story title="2x2 Grid" description="Basic grid layout with equal-sized cells">
-          <SimpleGrid />
+          <div style={{ width: "100%", height: "400px" }}>
+            <SimpleGrid />
+          </div>
         </Story>
-        <CodeBlock code={simpleGridCode} title="Simple Grid Code" />
+        <CodePreview code={simpleGridCode} title="Simple Grid Code" />
       </Section>
 
       <Section title="IDE-Style Layout">
@@ -27,9 +29,11 @@ export const PanelLayoutPreview: React.FC = () => {
           title="IDE Layout with Resizable Panels"
           description="Complex layout with toolbar, sidebar, canvas, inspector, and status bar. Includes draggable floating panel."
         >
-          <IDELayout />
+          <div style={{ width: "100%", height: "600px" }}>
+            <IDELayout />
+          </div>
         </Story>
-        <CodeBlock code={ideLayoutCode} title="IDE Layout Code" />
+        <CodePreview code={ideLayoutCode} title="IDE Layout Code" />
       </Section>
 
       <Section title="Dashboard Layout">
@@ -37,9 +41,11 @@ export const PanelLayoutPreview: React.FC = () => {
           title="Dashboard with Stats and Charts"
           description="Dashboard-style layout with header, stat cards, charts, and activity feed"
         >
-          <DashboardLayout />
+          <div style={{ width: "100%", height: "600px" }}>
+            <DashboardLayout />
+          </div>
         </Story>
-        <CodeBlock code={dashboardLayoutCode} title="Dashboard Layout Code" />
+        <CodePreview code={dashboardLayoutCode} title="Dashboard Layout Code" />
       </Section>
 
       <Section title="Draggable Overlays">
@@ -47,9 +53,11 @@ export const PanelLayoutPreview: React.FC = () => {
           title="Floating Draggable Panels"
           description="Canvas with multiple draggable floating panels for tools, colors, and settings"
         >
-          <DraggableOverlays />
+          <div style={{ width: "100%", height: "600px" }}>
+            <DraggableOverlays />
+          </div>
         </Story>
-        <CodeBlock code={draggableOverlaysCode} title="Draggable Overlays Code" />
+        <CodePreview code={draggableOverlaysCode} title="Draggable Overlays Code" />
       </Section>
     </div>
   );

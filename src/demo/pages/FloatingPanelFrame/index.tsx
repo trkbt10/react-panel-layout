@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { Section, Story, StoryActionButton } from "../../components/Story";
-import { CodeBlock } from "../../components/CodeBlock";
+import { CodePreview } from "../../components/CodePreview";
 import { BasicPanel, code as basicPanelCode } from "./BasicPanel";
 import { PanelWithMeta, code as panelWithMetaCode } from "./PanelWithMeta";
 import { PanelWithControls, code as panelWithControlsCode } from "./PanelWithControls";
@@ -27,7 +27,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           <BasicPanel />
         </Story>
-        <CodeBlock code={basicPanelCode} title="Basic Panel Code" />
+        <CodePreview code={basicPanelCode} title="Basic Panel Code" />
       </Section>
 
       <Section title="Panel with Meta Information">
@@ -37,7 +37,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           <PanelWithMeta />
         </Story>
-        <CodeBlock code={panelWithMetaCode} title="Panel with Meta Code" />
+        <CodePreview code={panelWithMetaCode} title="Panel with Meta Code" />
       </Section>
 
       <Section title="Panel with Controls">
@@ -48,7 +48,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           {showPanel1 ? <PanelWithControls onClose={() => setShowPanel1(false)} /> : <p>Panel closed</p>}
         </Story>
-        <CodeBlock code={panelWithControlsCode} title="Panel with Controls Code" />
+        <CodePreview code={panelWithControlsCode} title="Panel with Controls Code" />
       </Section>
 
       <Section title="Complex Panel">
@@ -59,7 +59,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           {showPanel2 ? <ComplexPanel onClose={() => setShowPanel2(false)} /> : <p>Panel closed</p>}
         </Story>
-        <CodeBlock code={complexPanelCode} title="Complex Panel Code" />
+        <CodePreview code={complexPanelCode} title="Complex Panel Code" />
       </Section>
 
       <Section title="Scrollable Content">
@@ -70,7 +70,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           {showPanel3 ? <ScrollablePanel onClose={() => setShowPanel3(false)} /> : <p>Panel closed</p>}
         </Story>
-        <CodeBlock code={scrollablePanelCode} title="Scrollable Panel Code" />
+        <CodePreview code={scrollablePanelCode} title="Scrollable Panel Code" />
       </Section>
     </div>
   );

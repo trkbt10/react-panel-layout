@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { SimpleResizablePanels, code as simpleCode } from "../SimpleResizablePanels";
-import { CodeBlock } from "../../../components/CodeBlock";
+import { CodePreview } from "../../../components/CodePreview";
 
 const Page: React.FC = () => {
   return (
@@ -12,10 +12,7 @@ const Page: React.FC = () => {
       <div style={{ marginBottom: "1rem" }}>
         <SimpleResizablePanels />
       </div>
-      <details>
-        <summary style={{ cursor: "pointer", marginBottom: "0.5rem" }}>Show Code</summary>
-        <CodeBlock code={simpleCode} title="Simple Resizable Panels Code" />
-      </details>
+      <CodePreview code={simpleCode} title="Simple Resizable Panels Code" />
     </div>
   );
 };

@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { VerticalResizeDemo, code as verticalCode } from "../VerticalResizeDemo";
-import { CodeBlock } from "../../../components/CodeBlock";
+import { CodePreview } from "../../../components/CodePreview";
 
 const Page: React.FC = () => {
   return (
@@ -12,10 +12,7 @@ const Page: React.FC = () => {
       <div style={{ marginBottom: "1rem" }}>
         <VerticalResizeDemo />
       </div>
-      <details>
-        <summary style={{ cursor: "pointer", marginBottom: "0.5rem" }}>Show Code</summary>
-        <CodeBlock code={verticalCode} title="Vertical Resize Code" />
-      </details>
+      <CodePreview code={verticalCode} title="Vertical Resize Code" />
     </div>
   );
 };
