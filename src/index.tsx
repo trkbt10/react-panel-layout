@@ -81,9 +81,9 @@ export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";
 // ============================================================================
 // VSCode-like Panel System (tabs + splits)
 // ============================================================================
-export { PanelSystem } from "./components/panels/PanelSystem";
-export { buildInitialState as buildPanelInitialState } from "./components/panels/PanelSystem";
-export { createPanelView } from "./components/panels/createPanelView";
+export { PanelSystem } from "./modules/panels/system/PanelSystem";
+export { buildInitialState as buildPanelInitialState } from "./modules/panels";
+export { createPanelView } from "./modules/panels/rendering/createPanelView";
 export type {
   PanelSystemProps as VSCodePanelSystemProps,
   PanelSystemState as VSCodePanelSystemState,

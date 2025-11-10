@@ -1,8 +1,8 @@
 /**
  * @file Focus and navigation helpers for panel-system.
  */
-import type { GroupId, PanelSystemState } from "./types";
-import { collectGroupsInOrder } from "./tree";
+import type { GroupId, PanelSystemState } from "../types";
+import { collectGroupsInOrder } from "../tree/logic";
 
 export const setFocusedGroup = (state: PanelSystemState, groupId: GroupId): PanelSystemState => {
   if (!state.groups[groupId]) {

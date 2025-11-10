@@ -68,6 +68,7 @@ export type TabBarRenderProps = {
 export type PanelGroupRenderProps = {
   group: GroupModel;
   tabbar: React.ReactNode;
+  content: React.ReactNode;
   onContentPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
   groupRef?: React.Ref<HTMLDivElement>;
   contentRef?: React.Ref<HTMLDivElement>;

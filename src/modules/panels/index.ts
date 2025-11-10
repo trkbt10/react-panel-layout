@@ -15,13 +15,13 @@ export type {
   PanelSystemProps,
 } from "./state/types";
 
-export { collectGroupsInOrder, splitLeaf, closeLeaf, isGroup, setSplitRatio } from "./state/tree";
-export { createEmptyGroup, addTabToGroup, removeTabFromGroup, moveTab, setActiveTab, reorderTabWithinGroup, addTabToGroupAtIndex } from "./state/groups";
-export { setFocusedGroup, focusGroupIndex, nextGroup, prevGroup, refreshGroupOrder } from "./state/focus";
+export { collectGroupsInOrder, splitLeaf, closeLeaf, isGroup, setSplitRatio } from "./state/tree/logic";
+export { createEmptyGroup, addTabToGroup, removeTabFromGroup, moveTab, setActiveTab, reorderTabWithinGroup, addTabToGroupAtIndex } from "./state/groups/logic";
+export { setFocusedGroup, focusGroupIndex, nextGroup, prevGroup, refreshGroupOrder } from "./state/focus/logic";
 
 import type { GroupId as Gid, PanelSystemState as PState, SplitDirection as Dir, TabDefinition } from "./state/types";
-import { splitLeaf, collectGroupsInOrder } from "./state/tree";
-import { createEmptyGroup } from "./state/groups";
+import { splitLeaf, collectGroupsInOrder } from "./state/tree/logic";
+import { createEmptyGroup } from "./state/groups/logic";
 
 export type IdFactory = () => Gid;
 

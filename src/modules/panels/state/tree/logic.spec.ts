@@ -1,8 +1,8 @@
 /**
  * @file Unit tests for panel-system tree operations
  */
-import type { PanelTree } from "./types";
-import { setSplitRatio } from "./tree";
+import type { PanelTree } from "../types";
+import { setSplitRatio } from "./logic";
 
 describe("panel-tree setSplitRatio", () => {
   it("updates ratio and clamps to bounds", () => {

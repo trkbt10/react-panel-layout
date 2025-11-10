@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { useKeybindings, registerDefaultBindings } from "../../keybindings/KeybindingsProvider";
-import { usePanelCommands } from "../commands/commands";
+import { usePanelCommands } from "../state/commands";
 
 export const DefaultKeybindingsInstaller: React.FC = () => {
   const api = useKeybindings();

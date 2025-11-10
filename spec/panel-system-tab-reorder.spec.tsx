@@ -6,7 +6,7 @@ import { render, act } from "@testing-library/react";
 import type { PanelSystemState, TabDefinition } from "../src/modules/panels/state/types";
 import { buildPanelInitialState } from "../src";
 import { PanelStateProvider, usePanelState } from "../src/modules/panels/state/StateContext";
-import { useCommitHandlers } from "../src/modules/panels/commands/commands";
+import { useCommitHandlers } from "../src/modules/panels/state/commands";
 
 type RecorderHandle = {
   handlers: ReturnType<typeof useCommitHandlers>;

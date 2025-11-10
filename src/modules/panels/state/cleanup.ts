@@ -3,7 +3,7 @@
  * - Removes groups with no tabs and collapses the tree accordingly.
  */
 import type { GroupId, PanelSystemState } from "./types";
-import { closeLeaf, collectGroupsInOrder } from "./tree";
+import { closeLeaf, collectGroupsInOrder } from "./tree/logic";
 
 /**
  * Remove empty groups (tabs.length === 0) by collapsing corresponding leaves.

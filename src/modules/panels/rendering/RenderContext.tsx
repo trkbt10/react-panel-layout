@@ -6,6 +6,7 @@ import type { GroupId, GroupModel, PanelId } from "../state/types";
 
 export type PanelRenderContextValue = {
   getGroup: (id: GroupId) => GroupModel | null;
+  getGroupContent: (id: GroupId) => React.ReactNode;
   onClickTab: (groupId: GroupId, tabId: PanelId) => void;
   onStartTabDrag: (tabId: PanelId, groupId: GroupId, e: React.PointerEvent) => void;
   onStartContentDrag: (groupId: GroupId, e: React.PointerEvent<HTMLDivElement>) => void;

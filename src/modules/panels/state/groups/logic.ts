@@ -1,7 +1,7 @@
 /**
  * @file Group and tab registry operations (pure, no tree logic).
  */
-import type { GroupId, GroupModel, PanelId, PanelSystemState, TabDefinition } from "./types";
+import type { GroupId, GroupModel, PanelId, PanelSystemState, TabDefinition } from "../types";
 
 export const createEmptyGroup = (id: GroupId): GroupModel => {
   return { id, tabIds: [], tabs: [], activeTabId: null };

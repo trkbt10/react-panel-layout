@@ -5,15 +5,12 @@ import * as React from "react";
 import type { PanelGroupRenderProps } from "../../modules/panels/state/types";
 import groupStyles from "./PanelGroupView.module.css";
 
-const RawPanelGroupView: React.FC<PanelGroupRenderProps> = ({ group, tabbar, onContentPointerDown, groupRef, contentRef }) => {
-  const activeTab = React.useMemo(() => group.tabs.find((t) => t.id === group.activeTabId) ?? null, [group.tabs, group.activeTabId]);
-  const empty = React.useMemo(() => React.createElement("div", { style: { color: "#888", fontSize: 12, padding: 12 } }, "No tabs"), []);
-  const contentNode = activeTab ? activeTab.render() : empty;
+const RawPanelGroupView: React.FC<PanelGroupRenderProps> = ({ group, tabbar, content, onContentPointerDown, groupRef, contentRef }) => {
   return (
     <div ref={groupRef} className={groupStyles.group} data-group-id={group.id}>
       {tabbar}
       <div ref={contentRef} className={groupStyles.content} data-dnd-zone="content" onPointerDown={onContentPointerDown}>
-        {contentNode}
+        {content}
       </div>
     </div>
   );

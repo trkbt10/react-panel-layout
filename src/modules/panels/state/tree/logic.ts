@@ -1,7 +1,7 @@
 /**
  * @file Tree operations for panel-system (no registry or focus concerns).
  */
-import type { GroupId, PanelTree, SplitDirection } from "./types";
+import type { GroupId, PanelTree, SplitDirection } from "../types";
 
 export type PathSegment = "a" | "b";
 export type NodePath = PathSegment[];

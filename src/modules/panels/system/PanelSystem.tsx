@@ -1,25 +1,39 @@
 /**
- * @file VSCode-like PanelSystem component (tabs + splits + drag/drop + keybindings)
+ * @file VSCode-like PanelSystem composed via module contexts and presentational components.
  */
 import * as React from "react";
-import styles from "./PanelSystem.module.css";
-import type { GroupId, PanelSystemProps } from "../../modules/panels/state/types";
-import { KeybindingsProvider } from "../../modules/keybindings/KeybindingsProvider";
-import { buildGridForAbsolutePanels, buildGridFromRects } from "../../modules/panels/layout/adapter";
-import { GridLayout } from "../grid/GridLayout";
-import { GroupContainer } from "./GroupContainer";
-import { InteractionsProvider, usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
-import { DropSuggestOverlay } from "./DropSuggestOverlay";
-import { TabDragOverlay } from "../tabs/TabDragOverlay";
-import { PanelStateProvider, usePanelState } from "../../modules/panels/state/StateContext";
-import { DefaultKeybindingsInstaller } from "../../modules/panels/keybindings/KeybindingsInstaller";
-import { useCommitHandlers } from "../../modules/panels/commands/commands";
-import { RenderBridge } from "../../modules/panels/rendering/RenderBridge";
-import { DomRegistryProvider } from "../../modules/panels/dom/DomRegistry";
-import { PanelSplitHandles } from "./PanelSplitHandles";
-import { PanelThemeProvider } from "../../modules/theme/tokens";
+import styles from "../../../components/panels/PanelSystem.module.css";
+import type { GroupId, PanelSystemProps } from "../state/types";
+import { KeybindingsProvider } from "../../keybindings/KeybindingsProvider";
+import { buildGridForAbsolutePanels, buildGridFromRects } from "../layout/adapter";
+import { GridLayout } from "../../../components/grid/GridLayout";
+import { GroupContainer } from "../rendering/GroupContainer";
+import { InteractionsProvider, usePanelInteractions } from "../interactions/InteractionsContext";
+import { DropSuggestOverlay } from "../../../components/panels/DropSuggestOverlay";
+import { TabDragOverlay } from "../../../components/tabs/TabDragOverlay";
+import { PanelStateProvider, usePanelState } from "../state/StateContext";
+import { DefaultKeybindingsInstaller } from "../keybindings/KeybindingsInstaller";
+import { useCommitHandlers } from "../state/commands";
+import { RenderBridge } from "../rendering/RenderBridge";
+import { DomRegistryProvider } from "../dom/DomRegistry";
+import { PanelSplitHandles } from "../state/PanelSplitHandles";
+import { PanelThemeProvider } from "../../theme/tokens";
 
-export const PanelSystem: React.FC<PanelSystemProps> = ({ initialState, createGroupId, layoutMode, gridTracksInteractive, dragThresholdPx, view, state: controlled, onStateChange, className, style, themeTokens, tabBarComponent, panelGroupComponent }) => {
+export const PanelSystem: React.FC<PanelSystemProps> = ({
+  initialState,
+  createGroupId,
+  layoutMode,
+  gridTracksInteractive,
+  dragThresholdPx,
+  view,
+  state: controlled,
+  onStateChange,
+  className,
+  style,
+  themeTokens,
+  tabBarComponent,
+  panelGroupComponent,
+}) => {
   if (!initialState) {
     throw new Error("PanelSystem requires initialState.");
   }
@@ -42,13 +56,17 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({ initialState, createGr
     const { state } = usePanelState();
     const { onCommitContentDrop, onCommitTabDrop } = useCommitHandlers();
 
-  const onRenderGroup = React.useCallback((gid: GroupId): React.ReactNode => {
-      if (view) {
-        const View = view;
-        return <View groupId={gid} />;
-      }
-      return <GroupContainer id={gid} TabBarComponent={tabBarComponent} PanelGroupComponent={panelGroupComponent} />;
-    }, [view, tabBarComponent, panelGroupComponent]);
+    const onRenderGroup = React.useCallback(
+      (gid: GroupId): React.ReactNode => {
+        if (view) {
+          const View = view;
+          return <View groupId={gid} />;
+        }
+        return <GroupContainer id={gid} TabBarComponent={tabBarComponent} PanelGroupComponent={panelGroupComponent} />;
+      },
+      [view, tabBarComponent, panelGroupComponent],
+    );
+
     const grid = React.useMemo(() => {
       if (layoutMode === "grid") {
         return buildGridFromRects(state, onRenderGroup, Boolean(gridTracksInteractive));
@@ -97,5 +115,3 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({ initialState, createGr
     </PanelStateProvider>
   );
 };
-
-export { buildInitialState } from "../../modules/panels";
