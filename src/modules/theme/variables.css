@@ -1,0 +1,69 @@
+/**
+ * @file CSS custom properties (variables) for react-panel-layout theme system
+ *
+ * These variables can be overridden by users via:
+ * 1. CSS: Override these variables in your own stylesheet
+ * 2. Inline: Pass tokens to PanelThemeProvider
+ */
+
+:root {
+  /* ========== Colors ========== */
+
+  /* Tab colors */
+  --rpl-color-tab-fg: #d5d7de;
+  --rpl-color-tab-active-bg: #2b2d35;
+  --rpl-color-tabbar-bg: #1e1f24;
+
+  /* Panel colors */
+  --rpl-color-panel-border: rgba(0, 0, 0, 0.3);
+  --rpl-color-panel-bg: #0b0b0c;
+
+  /* Primary color (for resize handles, etc.) */
+  --rpl-color-primary: #2196f3;
+
+  /* Drop suggestion overlay */
+  --rpl-color-drop-suggest-border: rgba(90, 150, 255, 0.9);
+  --rpl-color-drop-suggest-bg: rgba(90, 150, 255, 0.15);
+
+  /* Tab drag overlay */
+  --rpl-color-tabdrag-bg: rgba(34, 36, 42, 0.95);
+  --rpl-color-tabdrag-fg: #e9ebf0;
+  --rpl-color-tabdrag-border: rgba(120, 160, 255, 0.6);
+  --rpl-color-tabdrag-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+
+  /* Insert guide */
+  --rpl-color-insert-guide: rgba(120, 160, 255, 0.95);
+  --rpl-color-insert-guide-shadow: 0 0 0 2px rgba(120, 160, 255, 0.2);
+
+  /* ========== Sizes & Spacing ========== */
+
+  /* Tab sizing */
+  --rpl-size-tab-font: 12px;
+  --rpl-space-tab-padding-y: 4px;
+  --rpl-space-tab-padding-x: 8px;
+
+  /* Tabbar spacing */
+  --rpl-space-tabbar-gap: 6px;
+  --rpl-space-tabbar-padding-y: 4px;
+  --rpl-space-tabbar-padding-x: 6px;
+
+  /* Border radius */
+  --rpl-radius-tab: 4px;
+  --rpl-radius-suggest: 6px;
+
+  /* Border widths */
+  --rpl-size-suggest-border: 2px;
+
+  /* Handle thicknesses */
+  --rpl-size-grid-handle-thickness: 4px;
+  --rpl-size-resize-handle-thickness: 4px;
+  --rpl-size-split-handle-thickness: 6px;
+
+  /* Drop suggest padding */
+  --rpl-space-drop-suggest-padding: 6px;
+
+  /* ========== Z-indexes ========== */
+
+  --rpl-z-overlay: 9998;
+  --rpl-z-tabdrag-overlay: 9999;
+}

@@ -6,7 +6,6 @@ import type { GroupModel, GroupId, PanelId } from "../../../../modules/panels/st
 import { TabBar } from "../../../../components/tabs/TabBar";
 import { InteractionsProvider } from "../../../../modules/panels/interactions/InteractionsContext";
 import { DomRegistryProvider } from "../../../../modules/panels/dom/DomRegistry";
-import { PanelThemeProvider } from "../../../../modules/theme/tokens";
 import { DemoPage } from "../../components";
 
 const makeGroup = (id: GroupId): GroupModel => {
@@ -30,13 +29,12 @@ const Page: React.FC = () => {
   return (
     <DemoPage title="PanelSystem / TabBar" padding="1.5rem" maxWidth={960}>
       <div ref={containerRef} style={{ border: "1px solid #333", borderRadius: 6, background: "#111", padding: 8 }}>
-        <PanelThemeProvider>
-          <DomRegistryProvider>
-            <InteractionsProvider
-              containerRef={containerRef}
-              dragThresholdPx={6}
-              onCommitContentDrop={() => {}}
-              onCommitTabDrop={({ fromGroupId, tabId, targetGroupId, targetIndex }) => {
+        <DomRegistryProvider>
+          <InteractionsProvider
+            containerRef={containerRef}
+            dragThresholdPx={6}
+            onCommitContentDrop={() => {}}
+            onCommitTabDrop={({ fromGroupId, tabId, targetGroupId, targetIndex }) => {
                 if (fromGroupId !== targetGroupId) {
                   return;
                 }
@@ -60,7 +58,6 @@ const Page: React.FC = () => {
               <TabBar group={group} onClickTab={onClickTab} />
             </InteractionsProvider>
           </DomRegistryProvider>
-        </PanelThemeProvider>
       </div>
     </DemoPage>
   );

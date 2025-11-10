@@ -17,7 +17,6 @@ import { useCommitHandlers } from "../state/commands";
 import { RenderBridge } from "../rendering/RenderBridge";
 import { DomRegistryProvider } from "../dom/DomRegistry";
 import { PanelSplitHandles } from "../state/PanelSplitHandles";
-import { PanelThemeProvider } from "../../theme/tokens";
 
 export const PanelSystem: React.FC<PanelSystemProps> = ({
   initialState,
@@ -30,7 +29,6 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({
   onStateChange,
   className,
   style,
-  themeTokens,
   tabBarComponent,
   panelGroupComponent,
 }) => {
@@ -75,24 +73,22 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({
     }, [layoutMode, gridTracksInteractive, state, onRenderGroup]);
 
     return (
-      <PanelThemeProvider tokens={themeTokens}>
-        <DomRegistryProvider>
-          <InteractionsProvider
-            containerRef={containerRef}
-            dragThresholdPx={dragThresholdPx}
-            onCommitContentDrop={onCommitContentDrop}
-            onCommitTabDrop={onCommitTabDrop}
-          >
-            <RenderBridge>
-              <div ref={containerRef} className={className ? `${styles.root} ${className}` : styles.root} style={style}>
-                <GridLayout config={grid.config} layers={grid.layers} />
-              </div>
-            </RenderBridge>
-            <PanelSplitHandles containerRef={containerRef} />
-            <OverlayWithinProvider />
-          </InteractionsProvider>
-        </DomRegistryProvider>
-      </PanelThemeProvider>
+      <DomRegistryProvider>
+        <InteractionsProvider
+          containerRef={containerRef}
+          dragThresholdPx={dragThresholdPx}
+          onCommitContentDrop={onCommitContentDrop}
+          onCommitTabDrop={onCommitTabDrop}
+        >
+          <RenderBridge>
+            <div ref={containerRef} className={className ? `${styles.root} ${className}` : styles.root} style={style}>
+              <GridLayout config={grid.config} layers={grid.layers} />
+            </div>
+          </RenderBridge>
+          <PanelSplitHandles containerRef={containerRef} />
+          <OverlayWithinProvider />
+        </InteractionsProvider>
+      </DomRegistryProvider>
     );
   };
 

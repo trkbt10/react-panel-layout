@@ -8,7 +8,6 @@ import { isGroup } from "../../panels/state/tree/logic";
 import { usePanelState } from "../../panels/state/StateContext";
 import { useTree } from "../../panels/state/tree/Context";
 import { ResizeHandle } from "../../../components/resizer/ResizeHandle";
-import { usePanelTheme } from "../../theme/tokens";
 
 type Rect = { x: number; y: number; w: number; h: number };
 
@@ -45,7 +44,6 @@ export type PanelSplitHandlesProps = { containerRef: React.RefObject<HTMLDivElem
 export const PanelSplitHandles: React.FC<PanelSplitHandlesProps> = ({ containerRef }) => {
   const { state } = usePanelState();
   const { adjustSplitRatio } = useTree();
-  const theme = usePanelTheme();
 
   const handles = React.useMemo(() => collectHandles(state.tree, [], { x: 0, y: 0, w: 100, h: 100 }, []), [state.tree]);
 
@@ -60,13 +58,14 @@ export const PanelSplitHandles: React.FC<PanelSplitHandlesProps> = ({ containerR
       width: (containerRect.width * handle.parentRect.w) / 100,
       height: (containerRect.height * handle.parentRect.h) / 100,
     };
-    const thickness = theme.splitHandleThickness;
+
+    const thickness = "var(--rpl-size-split-handle-thickness, 6px)";
 
     if (handle.direction === "vertical") {
       const x = parentPx.left + (parentPx.width * (handle.linePos - handle.parentRect.x)) / handle.parentRect.w;
       const style: React.CSSProperties = {
         position: "fixed",
-        left: Math.round(x - thickness / 2),
+        left: `calc(${Math.round(x)}px - ${thickness} / 2)`,
         top: Math.round(parentPx.top),
         width: thickness,
         height: Math.round(parentPx.height),
@@ -93,7 +92,7 @@ export const PanelSplitHandles: React.FC<PanelSplitHandlesProps> = ({ containerR
     const style: React.CSSProperties = {
       position: "fixed",
       left: Math.round(parentPx.left),
-      top: Math.round(y - thickness / 2),
+      top: `calc(${Math.round(y)}px - ${thickness} / 2)`,
       width: Math.round(parentPx.width),
       height: thickness,
       cursor: "row-resize",

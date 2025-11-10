@@ -2,7 +2,6 @@
  * @file Types for VSCode-like panel system (tabs, groups, splits).
  */
 import * as React from "react";
-import type { PanelDesignTokens } from "../../theme/tokens";
 
 export type PanelId = string;
 export type GroupId = string;
@@ -93,8 +92,6 @@ export type PanelSystemProps = {
   /** ClassName/style passthrough */
   className?: string;
   style?: React.CSSProperties;
-  /** Optional design tokens to override defaults */
-  themeTokens?: Partial<PanelDesignTokens>;
   /** Pluggable UI components */
   tabBarComponent?: React.ComponentType<TabBarRenderProps>;
   panelGroupComponent?: React.ComponentType<PanelGroupRenderProps>;
