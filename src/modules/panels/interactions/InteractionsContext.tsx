@@ -5,6 +5,7 @@
 import * as React from "react";
 import type { DropZone, GroupId, PanelId } from "../core/types";
 import { pickDropZone } from "./dnd";
+import { useDomRegistry } from "../context/DomRegistry";
 
 export type SuggestInfo = { rect: DOMRectReadOnly; zone: DropZone } | null;
 
@@ -88,6 +89,7 @@ export type InteractionsProviderProps = React.PropsWithChildren<{
 
 export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ containerRef, dragThresholdPx, onCommitContentDrop, onCommitTabDrop, children }) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const dom = useDomRegistry();
 
   React.useEffect(() => {
     if (state.phase.kind === "idle") {
@@ -116,8 +118,12 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
       }
       dispatch({ type: "SET_POINTER", payload: { x, y } });
       if (phase.kind === "content") {
-        const groups = Array.from(container.querySelectorAll<HTMLElement>("[data-group-id]"));
-        const candidate = groups.map((el) => ({ el, rect: el.getBoundingClientRect() })).find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+        const groups = Array.from(dom.getAll().entries())
+          .map(([gid, els]) => ({ gid, el: els.content ?? els.group }))
+          .filter((it): it is { gid: GroupId; el: HTMLElement } => Boolean(it.el));
+        const candidate = groups
+          .map((g) => ({ gid: g.gid, el: g.el, rect: g.el.getBoundingClientRect() }))
+          .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (!candidate) {
           dispatch({ type: "SET_SUGGEST", payload: null });
           return;
@@ -127,10 +133,12 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
         return;
       }
       if (phase.kind === "tab") {
-        // Compute tabbar hover for reorder/cross-group
-        const tabbars = Array.from(container.querySelectorAll<HTMLElement>("[data-tabbar='true']"));
+        // Compute tabbar hover for reorder/cross-group using registered refs
+        const tabbars = Array.from(dom.getAll().entries())
+          .map(([gid, els]) => ({ gid, el: els.tabbar }))
+          .filter((it): it is { gid: GroupId; el: HTMLElement } => Boolean(it.el));
         const tabbarHit = tabbars
-          .map((el) => ({ el, rect: el.getBoundingClientRect() }))
+          .map((t) => ({ gid: t.gid, el: t.el, rect: t.el.getBoundingClientRect() }))
           .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (tabbarHit) {
           const tabButtons = Array.from(tabbarHit.el.querySelectorAll<HTMLButtonElement>("[role='tab']"));
@@ -151,13 +159,17 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
             return (btnRects[targetIndex - 1].right + btnRects[targetIndex].left) / 2;
           };
           const insertX = computeInsertX();
-          dispatch({ type: "SET_TABBAR_HOVER", payload: { groupId: (tabbarHit.el.getAttribute("data-group-id") as GroupId)!, index: targetIndex, rect: tabbarHit.rect, insertX } });
+          dispatch({ type: "SET_TABBAR_HOVER", payload: { groupId: tabbarHit.gid, index: targetIndex, rect: tabbarHit.rect, insertX } });
         } else {
           dispatch({ type: "SET_TABBAR_HOVER", payload: null });
         }
-        // Compute content suggest for split/move
-        const contents = Array.from(container.querySelectorAll<HTMLElement>("[data-dnd-zone='content']"));
-        const candidate = contents.map((el) => ({ el, rect: el.getBoundingClientRect() })).find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+        // Compute content suggest for split/move using registered refs
+        const contents = Array.from(dom.getAll().entries())
+          .map(([gid, els]) => ({ gid, el: els.content ?? els.group }))
+          .filter((it): it is { gid: GroupId; el: HTMLElement } => Boolean(it.el));
+        const candidate = contents
+          .map((c) => ({ gid: c.gid, el: c.el, rect: c.el.getBoundingClientRect() }))
+          .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (!candidate) {
           dispatch({ type: "SET_SUGGEST", payload: null });
           return;
@@ -184,12 +196,16 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
         return;
       }
       if (snapshot.phase.kind === "content") {
-        const groups = Array.from(container.querySelectorAll<HTMLElement>("[data-group-id]"));
-        const hit = groups.map((el) => ({ el, rect: el.getBoundingClientRect() })).find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+        const groups = Array.from(dom.getAll().entries())
+          .map(([gid, els]) => ({ gid, el: els.content ?? els.group }))
+          .filter((it): it is { gid: GroupId; el: HTMLElement } => Boolean(it.el));
+        const hit = groups
+          .map((g) => ({ gid: g.gid, el: g.el, rect: g.el.getBoundingClientRect() }))
+          .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (!hit) {
           return;
         }
-        const targetGroupId = (hit.el.getAttribute("data-group-id") as GroupId) ?? null;
+        const targetGroupId = hit.gid ?? null;
         if (!targetGroupId) {
           return;
         }
@@ -198,12 +214,14 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
         return;
       }
       if (snapshot.phase.kind === "tab") {
-        const tabbars = Array.from(container.querySelectorAll<HTMLElement>("[data-tabbar='true']"));
+        const tabbars = Array.from(dom.getAll().entries())
+          .map(([gid, els]) => ({ gid, el: els.tabbar }))
+          .filter((it): it is { gid: GroupId; el: HTMLElement } => Boolean(it.el));
         const tabbarHit = tabbars
-          .map((el) => ({ el, rect: el.getBoundingClientRect() }))
+          .map((t) => ({ gid: t.gid, el: t.el, rect: t.el.getBoundingClientRect() }))
           .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (tabbarHit) {
-          const targetGroupId = (tabbarHit.el.getAttribute("data-group-id") as GroupId) ?? null;
+          const targetGroupId = tabbarHit.gid;
           if (!targetGroupId) {
             return;
           }
@@ -217,13 +235,14 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
           onCommitTabDrop({ fromGroupId: snapshot.phase.fromGroupId, tabId: snapshot.phase.tabId, targetGroupId, targetIndex });
           return;
         }
-        const contents = Array.from(container.querySelectorAll<HTMLElement>("[data-dnd-zone='content']"));
+        const contents = Array.from(dom.getAll().entries())
+          .map(([gid, els]) => ({ gid, el: els.content ?? els.group }))
+          .filter((it): it is { gid: GroupId; el: HTMLElement } => Boolean(it.el));
         const contentHit = contents
-          .map((el) => ({ el, rect: el.getBoundingClientRect() }))
+          .map((c) => ({ gid: c.gid, el: c.el, rect: c.el.getBoundingClientRect() }))
           .find(({ rect }) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
         if (contentHit) {
-          const gidAttr = contentHit.el.closest('[data-group-id]') as HTMLElement | null;
-          const targetGroupId = (gidAttr?.getAttribute("data-group-id") as GroupId) ?? null;
+          const targetGroupId = contentHit.gid ?? null;
           if (!targetGroupId) {
             return;
           }
@@ -238,7 +257,7 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
     };
-  }, [state.phase, containerRef, dragThresholdPx, onCommitContentDrop, onCommitTabDrop]);
+  }, [state.phase, containerRef, dragThresholdPx, onCommitContentDrop, onCommitTabDrop, dom]);
 
   const value = React.useMemo<InteractionsContextValue>(() => ({
     suggest: state.suggest,

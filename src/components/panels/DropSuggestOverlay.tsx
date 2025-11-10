@@ -4,6 +4,7 @@
 import * as React from "react";
 import styles from "./DropSuggestOverlay.module.css";
 import type { DropZone } from "../../modules/panels/core/types";
+import { usePanelTheme } from "../../modules/theme/tokens";
 
 export type SuggestInfo = {
   rect: DOMRectReadOnly;
@@ -14,8 +15,9 @@ export const DropSuggestOverlay: React.FC<{ suggest: SuggestInfo | null }> = ({ 
   if (!suggest) {
     return null;
   }
+  const theme = usePanelTheme();
   const { rect, zone } = suggest;
-  const pad = 6;
+  const pad = theme.dropSuggestPadding;
   const left = rect.left;
   const top = rect.top;
   const width = rect.width;

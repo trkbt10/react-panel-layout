@@ -36,8 +36,9 @@ export const splitGroup = (state: PState, groupId: Gid, direction: Dir, createGr
 export const buildInitialState = (tabs: TabDefinition[]): PState => {
   const groupId: Gid = "g_1";
   const tree = { type: "group", groupId } as const;
-  const group = { id: groupId, tabs, activeTabId: tabs[0]?.id ?? null };
+  const panels = Object.fromEntries(tabs.map((t) => [t.id, t]));
+  const group = { id: groupId, tabIds: tabs.map((t) => t.id), tabs, activeTabId: tabs[0]?.id ?? null } as const;
   const groups = { [groupId]: group } as PState["groups"];
   const groupOrder: Gid[] = [groupId];
-  return { tree, groups, groupOrder, focusedGroupId: groupId };
+  return { tree, panels, groups, groupOrder, focusedGroupId: groupId } as PState;
 };

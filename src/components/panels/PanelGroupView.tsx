@@ -2,23 +2,17 @@
  * @file Group view rendering for PanelSystem (tabbar + active content).
  */
 import * as React from "react";
-import type { GroupModel } from "../../modules/panels/core/types";
+import type { PanelGroupRenderProps } from "../../modules/panels/core/types";
 import groupStyles from "./PanelGroupView.module.css";
 
-export type PanelGroupViewProps = {
-  group: GroupModel;
-  tabbar: React.ReactNode;
-  onContentPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
-};
-
-const RawPanelGroupView: React.FC<PanelGroupViewProps> = ({ group, tabbar, onContentPointerDown }) => {
-  const activeTab = React.useMemo(() => group.tabs.find((t) => t.id === group.activeTabId) ?? null, [group]);
+const RawPanelGroupView: React.FC<PanelGroupRenderProps> = ({ group, tabbar, onContentPointerDown, groupRef, contentRef }) => {
+  const activeTab = React.useMemo(() => group.tabs.find((t) => t.id === group.activeTabId) ?? null, [group.tabs, group.activeTabId]);
   const empty = React.useMemo(() => React.createElement("div", { style: { color: "#888", fontSize: 12, padding: 12 } }, "No tabs"), []);
   const contentNode = activeTab ? activeTab.render() : empty;
   return (
-    <div className={groupStyles.group} data-group-id={group.id}>
+    <div ref={groupRef} className={groupStyles.group} data-group-id={group.id}>
       {tabbar}
-      <div className={groupStyles.content} data-dnd-zone="content" onPointerDown={onContentPointerDown}>
+      <div ref={contentRef} className={groupStyles.content} data-dnd-zone="content" onPointerDown={onContentPointerDown}>
         {contentNode}
       </div>
     </div>

@@ -10,10 +10,7 @@ export const TabDragOverlay: React.FC = () => {
   const { isTabDragging, draggingTabId, dragPointer, tabbarHover } = usePanelInteractions();
   const { state } = usePanelState();
 
-  if (!isTabDragging) {
-    return null;
-  }
-
+  // Do not early-return before hooks; compute values unconditionally
   const title = React.useMemo((): string | null => {
     if (!draggingTabId) {
       return null;
@@ -61,6 +58,10 @@ export const TabDragOverlay: React.FC = () => {
     }
     return <div className={styles.insertGuide} style={guideStyle} />;
   };
+
+  if (!isTabDragging) {
+    return null;
+  }
 
   return (
     <div className={styles.overlay}>

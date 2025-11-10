@@ -84,18 +84,15 @@ export const useCommitHandlers = (): {
         if (fromGroupId === targetGroupId) {
           const groups = { ...prev.groups };
           const group = groups[fromGroupId];
-          const currentIndex = group.tabs.findIndex((t) => t.id === tabId);
+          const currentIndex = group.tabIds.findIndex((id) => id === tabId);
           if (currentIndex === -1) {
             return prev;
           }
-          const bounded = Math.max(0, Math.min(targetIndex, group.tabs.length - 1));
-          if (bounded === currentIndex) {
-            return prev;
-          }
-          const tabs = group.tabs.slice();
-          const [movedTab] = tabs.splice(currentIndex, 1);
-          tabs.splice(bounded, 0, movedTab);
-          groups[fromGroupId] = { ...group, tabs };
+          const filteredIds = group.tabIds.filter((id) => id !== tabId);
+          const insertIndex = Math.max(0, Math.min(targetIndex, filteredIds.length));
+          const nextTabIds = filteredIds.slice(0, insertIndex).concat([tabId], filteredIds.slice(insertIndex));
+          const nextTabs = nextTabIds.map((id) => prev.panels[id]).filter(Boolean);
+          groups[fromGroupId] = { ...group, tabIds: nextTabIds, tabs: nextTabs };
           return { ...prev, groups };
         }
         const groups = { ...prev.groups };
@@ -106,9 +103,9 @@ export const useCommitHandlers = (): {
           activeTabId: groups[fromGroupId].activeTabId === tabId ? fromTabs[0]?.id ?? null : groups[fromGroupId].activeTabId,
         };
         const target = groups[targetGroupId];
-        const bounded = Math.max(0, Math.min(targetIndex, target.tabs.length));
-        const toTabs = target.tabs.slice();
-        toTabs.splice(bounded, 0, tab);
+        const existingFiltered = target.tabs.filter((t) => t.id !== tabId);
+        const bounded = Math.max(0, Math.min(targetIndex, existingFiltered.length));
+        const toTabs = existingFiltered.slice(0, bounded).concat([tab], existingFiltered.slice(bounded));
         groups[targetGroupId] = { ...target, tabs: toTabs, activeTabId: tabId };
         return { ...prev, groups, focusedGroupId: targetGroupId };
       });

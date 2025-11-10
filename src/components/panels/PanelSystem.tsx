@@ -15,9 +15,11 @@ import { PanelStateProvider, usePanelState } from "../../modules/panels/context/
 import { DefaultKeybindingsInstaller } from "../../modules/panels/context/KeybindingsInstaller";
 import { useCommitHandlers } from "../../modules/panels/context/commands";
 import { RenderBridge } from "../../modules/panels/context/RenderBridge";
+import { DomRegistryProvider } from "../../modules/panels/context/DomRegistry";
 import { PanelSplitHandles } from "./PanelSplitHandles";
+import { PanelThemeProvider } from "../../modules/theme/tokens";
 
-export const PanelSystem: React.FC<PanelSystemProps> = ({ initialState, createGroupId, layoutMode, gridTracksInteractive, dragThresholdPx, state: controlled, onStateChange, className, style }) => {
+export const PanelSystem: React.FC<PanelSystemProps> = ({ initialState, createGroupId, layoutMode, gridTracksInteractive, dragThresholdPx, view, state: controlled, onStateChange, className, style, themeTokens, tabBarComponent, panelGroupComponent }) => {
   if (!initialState) {
     throw new Error("PanelSystem requires initialState.");
   }
@@ -40,7 +42,13 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({ initialState, createGr
     const { state } = usePanelState();
     const { onCommitContentDrop, onCommitTabDrop } = useCommitHandlers();
 
-    const onRenderGroup = React.useCallback((gid: GroupId): React.ReactNode => <GroupContainer id={gid} />, []);
+  const onRenderGroup = React.useCallback((gid: GroupId): React.ReactNode => {
+      if (view) {
+        const View = view;
+        return <View groupId={gid} />;
+      }
+      return <GroupContainer id={gid} TabBarComponent={tabBarComponent} PanelGroupComponent={panelGroupComponent} />;
+    }, [view, tabBarComponent, panelGroupComponent]);
     const grid = React.useMemo(() => {
       if (layoutMode === "grid") {
         return buildGridFromRects(state, onRenderGroup, Boolean(gridTracksInteractive));
@@ -49,20 +57,24 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({ initialState, createGr
     }, [layoutMode, gridTracksInteractive, state, onRenderGroup]);
 
     return (
-      <InteractionsProvider
-        containerRef={containerRef}
-        dragThresholdPx={dragThresholdPx}
-        onCommitContentDrop={onCommitContentDrop}
-        onCommitTabDrop={onCommitTabDrop}
-      >
-        <RenderBridge>
-          <div ref={containerRef} className={className ? `${styles.root} ${className}` : styles.root} style={style}>
-            <GridLayout config={grid.config} layers={grid.layers} />
-          </div>
-        </RenderBridge>
-        <PanelSplitHandles containerRef={containerRef} />
-        <OverlayWithinProvider />
-      </InteractionsProvider>
+      <PanelThemeProvider tokens={themeTokens}>
+        <DomRegistryProvider>
+          <InteractionsProvider
+            containerRef={containerRef}
+            dragThresholdPx={dragThresholdPx}
+            onCommitContentDrop={onCommitContentDrop}
+            onCommitTabDrop={onCommitTabDrop}
+          >
+            <RenderBridge>
+              <div ref={containerRef} className={className ? `${styles.root} ${className}` : styles.root} style={style}>
+                <GridLayout config={grid.config} layers={grid.layers} />
+              </div>
+            </RenderBridge>
+            <PanelSplitHandles containerRef={containerRef} />
+            <OverlayWithinProvider />
+          </InteractionsProvider>
+        </DomRegistryProvider>
+      </PanelThemeProvider>
     );
   };
 

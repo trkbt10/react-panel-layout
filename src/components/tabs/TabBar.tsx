@@ -3,19 +3,13 @@
  */
 import * as React from "react";
 import styles from "./TabBar.module.css";
-import type { GroupModel, PanelId, GroupId } from "../../modules/panels/core/types";
+import type { TabBarRenderProps } from "../../modules/panels/core/types";
 import { usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
 
-export type TabBarProps = {
-  group: GroupModel;
-  onClickTab: (tabId: PanelId) => void;
-  onStartDrag?: (tabId: PanelId, groupId: GroupId, e: React.PointerEvent) => void;
-};
-
-export const TabBar: React.FC<TabBarProps> = ({ group, onClickTab, onStartDrag }) => {
+export const TabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef }) => {
   const { isTabDragging, draggingTabId } = usePanelInteractions();
   return (
-    <div className={styles.tabbar} role="tablist" data-tabbar="true" data-group-id={group.id} data-dragging={isTabDragging ? "true" : "false"}>
+    <div ref={rootRef} className={styles.tabbar} role="tablist" data-tabbar="true" data-group-id={group.id} data-dragging={isTabDragging ? "true" : "false"}>
       {group.tabs.map((tab, index) => {
         const active = group.activeTabId === tab.id;
         const dragging = draggingTabId === tab.id;

@@ -7,7 +7,7 @@
 
 .resizeHandle:hover,
 .resizeHandle[data-is-dragging="true"] {
-  background-color: var(--node-editor-color-primary, #2196f3);
+  background-color: var(--rpl-color-primary, var(--node-editor-color-primary, #2196f3));
 }
 
 .resizeHandle[data-is-dragging="true"] {
@@ -15,7 +15,7 @@
 }
 
 .resizeHandle[data-direction="vertical"] {
-  width: 4px;
+  width: var(--rpl-size-resize-handle-thickness, 4px);
   height: 100%;
   top: 0;
   cursor: col-resize;
@@ -23,7 +23,7 @@
 
 .resizeHandle[data-direction="horizontal"] {
   width: 100%;
-  height: 4px;
+  height: var(--rpl-size-resize-handle-thickness, 4px);
   left: 0;
   cursor: row-resize;
 }

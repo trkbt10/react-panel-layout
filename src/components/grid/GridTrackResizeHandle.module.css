@@ -2,7 +2,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: var(--rpl-size-grid-handle-thickness, 4px);
   pointer-events: auto;
 }
 
@@ -10,7 +10,6 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 4px;
+  height: var(--rpl-size-grid-handle-thickness, 4px);
   pointer-events: auto;
 }
-

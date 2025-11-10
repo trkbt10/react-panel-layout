@@ -4,6 +4,7 @@
  */
 import * as React from "react";
 import type { GroupId, PanelSystemState } from "../core/types";
+import { cleanupEmptyGroups } from "../core/cleanup";
 
 export type PanelStateContextValue = {
   state: PanelSystemState;
@@ -29,12 +30,17 @@ export type PanelStateProviderProps = React.PropsWithChildren<{
 }>;
 
 export const PanelStateProvider: React.FC<PanelStateProviderProps> = ({ initialState, createGroupId, state: controlled, onStateChange, children }) => {
-  const [uncontrolled, setUncontrolled] = React.useState<PanelSystemState>(initialState);
-  const state = controlled ?? uncontrolled;
+  // Sanitize initial state to avoid rendering stale empty groups
+  const initialSanitized = React.useMemo(() => cleanupEmptyGroups(initialState), [initialState]);
+  const [uncontrolled, setUncontrolled] = React.useState<PanelSystemState>(initialSanitized);
+  const rawState = controlled ?? uncontrolled;
+  // Derive a sanitized view of state for rendering/consumers without mutating external state
+  const state = React.useMemo(() => cleanupEmptyGroups(rawState), [rawState]);
 
   const setState = React.useCallback(
     (updater: (prev: PanelSystemState) => PanelSystemState) => {
-      const next = updater(state);
+      const nextRaw = updater(state);
+      const next = cleanupEmptyGroups(nextRaw);
       if (onStateChange) {
         onStateChange(next);
       }
@@ -49,4 +55,3 @@ export const PanelStateProvider: React.FC<PanelStateProviderProps> = ({ initialS
 
   return <PanelStateContext.Provider value={value}>{children}</PanelStateContext.Provider>;
 };
-

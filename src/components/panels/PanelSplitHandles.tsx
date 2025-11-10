@@ -7,6 +7,7 @@ import type { PathSegment, NodePath } from "../../modules/panels/core/tree";
 import { setSplitRatio, getAtPath, isGroup } from "../../modules/panels/core/tree";
 import { usePanelState } from "../../modules/panels/context/StateContext";
 import { ResizeHandle } from "../resizer/ResizeHandle";
+import { usePanelTheme } from "../../modules/theme/tokens";
 
 type Rect = { x: number; y: number; w: number; h: number }; // percentages in [0..100]
 
@@ -40,6 +41,7 @@ const collectHandles = (node: PanelTree, path: NodePath, rect: Rect, acc: Handle
 
 export const PanelSplitHandles: React.FC<{ containerRef: React.RefObject<HTMLDivElement | null> }> = ({ containerRef }) => {
   const { state, setState } = usePanelState();
+  const theme = usePanelTheme();
 
   const handles = React.useMemo(() => {
     return collectHandles(state.tree, [], { x: 0, y: 0, w: 100, h: 100 }, []);
@@ -56,7 +58,7 @@ export const PanelSplitHandles: React.FC<{ containerRef: React.RefObject<HTMLDiv
       width: (containerRect.width * h.parentRect.w) / 100,
       height: (containerRect.height * h.parentRect.h) / 100,
     };
-    const thickness = 6;
+    const thickness = theme.splitHandleThickness;
 
     if (h.direction === "vertical") {
       const x = parentPx.left + (parentPx.width * (h.linePos - h.parentRect.x)) / h.parentRect.w;

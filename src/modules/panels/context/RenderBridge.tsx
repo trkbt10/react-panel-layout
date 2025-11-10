@@ -13,11 +13,23 @@ export const RenderBridge: React.FC<React.PropsWithChildren<unknown>> = ({ child
   return (
     <PanelRenderProvider
       value={{
-        getGroup: (id) => state.groups[id] ?? null,
+        getGroup: (id) => {
+          const g = state.groups[id];
+          if (!g) {
+            return null;
+          }
+          // Synthesize tabs from registry + tabIds to avoid duplicated tab definitions
+          const tabs = g.tabIds.map((tid) => state.panels[tid]).filter(Boolean);
+          return { ...g, tabs };
+        },
         onClickTab: (gid, tabId) => {
           setState((prev) => setActiveTab(prev, gid, tabId));
         },
-        onStartTabDrag: interactions.onStartTabDrag,
+        onStartTabDrag: (tabId, groupId, e) => {
+          // Enforce activation before any drag logic (centralized; no duplication in TabBars)
+          setState((prev) => setActiveTab(prev, groupId, tabId));
+          interactions.onStartTabDrag(tabId, groupId, e);
+        },
         onStartContentDrag: (groupId, e) => {
           const g = state.groups[groupId];
           if (!g || !g.activeTabId) {
