@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { PanelSystem, buildPanelInitialState } from "../../index";
-import type { VSCodePanelTab } from "../../index";
+import type { TabDefinition } from "../../index";
 import { createPanelView } from "../../index";
 import { ChromeTabBar } from "../components/ChromeTabBar";
 import { VSCodeTabBar } from "../components/VSCodeTabBar";
@@ -11,8 +11,8 @@ import { GitHubTabBar } from "../components/GitHubTabBar";
 
 type TabStyle = "raised" | "chrome" | "vscode" | "github";
 
-const makeTabs = (): VSCodePanelTab[] => {
-  const mk = (id: string, title: string): VSCodePanelTab => ({ id, title, render: () => React.createElement("div", { style: { padding: 12 } }, `${title} content`) });
+const makeTabs = (): TabDefinition[] => {
+  const mk = (id: string, title: string): TabDefinition => ({ id, title, render: () => React.createElement("div", { style: { padding: 12 } }, `${title} content`) });
   return [mk("welcome", "Welcome"), mk("explorer", "Explorer"), mk("preview", "Preview")];
 };
 

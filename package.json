@@ -15,6 +15,10 @@
     "./config": {
       "import": "./dist/config.js",
       "types": "./dist/config/index.d.ts"
+    },
+    "./floating": {
+      "import": "./dist/floating.js",
+      "types": "./dist/floating/index.d.ts"
     }
   },
   "scripts": {

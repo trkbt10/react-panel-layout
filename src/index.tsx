@@ -32,12 +32,6 @@ export type {
 // ============================================================================
 export { GridLayout } from "./components/grid/GridLayout";
 export type { GridLayoutProps } from "./components/grid/GridLayout";
-export {
-  PanelLayoutRouter,
-  buildLayersFromRoutes,
-  createPanelLayoutFromRoutes,
-} from "./config/panelRouter";
-export type { PanelRoute, PanelLayoutRouterProps } from "./config/panelRouter";
 
 // ============================================================================
 // Drawer Components
@@ -50,23 +44,6 @@ export type { DrawerLayersProps } from "./components/window/DrawerLayers";
 // ============================================================================
 // Panel Components
 // ============================================================================
-export {
-  FloatingPanelFrame,
-  FloatingPanelHeader,
-  FloatingPanelTitle,
-  FloatingPanelMeta,
-  FloatingPanelControls,
-  FloatingPanelContent,
-} from "./components/paneling/FloatingPanelFrame";
-export type {
-  FloatingPanelFrameProps,
-  FloatingPanelHeaderProps,
-  FloatingPanelTitleProps,
-  FloatingPanelMetaProps,
-  FloatingPanelControlsProps,
-  FloatingPanelContentProps,
-} from "./components/paneling/FloatingPanelFrame";
-
 export { HorizontalDivider } from "./components/resizer/HorizontalDivider";
 export type { HorizontalDividerProps } from "./components/resizer/HorizontalDivider";
 
@@ -79,24 +56,17 @@ export type { ResizeHandleProps } from "./components/resizer/ResizeHandle";
 export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";
 
 // ============================================================================
-// VSCode-like Panel System (tabs + splits)
+// Panel System (tabs + splits)
 // ============================================================================
 export { PanelSystem } from "./modules/panels/system/PanelSystem";
 export { buildInitialState as buildPanelInitialState } from "./modules/panels";
 export { createPanelView } from "./modules/panels/rendering/createPanelView";
 export type {
-  PanelSystemProps as VSCodePanelSystemProps,
-  PanelSystemState as VSCodePanelSystemState,
-  GroupModel as VSCodePanelGroupModel,
-  TabDefinition as VSCodePanelTab,
-  SplitDirection as VSCodeSplitDirection,
+  PanelSystemProps,
+  PanelSystemState,
+  GroupModel,
+  TabDefinition,
+  SplitDirection,
   TabBarRenderProps,
   PanelGroupRenderProps,
 } from "./modules/panels/state/types";
-
-// ============================================================================
-// Theme (Design Tokens)
-// ============================================================================
-export { PanelThemeProvider, defaultPanelDesignTokens } from "./modules/theme/tokens";
-export type { PanelDesignTokens } from "./modules/theme/tokens";
-export { raisedPanelDesignTokens } from "./modules/theme/tokens";

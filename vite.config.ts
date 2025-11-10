@@ -14,6 +14,7 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, "src/index.tsx"),
         config: resolve(__dirname, "src/config/index.tsx"),
+        floating: resolve(__dirname, "src/floating/index.ts"),
       },
       formats: ["es"],
     },
