@@ -8,13 +8,11 @@ import { IDELayout, code as ideLayoutCode } from "./IDELayout";
 import { SimpleGrid, code as simpleGridCode } from "./SimpleGrid";
 import { DashboardLayout, code as dashboardLayoutCode } from "./DashboardLayout";
 import { DraggableOverlays, code as draggableOverlaysCode } from "./DraggableOverlays";
-import styles from "../FloatingPanelFramePreview.module.css";
+import { DemoPage } from "../components";
 
 export const PanelLayoutPreview: React.FC = () => {
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>Panel Layout System</h1>
-
+    <DemoPage title="Panel Layout System" padding="2rem">
       <Section title="Simple Grid Layout">
         <Story title="2x2 Grid" description="Basic grid layout with equal-sized cells">
           <div style={{ width: "100%", height: "400px" }}>
@@ -59,6 +57,6 @@ export const PanelLayoutPreview: React.FC = () => {
         </Story>
         <CodePreview code={draggableOverlaysCode} title="Draggable Overlays Code" />
       </Section>
-    </div>
+    </DemoPage>
   );
 };

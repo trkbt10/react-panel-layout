@@ -1,0 +1,11 @@
+.infoBox {
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.infoBox strong {
+  font-weight: 600;
+}

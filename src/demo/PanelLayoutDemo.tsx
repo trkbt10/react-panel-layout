@@ -8,7 +8,7 @@ import type { PanelLayoutConfig, LayerDefinition } from "../types";
 import { DataPreview } from "./components/DataPreview";
 import { Section, Story } from "./components/Story";
 import { CodePreview } from "./components/CodePreview";
-import styles from "./pages/FloatingPanelFramePreview.module.css";
+import { DemoPage } from "./pages/components";
 // Keep only the featured workspace sample on this page to ensure single-sample per page.
 import "./demo.css";
 
@@ -227,13 +227,16 @@ const layers: LayerDefinition[] = [
  */
 export const PanelLayoutDemo: React.FC = () => {
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>Panel Layout Demo</h1>
-      <p style={{ marginBottom: "2rem", color: "#555", lineHeight: 1.6 }}>
-        Explore the featured workspace configuration and browse additional panel layout presets grouped similarly to the
-        Component Previews section.
-      </p>
-
+    <DemoPage
+      title="Panel Layout Demo"
+      padding="2rem"
+      intro={
+        <p style={{ margin: 0, color: "#555", lineHeight: 1.6 }}>
+          Explore the featured workspace configuration and browse additional panel layout presets grouped similarly to
+          the Component Previews section.
+        </p>
+      }
+    >
       <Section title="Featured Workspace">
         <Story
           title="Creative Studio"
@@ -247,6 +250,6 @@ export const PanelLayoutDemo: React.FC = () => {
       </Section>
 
       {/* Intentionally no gallery here; each sample has its own page under Components / PanelLayout. */}
-    </div>
+    </DemoPage>
   );
 };

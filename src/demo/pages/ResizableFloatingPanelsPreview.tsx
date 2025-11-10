@@ -13,6 +13,7 @@ import {
 import { useLayerDragHandle } from "../../modules/grid/useLayerDragHandle";
 import { Section, Story } from "../components/Story";
 import { CodePreview } from "../components/CodePreview";
+import { DemoPage } from "./components";
 import styles from "./ResizableFloatingPanelsPreview.module.css";
 
 const EDGE_RESIZE_DEMO_CODE = `import {
@@ -209,13 +210,16 @@ const FloatingWorkspaceDemo: React.FC = () => {
 
 export const ResizableFloatingPanelsPreview: React.FC = () => {
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>Resizable Floating Panels</h1>
-      <p className={styles.intro}>
-        Floating layers can now be resized from any edge in addition to the existing corner handles. This demo shows how
-        the edge handles behave inside a canvas environment and how you can react to the updated dimensions.
-      </p>
-
+    <DemoPage
+      title="Resizable Floating Panels"
+      padding="2rem"
+      intro={
+        <p className={styles.intro}>
+          Floating layers can now be resized from any edge in addition to the existing corner handles. This demo shows
+          how the edge handles behave inside a canvas environment and how you can react to the updated dimensions.
+        </p>
+      }
+    >
       <Section title="Floating Panel Interactions">
         <Story
           title="Edge Resize Handles"
@@ -225,6 +229,6 @@ export const ResizableFloatingPanelsPreview: React.FC = () => {
         </Story>
         <CodePreview code={EDGE_RESIZE_DEMO_CODE} title="Edge Resize Demo Code" />
       </Section>
-    </div>
+    </DemoPage>
   );
 };

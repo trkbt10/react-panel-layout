@@ -3,19 +3,19 @@
  */
 import * as React from "react";
 import { IDELayout, code as ideLayoutCode } from "../IDELayout";
-import { CodePreview } from "../../../components/CodePreview";
+import { SingleSamplePage } from "../../components";
 
 const Page: React.FC = () => {
   return (
-    <div style={{ padding: "1.5rem", maxWidth: 1200 }}>
-      <h1 style={{ margin: "0 0 1rem 0" }}>PanelLayout / IDE Layout</h1>
-      <div style={{ marginBottom: "1rem", height: "600px" }}>
-        <IDELayout />
-      </div>
-      <CodePreview code={ideLayoutCode} title="IDE Layout Code" />
-    </div>
+    <SingleSamplePage
+      title="PanelLayout / IDE Layout"
+      code={ideLayoutCode}
+      codeTitle="IDE Layout Code"
+      previewHeight={600}
+    >
+      <IDELayout />
+    </SingleSamplePage>
   );
 };
 
 export default Page;
-

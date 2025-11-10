@@ -8,14 +8,13 @@ import { VerticalResizeDemo, code as verticalCode } from "./VerticalResizeDemo";
 import { HorizontalResizeDemo, code as horizontalCode } from "./HorizontalResizeDemo";
 import { BothDirectionsDemo, code as bothDirectionsCode } from "./BothDirectionsDemo";
 import { NestedPanelsDemo, code as nestedPanelsCode } from "./NestedPanelsDemo";
-import styles from "../ResizeHandlePreview.module.css";
+import { DemoPage } from "../components";
+import styles from "./page.module.css";
 
 export const ResizeHandlePreview: React.FC = () => {
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>ResizeHandle Component</h1>
-
+    <DemoPage title="ResizeHandle Component" padding="2rem">
       <Section title="Vertical Resize Handle">
         <Story
           title="Vertical Resize"
@@ -63,6 +62,6 @@ export const ResizeHandlePreview: React.FC = () => {
           </div>
         </Story>
       </Section>
-    </div>
+    </DemoPage>
   );
 };

@@ -9,7 +9,7 @@ import { PanelWithMeta, code as panelWithMetaCode } from "./PanelWithMeta";
 import { PanelWithControls, code as panelWithControlsCode } from "./PanelWithControls";
 import { ComplexPanel, code as complexPanelCode } from "./ComplexPanel";
 import { ScrollablePanel, code as scrollablePanelCode } from "./ScrollablePanel";
-import styles from "../FloatingPanelFramePreview.module.css";
+import { DemoPage } from "../components";
 
 export const FloatingPanelFramePreview: React.FC = () => {
   const [showPanel1, setShowPanel1] = React.useState(true);
@@ -17,9 +17,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
   const [showPanel3, setShowPanel3] = React.useState(true);
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>FloatingPanelFrame Components</h1>
-
+    <DemoPage title="FloatingPanelFrame Components" padding="2rem">
       <Section title="Basic Panel">
         <Story
           title="Simple Panel"
@@ -72,6 +70,6 @@ export const FloatingPanelFramePreview: React.FC = () => {
         </Story>
         <CodePreview code={scrollablePanelCode} title="Scrollable Panel Code" />
       </Section>
-    </div>
+    </DemoPage>
   );
 };

@@ -7,6 +7,7 @@ import { TabBar } from "../../../../components/tabs/TabBar";
 import { InteractionsProvider } from "../../../../modules/panels/interactions/InteractionsContext";
 import { DomRegistryProvider } from "../../../../modules/panels/dom/DomRegistry";
 import { PanelThemeProvider } from "../../../../modules/theme/tokens";
+import { DemoPage } from "../../components";
 
 const makeGroup = (id: GroupId): GroupModel => {
   const tabs = [
@@ -27,8 +28,7 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: "1.5rem", height: "100%" }}>
-      <h1 style={{ margin: "0 0 1rem 0" }}>PanelSystem / TabBar</h1>
+    <DemoPage title="PanelSystem / TabBar" padding="1.5rem" maxWidth={960}>
       <div ref={containerRef} style={{ border: "1px solid #333", borderRadius: 6, background: "#111", padding: 8 }}>
         <PanelThemeProvider>
           <DomRegistryProvider>
@@ -62,7 +62,7 @@ const Page: React.FC = () => {
           </DomRegistryProvider>
         </PanelThemeProvider>
       </div>
-    </div>
+    </DemoPage>
   );
 };
 

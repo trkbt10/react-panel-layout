@@ -7,13 +7,12 @@ import { CodePreview } from "../../components/CodePreview";
 import { SimpleResizablePanels, code as simpleCode } from "./SimpleResizablePanels";
 import { PanelsWithRichContent, code as richContentCode } from "./PanelsWithRichContent";
 import { ThreePanelLayout, code as threePanelCode } from "./ThreePanelLayout";
-import styles from "../HorizontalDividerPreview.module.css";
+import { DemoPage } from "../components";
+import styles from "./page.module.css";
 
 export const HorizontalDividerPreview: React.FC = () => {
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>HorizontalDivider Component</h1>
-
+    <DemoPage title="HorizontalDivider Component" padding="2rem">
       <Section title="Basic Usage">
         <Story
           title="Simple Resizable Panels"
@@ -57,6 +56,6 @@ export const HorizontalDividerPreview: React.FC = () => {
           </div>
         </Story>
       </Section>
-    </div>
+    </DemoPage>
   );
 };
