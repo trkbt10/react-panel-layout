@@ -16,21 +16,35 @@ export default defineConfig({
         config: resolve(__dirname, "src/config/index.tsx"),
         floating: resolve(__dirname, "src/floating/index.ts"),
       },
-      formats: ["es"],
     },
     rollupOptions: {
       external: ["react", "react-dom", "react/jsx-runtime"],
-      output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "react/jsx-runtime": "react/jsx-runtime",
+      output: [
+        {
+          format: "es",
+          // Preserve the entry names for subpath exports
+          entryFileNames: "[name].js",
+          chunkFileNames: "[name]-[hash].js",
+          // Preserve module structure for better tree-shaking
+          preserveModules: false,
         },
-        // Preserve the entry names for subpath exports
-        entryFileNames: "[name].js",
-        chunkFileNames: "[name]-[hash].js",
-      },
+        {
+          format: "cjs",
+          // Use .cjs extension for CommonJS files
+          entryFileNames: "[name].cjs",
+          chunkFileNames: "[name]-[hash].cjs",
+          preserveModules: false,
+        },
+      ],
     },
     sourcemap: true,
+    // Ensure CSS is emitted as a single file
+    cssCodeSplit: false,
+  },
+  css: {
+    modules: {
+      // Generate scoped class names for CSS modules
+      localsConvention: "camelCaseOnly",
+    },
   },
 });

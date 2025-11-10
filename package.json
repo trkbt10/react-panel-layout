@@ -2,25 +2,36 @@
   "name": "react-panel-layout",
   "version": "0.1.0",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "packageManager": "bun@1.3.1",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./config": {
+      "types": "./dist/config/index.d.ts",
       "import": "./dist/config.js",
-      "types": "./dist/config/index.d.ts"
+      "require": "./dist/config.cjs"
     },
     "./floating": {
+      "types": "./dist/floating/index.d.ts",
       "import": "./dist/floating.js",
-      "types": "./dist/floating/index.d.ts"
-    }
+      "require": "./dist/floating.cjs"
+    },
+    "./style.css": "./dist/react-panel-layout.css",
+    "./package.json": "./package.json"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite --config vite.demo.config.ts",
     "build": "vite build --config vite.config.ts && tsc -p tsconfig.build.json",
