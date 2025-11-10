@@ -2,8 +2,8 @@
  * @file Hooks that expose commands and commit handlers for the panel system.
  */
 import * as React from "react";
-import type { DropZone, PanelCommands, SplitDirection } from "../core/types";
-import { usePanelState } from "./StateContext";
+import type { DropZone, PanelCommands, SplitDirection } from "../state/types";
+import { usePanelState } from "../state/StateContext";
 import { moveTab, setActiveTab, setFocusedGroup, splitGroup, focusGroupIndex as focusIdx, nextGroup, prevGroup } from "../index";
 
 export const usePanelCommands = (): PanelCommands => {

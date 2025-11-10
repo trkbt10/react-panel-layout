@@ -1,0 +1,55 @@
+.tabbar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 6px;
+  background: #dee1e6;
+  border-bottom: 1px solid #c5c7ca;
+  min-height: 32px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  background: #c8cacd;
+  color: #3c4043;
+  border: none;
+  margin: 0 -10px 0 0;
+  padding: 6px calc(12px + 10px);
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 100%, 0 100%);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  z-index: 1;
+  transition: background 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.tab:hover {
+  background: #d4d6d9;
+}
+
+.tabActive {
+  background: #ffffff;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.tabActive:hover {
+  background: #ffffff;
+}
+
+.tabDragging {
+  opacity: 0.6;
+}
+
+.tabTitle {
+  font-size: 12px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}

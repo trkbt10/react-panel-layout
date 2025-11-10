@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import styles from "./DropSuggestOverlay.module.css";
-import type { DropZone } from "../../modules/panels/core/types";
+import type { DropZone } from "../../modules/panels/state/types";
 import { usePanelTheme } from "../../modules/theme/tokens";
 
 export type SuggestInfo = {

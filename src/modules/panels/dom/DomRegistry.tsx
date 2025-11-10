@@ -3,7 +3,7 @@
  * instead of global querySelectorAll scans.
  */
 import * as React from "react";
-import type { GroupId } from "../core/types";
+import type { GroupId } from "../state/types";
 
 export type RegisteredEls = {
   group: HTMLElement | null;

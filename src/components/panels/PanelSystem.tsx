@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import styles from "./PanelSystem.module.css";
-import type { GroupId, PanelSystemProps } from "../../modules/panels/core/types";
+import type { GroupId, PanelSystemProps } from "../../modules/panels/state/types";
 import { KeybindingsProvider } from "../../modules/keybindings/KeybindingsProvider";
 import { buildGridForAbsolutePanels, buildGridFromRects } from "../../modules/panels/layout/adapter";
 import { GridLayout } from "../grid/GridLayout";
@@ -11,11 +11,11 @@ import { GroupContainer } from "./GroupContainer";
 import { InteractionsProvider, usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
 import { DropSuggestOverlay } from "./DropSuggestOverlay";
 import { TabDragOverlay } from "../tabs/TabDragOverlay";
-import { PanelStateProvider, usePanelState } from "../../modules/panels/context/StateContext";
-import { DefaultKeybindingsInstaller } from "../../modules/panels/context/KeybindingsInstaller";
-import { useCommitHandlers } from "../../modules/panels/context/commands";
-import { RenderBridge } from "../../modules/panels/context/RenderBridge";
-import { DomRegistryProvider } from "../../modules/panels/context/DomRegistry";
+import { PanelStateProvider, usePanelState } from "../../modules/panels/state/StateContext";
+import { DefaultKeybindingsInstaller } from "../../modules/panels/keybindings/KeybindingsInstaller";
+import { useCommitHandlers } from "../../modules/panels/commands/commands";
+import { RenderBridge } from "../../modules/panels/rendering/RenderBridge";
+import { DomRegistryProvider } from "../../modules/panels/dom/DomRegistry";
 import { PanelSplitHandles } from "./PanelSplitHandles";
 import { PanelThemeProvider } from "../../modules/theme/tokens";
 

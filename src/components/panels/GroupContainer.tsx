@@ -2,9 +2,9 @@
  * @file Thin group container that pulls state and actions from context.
  */
 import * as React from "react";
-import type { GroupId, PanelGroupRenderProps, TabBarRenderProps } from "../../modules/panels/core/types";
-import { usePanelRenderContext } from "../../modules/panels/context/RenderContext";
-import { useDomRegistry } from "../../modules/panels/context/DomRegistry";
+import type { GroupId, PanelGroupRenderProps, TabBarRenderProps } from "../../modules/panels/state/types";
+import { usePanelRenderContext } from "../../modules/panels/rendering/RenderContext";
+import { useDomRegistry } from "../../modules/panels/dom/DomRegistry";
 import { PanelGroupView } from "./PanelGroupView";
 import { TabBar } from "../tabs/TabBar";
 

@@ -1,8 +1,8 @@
 /**
  * @file Unit tests for panel-system state operations (flattened path).
  */
-import { buildInitialState, splitGroup, moveTab, focusGroupIndex, nextGroup, prevGroup } from "./index";
-import type { TabDefinition } from "./core/types";
+import { buildInitialState, splitGroup, moveTab, focusGroupIndex, nextGroup, prevGroup } from "../index";
+import type { TabDefinition } from "./types";
 
 const makeTab = (id: string, title?: string): TabDefinition => ({ id, title: title ?? id, render: () => id });
 

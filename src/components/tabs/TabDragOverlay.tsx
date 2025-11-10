@@ -4,7 +4,7 @@
 import * as React from "react";
 import styles from "./TabDragOverlay.module.css";
 import { usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
-import { usePanelState } from "../../modules/panels/context/StateContext";
+import { usePanelState } from "../../modules/panels/state/StateContext";
 
 export const TabDragOverlay: React.FC = () => {
   const { isTabDragging, draggingTabId, dragPointer, tabbarHover } = usePanelInteractions();

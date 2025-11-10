@@ -2,7 +2,7 @@
  * @file Group view rendering for PanelSystem (tabbar + active content).
  */
 import * as React from "react";
-import type { PanelGroupRenderProps } from "../../modules/panels/core/types";
+import type { PanelGroupRenderProps } from "../../modules/panels/state/types";
 import groupStyles from "./PanelGroupView.module.css";
 
 const RawPanelGroupView: React.FC<PanelGroupRenderProps> = ({ group, tabbar, onContentPointerDown, groupRef, contentRef }) => {

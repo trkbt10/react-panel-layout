@@ -3,9 +3,9 @@
  * Consumers can provide their TabBar/PanelGroup presentation, without PanelSystem injecting operations.
  */
 import * as React from "react";
-import type { GroupId, PanelGroupRenderProps, TabBarRenderProps } from "../../modules/panels/core/types";
-import { usePanelRenderContext } from "../../modules/panels/context/RenderContext";
-import { useDomRegistry } from "../../modules/panels/context/DomRegistry";
+import type { GroupId, PanelGroupRenderProps, TabBarRenderProps } from "../../modules/panels/state/types";
+import { usePanelRenderContext } from "../../modules/panels/rendering/RenderContext";
+import { useDomRegistry } from "../../modules/panels/dom/DomRegistry";
 import { PanelGroupView } from "./PanelGroupView";
 import { TabBar as DefaultTabBar } from "../tabs/TabBar";
 
@@ -42,4 +42,3 @@ export const createPanelView = (
   View.displayName = "ConnectedPanelView";
   return View;
 };
-

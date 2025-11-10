@@ -13,15 +13,15 @@ export type {
   DraggingTab,
   PanelCommands,
   PanelSystemProps,
-} from "./core/types";
+} from "./state/types";
 
-export { collectGroupsInOrder, splitLeaf, closeLeaf, isGroup, setSplitRatio } from "./core/tree";
-export { createEmptyGroup, addTabToGroup, removeTabFromGroup, moveTab, setActiveTab, reorderTabWithinGroup, addTabToGroupAtIndex } from "./core/groups";
-export { setFocusedGroup, focusGroupIndex, nextGroup, prevGroup, refreshGroupOrder } from "./core/focus";
+export { collectGroupsInOrder, splitLeaf, closeLeaf, isGroup, setSplitRatio } from "./state/tree";
+export { createEmptyGroup, addTabToGroup, removeTabFromGroup, moveTab, setActiveTab, reorderTabWithinGroup, addTabToGroupAtIndex } from "./state/groups";
+export { setFocusedGroup, focusGroupIndex, nextGroup, prevGroup, refreshGroupOrder } from "./state/focus";
 
-import type { GroupId as Gid, PanelSystemState as PState, SplitDirection as Dir, TabDefinition } from "./core/types";
-import { splitLeaf, collectGroupsInOrder } from "./core/tree";
-import { createEmptyGroup } from "./core/groups";
+import type { GroupId as Gid, PanelSystemState as PState, SplitDirection as Dir, TabDefinition } from "./state/types";
+import { splitLeaf, collectGroupsInOrder } from "./state/tree";
+import { createEmptyGroup } from "./state/groups";
 
 export type IdFactory = () => Gid;
 

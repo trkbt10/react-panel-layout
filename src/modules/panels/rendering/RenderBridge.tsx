@@ -4,8 +4,8 @@
 import * as React from "react";
 import { usePanelInteractions } from "../interactions/InteractionsContext";
 import { PanelRenderProvider } from "./RenderContext";
-import { usePanelState } from "./StateContext";
-import { setActiveTab } from "../core/groups";
+import { usePanelState } from "../state/StateContext";
+import { setActiveTab } from "../state/groups";
 
 export const RenderBridge: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
   const interactions = usePanelInteractions();

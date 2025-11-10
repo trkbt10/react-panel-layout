@@ -3,7 +3,7 @@
  * Strategy: Use a 1x1 relative grid and place groups as absolute layers using computed rects.
  */
 import type { LayerDefinition, PanelLayoutConfig } from "../../../types";
-import type { GroupId, PanelSystemState, PanelTree } from "../core/types";
+import type { GroupId, PanelSystemState, PanelTree } from "../state/types";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 

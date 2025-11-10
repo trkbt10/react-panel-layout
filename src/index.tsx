@@ -32,6 +32,12 @@ export type {
 // ============================================================================
 export { GridLayout } from "./components/grid/GridLayout";
 export type { GridLayoutProps } from "./components/grid/GridLayout";
+export {
+  PanelLayoutRouter,
+  buildLayersFromRoutes,
+  createPanelLayoutFromRoutes,
+} from "./config/panelRouter";
+export type { PanelRoute, PanelLayoutRouterProps } from "./config/panelRouter";
 
 // ============================================================================
 // Drawer Components
@@ -77,10 +83,20 @@ export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";
 // ============================================================================
 export { PanelSystem } from "./components/panels/PanelSystem";
 export { buildInitialState as buildPanelInitialState } from "./components/panels/PanelSystem";
+export { createPanelView } from "./components/panels/createPanelView";
 export type {
   PanelSystemProps as VSCodePanelSystemProps,
   PanelSystemState as VSCodePanelSystemState,
   GroupModel as VSCodePanelGroupModel,
   TabDefinition as VSCodePanelTab,
   SplitDirection as VSCodeSplitDirection,
-} from "./modules/panels/core/types";
+  TabBarRenderProps,
+  PanelGroupRenderProps,
+} from "./modules/panels/state/types";
+
+// ============================================================================
+// Theme (Design Tokens)
+// ============================================================================
+export { PanelThemeProvider, defaultPanelDesignTokens } from "./modules/theme/tokens";
+export type { PanelDesignTokens } from "./modules/theme/tokens";
+export { raisedPanelDesignTokens } from "./modules/theme/tokens";

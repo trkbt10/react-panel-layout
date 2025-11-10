@@ -2,10 +2,10 @@
  * @file Overlay draggable handles to adjust split ratios directly on the panel tree.
  */
 import * as React from "react";
-import type { PanelTree } from "../../modules/panels/core/types";
-import type { PathSegment, NodePath } from "../../modules/panels/core/tree";
-import { setSplitRatio, getAtPath, isGroup } from "../../modules/panels/core/tree";
-import { usePanelState } from "../../modules/panels/context/StateContext";
+import type { PanelTree } from "../../modules/panels/state/types";
+import type { PathSegment, NodePath } from "../../modules/panels/state/tree";
+import { setSplitRatio, getAtPath, isGroup } from "../../modules/panels/state/tree";
+import { usePanelState } from "../../modules/panels/state/StateContext";
 import { ResizeHandle } from "../resizer/ResizeHandle";
 import { usePanelTheme } from "../../modules/theme/tokens";
 

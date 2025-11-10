@@ -1,12 +1,12 @@
 /**
- * @file Tab bar with drag handles (generic, not panel-specific).
+ * @file Chrome-style tab bar component (demo only)
  */
 import * as React from "react";
-import styles from "./TabBar.module.css";
+import styles from "./ChromeTabBar.module.css";
 import type { TabBarRenderProps } from "../../modules/panels/state/types";
 import { usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
 
-export const TabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef }) => {
+export const ChromeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef }) => {
   const { isTabDragging, draggingTabId } = usePanelInteractions();
   return (
     <div ref={rootRef} className={styles.tabbar} role="tablist" data-tabbar="true" data-group-id={group.id} data-dragging={isTabDragging ? "true" : "false"}>

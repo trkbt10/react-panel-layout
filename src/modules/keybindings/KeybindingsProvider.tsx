@@ -3,7 +3,7 @@
  * Belongs to modules: distributes a single source of keybindings to UI.
  */
 import * as React from "react";
-import type { PanelCommands } from "../panels/core/types";
+import type { PanelCommands } from "../panels/state/types";
 
 export type KeyCombo = string; // e.g., "Mod-Shift-\\", "Mod-1"
 

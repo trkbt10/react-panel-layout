@@ -25,6 +25,7 @@ import PL_Dashboard from "./pages/PanelLayout/dashboard";
 import PL_Overlays from "./pages/PanelLayout/draggable-overlays";
 
 import PS_Preview from "./pages/PanelSystem/preview";
+import PS_Tabbar from "./pages/PanelSystem/tabbar";
 import RFP_Edge from "./pages/ResizableFloatingPanels/edge-resize";
 
 export type DemoPage = {
@@ -107,6 +108,7 @@ export const demoCategories: DemoCategory[] = [
     base: "/components/panel-system",
     pages: [
       { id: "preview", label: "Preview", path: "preview", element: <PS_Preview /> },
+      { id: "tabbar", label: "TabBar", path: "tabbar", element: <PS_Tabbar /> },
     ],
   },
 ];

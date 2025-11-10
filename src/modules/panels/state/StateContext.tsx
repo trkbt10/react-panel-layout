@@ -3,8 +3,8 @@
  * Provides single source of truth state and helpers to update it.
  */
 import * as React from "react";
-import type { GroupId, PanelSystemState } from "../core/types";
-import { cleanupEmptyGroups } from "../core/cleanup";
+import type { GroupId, PanelSystemState } from "./types";
+import { cleanupEmptyGroups } from "./cleanup";
 
 export type PanelStateContextValue = {
   state: PanelSystemState;

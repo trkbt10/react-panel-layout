@@ -2,7 +2,7 @@
  * @file Panel render context providing per-group accessors and actions.
  */
 import * as React from "react";
-import type { GroupId, GroupModel, PanelId } from "../core/types";
+import type { GroupId, GroupModel, PanelId } from "../state/types";
 
 export type PanelRenderContextValue = {
   getGroup: (id: GroupId) => GroupModel | null;
@@ -24,4 +24,3 @@ export const usePanelRenderContext = (): PanelRenderContextValue => {
 export const PanelRenderProvider: React.FC<React.PropsWithChildren<{ value: PanelRenderContextValue }>> = ({ value, children }) => {
   return <PanelRenderContext.Provider value={value}>{children}</PanelRenderContext.Provider>;
 };
-

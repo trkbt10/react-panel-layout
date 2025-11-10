@@ -1,7 +1,7 @@
 /**
  * @file DnD utilities for panel interactions
  */
-import type { DropZone } from "../core/types";
+import type { DropZone } from "../state/types";
 
 export const pickDropZone = (rect: DOMRectReadOnly, x: number, y: number): DropZone => {
   const left = rect.left;
