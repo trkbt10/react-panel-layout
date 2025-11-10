@@ -59,7 +59,7 @@ export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";
 // Panel System (tabs + splits)
 // ============================================================================
 export { PanelSystem } from "./modules/panels/system/PanelSystem";
-export { buildInitialState as buildPanelInitialState } from "./modules/panels";
+export { buildInitialState } from "./modules/panels";
 export { createPanelView } from "./modules/panels/rendering/createPanelView";
 export type {
   PanelSystemProps,

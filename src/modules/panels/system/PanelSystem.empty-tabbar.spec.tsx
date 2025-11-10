@@ -3,11 +3,11 @@
  */
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
-import { PanelSystem, buildPanelInitialState } from "../src";
-import type { VSCodePanelTab } from "../src";
-import { splitLeaf, createEmptyGroup } from "../src/modules/panels";
+import { PanelSystem } from "./PanelSystem";
+import { buildInitialState, splitLeaf, createEmptyGroup } from "..";
+import type { TabDefinition } from "..";
 
-const makeTabs = (): VSCodePanelTab[] => {
+const makeTabs = (): TabDefinition[] => {
   return [
     { id: "welcome", title: "Welcome", render: () => React.createElement("div", null, "Welcome") },
   ];
@@ -16,7 +16,7 @@ const makeTabs = (): VSCodePanelTab[] => {
 describe("PanelSystem empty groups cleanup", () => {
   it("collapses empty groups so only non-empty tabbars render", () => {
     const tabs = makeTabs();
-    const initial = buildPanelInitialState(tabs);
+    const initial = buildInitialState(tabs);
     // Split once to create a second, empty group
     const { tree, newGroupId } = splitLeaf(initial.tree, initial.groupOrder[0], "vertical", () => "g_2");
     const state = {

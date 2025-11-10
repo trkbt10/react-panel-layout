@@ -3,10 +3,11 @@
  */
 import * as React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { PanelSystem, buildPanelInitialState } from "../src";
-import type { VSCodePanelTab } from "../src";
+import { PanelSystem } from "./PanelSystem";
+import { buildInitialState } from "..";
+import type { TabDefinition } from "..";
 
-const makeTabs = (): VSCodePanelTab[] => {
+const makeTabs = (): TabDefinition[] => {
   return [
     { id: "welcome", title: "Welcome", render: () => React.createElement("div", null, "Welcome") },
     { id: "explorer", title: "Explorer", render: () => React.createElement("div", null, "Explorer") },
@@ -25,7 +26,7 @@ const idFactory = () => {
 describe("PanelSystem tabs", () => {
   it("does not duplicate tabs when clicking items", () => {
     const tabs = makeTabs();
-    const initial = buildPanelInitialState(tabs);
+    const initial = buildInitialState(tabs);
     const createGroupId = idFactory();
 
     render(

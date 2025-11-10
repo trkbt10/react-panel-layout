@@ -2,7 +2,7 @@
  * @file PanelSystem Preview (single component per page)
  */
 import * as React from "react";
-import { PanelSystem, buildPanelInitialState } from "../../index";
+import { PanelSystem, buildInitialState } from "../../index";
 import type { TabDefinition } from "../../index";
 import { createPanelView } from "../../index";
 import { ChromeTabBar } from "../components/ChromeTabBar";
@@ -29,7 +29,7 @@ const useIdFactory = (): (() => string) => {
 export const PanelSystemPreview: React.FC = () => {
   const [tabStyle, setTabStyle] = React.useState<TabStyle>("raised");
   const tabs = React.useMemo(() => makeTabs(), []);
-  const initialState = React.useMemo(() => buildPanelInitialState(tabs), [tabs]);
+  const initialState = React.useMemo(() => buildInitialState(tabs), [tabs]);
   const createGroupId = useIdFactory();
   const View = React.useMemo(() => {
     switch (tabStyle) {

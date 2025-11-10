@@ -3,10 +3,10 @@
  */
 import * as React from "react";
 import { render, act } from "@testing-library/react";
-import type { PanelSystemState, TabDefinition } from "../src/modules/panels/state/types";
-import { buildPanelInitialState } from "../src";
-import { PanelStateProvider, usePanelState } from "../src/modules/panels/state/StateContext";
-import { useCommitHandlers } from "../src/modules/panels/state/commands";
+import type { PanelSystemState, TabDefinition } from "../state/types";
+import { buildInitialState } from "..";
+import { PanelStateProvider, usePanelState } from "../state/StateContext";
+import { useCommitHandlers } from "../state/commands";
 
 type RecorderHandle = {
   handlers: ReturnType<typeof useCommitHandlers>;
@@ -36,7 +36,7 @@ const makeTabs = (): TabDefinition[] => [
 
 describe("PanelSystem tab reorder", () => {
   it("reorders tabs within the same group", () => {
-    const initial = buildPanelInitialState(makeTabs());
+    const initial = buildInitialState(makeTabs());
     const ref = React.createRef<RecorderHandle>();
 
     render(
