@@ -81,8 +81,12 @@ function App() {
     return <Outlet />;
   };
 
+  // Use Vite's BASE_URL for React Router basename
+  // This automatically matches the base path set in vite.config.ts
+  const basename = import.meta.env.BASE_URL;
+
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
