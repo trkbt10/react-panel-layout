@@ -10,12 +10,4 @@
   min-height: 0;
   position: relative;
   overflow: hidden;
-  background: var(--rpl-color-panel-bg, #0b0b0c);
-}
-/* Raised panel shell integrates with raised tabs (border under tabbar) */
-.content {
-  border: 1px solid var(--rpl-color-panel-border, rgba(0,0,0,0.3));
-  border-top: none;
-  border-bottom-left-radius: var(--rpl-radius-tab, 4px);
-  border-bottom-right-radius: var(--rpl-radius-tab, 4px);
 }

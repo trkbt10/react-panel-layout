@@ -1,20 +1,8 @@
 .horizontalDivider {
   width: 4px;
-  background: transparent;
   cursor: col-resize;
   position: relative;
   user-select: none;
-  transition: background-color 0.2s ease;
-}
-
-.horizontalDivider:hover {
-  background: var(--node-editor-accent-color, #007aff);
-  opacity: 0.3;
-}
-
-.horizontalDivider[data-dragging="true"] {
-  background: var(--node-editor-accent-color, #007aff);
-  opacity: 0.6;
 }
 
 /* Add a larger hit area */
@@ -25,14 +13,5 @@
   left: -4px;
   right: -4px;
   bottom: 0;
-  background: transparent;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .horizontalDivider:hover,
-  .horizontalDivider[data-dragging="true"] {
-    background: var(--node-editor-accent-color, #0099ff);
-  }
 }
 

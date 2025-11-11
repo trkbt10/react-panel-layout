@@ -1,20 +1,16 @@
 .tab {
   display: inline-flex;
   align-items: center;
-  padding: var(--rpl-space-tab-padding-y, 4px) var(--rpl-space-tab-padding-x, 8px);
-  border-radius: var(--rpl-radius-tab, 4px) var(--rpl-radius-tab, 4px) 0 0;
-  color: var(--rpl-color-tab-fg, #d5d7de);
-  background: transparent;
   user-select: none;
 }
 .tabActive {
-  background: var(--rpl-color-tab-active-bg, #2b2d35);
+  /* No decoration - controlled by user */
 }
 .tabDragging {
-  opacity: 0.6;
+  /* No decoration - controlled by user */
 }
 .tabTitle {
-  font-size: var(--rpl-size-tab-font, 12px);
+  /* No decoration - controlled by user */
 }
 .spacer {
   flex: 1 1 auto;
@@ -22,37 +18,4 @@
 .tabbar {
   display: flex;
   align-items: center;
-  gap: var(--rpl-space-tabbar-gap, 6px);
-  padding: var(--rpl-space-tabbar-padding-y, 4px) var(--rpl-space-tabbar-padding-x, 6px);
-  background: var(--rpl-color-tabbar-bg, #1e1f24);
-  border-bottom: 1px solid var(--rpl-color-panel-border, rgba(0,0,0,0.3));
-}
-
-/* Raised tab variant */
-[data-rpl-tab-style="raised"] .tabbar {
-  gap: 0;
-  padding: 0 var(--rpl-space-tabbar-padding-x, 6px);
-}
-.tabbar .tab {
-  background: var(--rpl-color-tabbar-bg, #1e1f24);
-  border: 1px solid var(--rpl-color-panel-border, rgba(0,0,0,0.3));
-  border-bottom: none;
-  margin: 0 2px;
-  border-top-left-radius: var(--rpl-radius-tab, 4px);
-  border-top-right-radius: var(--rpl-radius-tab, 4px);
-}
-.tabbar .tabActive {
-  background: var(--rpl-color-tab-active-bg, #2b2d35);
-  position: relative;
-}
-.tabbar .tabActive::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 2px;
-  background: var(--rpl-color-primary, #2196f3);
-  border-top-left-radius: var(--rpl-radius-tab, 4px);
-  border-top-right-radius: var(--rpl-radius-tab, 4px);
 }

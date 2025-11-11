@@ -6,40 +6,86 @@ import styles from "./TabBar.module.css";
 import type { TabBarRenderProps } from "../../modules/panels/state/types";
 import { usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
 
-export const TabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef }) => {
+export type TabBarProps = TabBarRenderProps & {
+  /** Custom component for the tabbar container */
+  component?: React.ComponentType<React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }>;
+  /** Custom element for the tabbar container */
+  element?: React.ReactElement;
+  /** Custom component for individual tabs */
+  tabComponent?: React.ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement>>;
+  /** Custom element factory for individual tabs */
+  tabElement?: (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => React.ReactElement;
+};
+
+export const TabBar: React.FC<TabBarProps> = ({
+  group,
+  onClickTab,
+  onStartDrag,
+  rootRef,
+  component: ContainerComponent,
+  element,
+  tabComponent: TabComponent,
+  tabElement
+}) => {
   const { isTabDragging, draggingTabId } = usePanelInteractions();
-  return (
-    <div ref={rootRef} className={styles.tabbar} role="tablist" data-tabbar="true" data-group-id={group.id} data-dragging={isTabDragging ? "true" : "false"}>
-      {group.tabs.map((tab, index) => {
-        const active = group.activeTabId === tab.id;
-        const dragging = draggingTabId === tab.id;
-        const className = `${styles.tab} ${active ? styles.tabActive : ""} ${dragging ? styles.tabDragging : ""}`.trim();
-        return (
-          <button
-            key={`${group.id}:${tab.id}:${index}`}
-            type="button"
-            role="tab"
-            aria-selected={active}
-            className={className}
-            onClick={() => {
-              onClickTab(tab.id);
-            }}
-            onPointerDown={(e) => {
-              if (!onStartDrag) {
-                return;
-              }
-              if (e.button !== 0) {
-                return;
-              }
-              onStartDrag(tab.id, group.id, e);
-            }}
-            data-tab-id={tab.id}
-          >
-            <span className={styles.tabTitle}>{tab.title}</span>
-          </button>
-        );
-      })}
+
+  const containerProps = {
+    ref: rootRef,
+    className: styles.tabbar,
+    role: "tablist" as const,
+    "data-tabbar": "true",
+    "data-group-id": group.id,
+    "data-dragging": isTabDragging ? "true" : "false",
+  };
+
+  const tabs = group.tabs.map((tab, index) => {
+    const active = group.activeTabId === tab.id;
+    const dragging = draggingTabId === tab.id;
+    const className = `${styles.tab} ${active ? styles.tabActive : ""} ${dragging ? styles.tabDragging : ""}`.trim();
+
+    const tabProps = {
+      key: `${group.id}:${tab.id}:${index}`,
+      type: "button" as const,
+      role: "tab" as const,
+      "aria-selected": active,
+      className,
+      onClick: () => {
+        onClickTab(tab.id);
+      },
+      onPointerDown: (e: React.PointerEvent<HTMLButtonElement>) => {
+        if (!onStartDrag) {
+          return;
+        }
+        if (e.button !== 0) {
+          return;
+        }
+        onStartDrag(tab.id, group.id, e);
+      },
+      "data-tab-id": tab.id,
+      children: <span className={styles.tabTitle}>{tab.title}</span>,
+    };
+
+    if (tabElement) {
+      return tabElement(tabProps);
+    }
+    if (TabComponent) {
+      return <TabComponent {...tabProps} />;
+    }
+    return <button {...tabProps} />;
+  });
+
+  const content = (
+    <>
+      {tabs}
       <span className={styles.spacer} />
-    </div>
+    </>
   );
+
+  if (element) {
+    return React.cloneElement(element, containerProps, content);
+  }
+  if (ContainerComponent) {
+    return <ContainerComponent {...containerProps}>{content}</ContainerComponent>;
+  }
+  return <div {...containerProps}>{content}</div>;
 };
