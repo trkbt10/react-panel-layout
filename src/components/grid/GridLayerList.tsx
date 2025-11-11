@@ -6,7 +6,6 @@ import type { LayerDefinition } from "../../types";
 import { useGridLayoutContext } from "../../modules/grid/GridLayoutContext";
 import { LayerInstanceProvider } from "../../modules/grid/LayerInstanceContext";
 import { PopupLayerPortal } from "../window/PopupLayerPortal";
-import styles from "./GridLayerList.module.css";
 import { GridLayerResizeHandles } from "./GridLayerResizeHandles";
 import type { ResizeHandleConfig } from "../../modules/grid/GridLayoutContext";
 
@@ -51,6 +50,14 @@ export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
           gridPlacementStyle.gridColumn = layer.gridColumn;
         }
 
+        const buildCombinedStyle = (): React.CSSProperties => {
+          if (isResizable) {
+            return { ...style, ...gridPlacementStyle, position: "relative" as const };
+          }
+          return { ...style, ...gridPlacementStyle };
+        };
+        const combinedStyle = buildCombinedStyle();
+
         return (
           <div
             key={layer.id}
@@ -58,8 +65,7 @@ export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
             data-draggable={Boolean(layer.floating?.draggable)}
             data-resizable={isResizable}
             data-resizing={isResizing}
-            className={styles.gridLayer}
-            style={{ ...style, ...gridPlacementStyle }}
+            style={combinedStyle}
             onPointerDown={handleLayerPointerDown}
           >
             <LayerInstanceProvider layerId={layer.id}>{layer.component}</LayerInstanceProvider>

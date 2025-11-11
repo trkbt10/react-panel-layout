@@ -8,7 +8,18 @@ import { ensureDialogPolyfill } from "../../utils/polyfills/createDialogPolyfill
 import { useEffectEvent } from "../../hooks/useEffectEvent";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
 import { useResizeObserver } from "../../hooks/useResizeObserver";
-import styles from "./DialogOverlay.module.css";
+import { DIALOG_OVERLAY_Z_INDEX } from "../../constants/styles";
+
+const contextDialogStyle: React.CSSProperties = {
+  border: "none",
+  padding: 0,
+  background: "transparent",
+};
+
+const contextContentStyle: React.CSSProperties = {
+  position: "fixed",
+  zIndex: DIALOG_OVERLAY_Z_INDEX,
+};
 
 type DataAttributes = Record<string, string | number | boolean>;
 
@@ -72,6 +83,7 @@ const DialogOverlayContent: React.FC<Omit<DialogOverlayProps, "visible">> = ({
 
   const mergedStyle: React.CSSProperties = React.useMemo(
     () => ({
+      ...contextContentStyle,
       ...contentStyle,
       left: computedPosition.x,
       top: computedPosition.y,
@@ -95,7 +107,7 @@ const DialogOverlayContent: React.FC<Omit<DialogOverlayProps, "visible">> = ({
   return (
     <div
       ref={contentRef}
-      className={`${styles.contextContent}${contentClassName ? ` ${contentClassName}` : ""}`}
+      className={contentClassName}
       style={mergedStyle}
       onKeyDown={onKeyDown}
       {...dataProps}
@@ -140,7 +152,7 @@ const DialogOverlayImpl: React.FC<DialogOverlayProps> = ({
   );
 
   return (
-    <dialog ref={dialogRef} className={styles.contextDialog} onCancel={handleCancel}>
+    <dialog ref={dialogRef} style={contextDialogStyle} onCancel={handleCancel}>
       <React.Activity mode={visible ? "visible" : "hidden"}>
         <DialogOverlayContent
           anchor={anchor}

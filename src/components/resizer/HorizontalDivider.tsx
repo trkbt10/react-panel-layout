@@ -2,8 +2,8 @@
  * @file Horizontal divider component
  */
 import * as React from "react";
-import styles from "./HorizontalDivider.module.css";
 import { useResizeDrag } from "../../modules/resizer/useResizeDrag";
+import { HORIZONTAL_DIVIDER_WIDTH } from "../../constants/styles";
 
 export type HorizontalDividerProps = {
   onResize: (deltaX: number) => void;
@@ -11,6 +11,13 @@ export type HorizontalDividerProps = {
   component?: React.ComponentType<React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }>;
   /** Custom element for the divider */
   element?: React.ReactElement;
+};
+
+const horizontalDividerStyle: React.CSSProperties = {
+  width: HORIZONTAL_DIVIDER_WIDTH,
+  cursor: "col-resize",
+  position: "relative",
+  userSelect: "none",
 };
 
 export const HorizontalDivider: React.FC<HorizontalDividerProps> = ({ onResize, component: Component, element }) => {
@@ -21,7 +28,7 @@ export const HorizontalDivider: React.FC<HorizontalDividerProps> = ({ onResize, 
 
   const dividerProps = {
     ref,
-    className: styles.horizontalDivider,
+    style: horizontalDividerStyle,
     "data-dragging": isDragging ? "true" : undefined,
     onPointerDown,
   };

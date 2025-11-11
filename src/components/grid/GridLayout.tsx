@@ -5,7 +5,6 @@ import * as React from "react";
 import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
 import type { LayerDefinition, PanelLayoutConfig } from "../../types";
 import { DrawerLayers } from "../window/DrawerLayers";
-import styles from "./GridLayout.module.css";
 import { GridLayerList } from "./GridLayerList";
 import { GridTrackResizeHandle } from "./GridTrackResizeHandle";
 import { PanelSystemProvider, usePanelSystem } from "../../PanelSystemContext";
@@ -13,6 +12,20 @@ import { useGridPlacements } from "../../modules/grid/useGridPlacements";
 import { useGridTracks } from "../../modules/grid/useGridTracks";
 import { useLayerInteractions } from "../../modules/grid/useLayerInteractions";
 import { GridLayoutProvider } from "../../modules/grid/GridLayoutContext";
+
+const gridLayoutBaseStyle: React.CSSProperties = {
+  display: "grid",
+  width: "100%",
+  height: "100%",
+  overflow: "hidden",
+};
+
+const gridLayoutDraggingStyle: React.CSSProperties = {
+  touchAction: "none",
+  WebkitTouchCallout: "none",
+  WebkitUserSelect: "none",
+  userSelect: "none",
+};
 
 export type GridLayoutProps = {
   config: PanelLayoutConfig;
@@ -43,12 +56,20 @@ const GridLayoutInner: React.FC<{
     layerById,
   });
 
+  const isDraggingOrResizing = draggingLayerId ? true : Boolean(resizingLayerId);
+  const combinedStyle = React.useMemo(() => {
+    return {
+      ...gridLayoutBaseStyle,
+      ...gridStyle,
+      ...(isDraggingOrResizing ? gridLayoutDraggingStyle : {}),
+    };
+  }, [gridStyle, isDraggingOrResizing]);
+
   return (
     <>
       <div
         ref={gridRef}
-        className={styles.gridLayout}
-        style={gridStyle}
+        style={combinedStyle}
         data-dragging={Boolean(draggingLayerId)}
         data-resizing={Boolean(resizingLayerId)}
         data-visible={isIntersecting}

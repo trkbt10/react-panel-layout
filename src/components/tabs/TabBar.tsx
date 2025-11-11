@@ -2,7 +2,6 @@
  * @file Tab bar with drag handles (generic, not panel-specific).
  */
 import * as React from "react";
-import styles from "./TabBar.module.css";
 import type { TabBarRenderProps } from "../../modules/panels/state/types";
 import { usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
 
@@ -15,6 +14,21 @@ export type TabBarProps = TabBarRenderProps & {
   tabComponent?: React.ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement>>;
   /** Custom element factory for individual tabs */
   tabElement?: (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => React.ReactElement;
+};
+
+const tabbarStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+};
+
+const tabStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  userSelect: "none",
+};
+
+const spacerStyle: React.CSSProperties = {
+  flex: "1 1 auto",
 };
 
 export const TabBar: React.FC<TabBarProps> = ({
@@ -31,7 +45,7 @@ export const TabBar: React.FC<TabBarProps> = ({
 
   const containerProps = {
     ref: rootRef,
-    className: styles.tabbar,
+    style: tabbarStyle,
     role: "tablist" as const,
     "data-tabbar": "true",
     "data-group-id": group.id,
@@ -41,14 +55,13 @@ export const TabBar: React.FC<TabBarProps> = ({
   const tabs = group.tabs.map((tab, index) => {
     const active = group.activeTabId === tab.id;
     const dragging = draggingTabId === tab.id;
-    const className = `${styles.tab} ${active ? styles.tabActive : ""} ${dragging ? styles.tabDragging : ""}`.trim();
 
     const tabProps = {
       key: `${group.id}:${tab.id}:${index}`,
       type: "button" as const,
       role: "tab" as const,
       "aria-selected": active,
-      className,
+      style: tabStyle,
       onClick: () => {
         onClickTab(tab.id);
       },
@@ -62,7 +75,9 @@ export const TabBar: React.FC<TabBarProps> = ({
         onStartDrag(tab.id, group.id, e);
       },
       "data-tab-id": tab.id,
-      children: <span className={styles.tabTitle}>{tab.title}</span>,
+      "data-active": active ? "true" : "false",
+      "data-dragging": dragging ? "true" : "false",
+      children: <span>{tab.title}</span>,
     };
 
     if (tabElement) {
@@ -77,7 +92,7 @@ export const TabBar: React.FC<TabBarProps> = ({
   const content = (
     <>
       {tabs}
-      <span className={styles.spacer} />
+      <span style={spacerStyle} />
     </>
   );
 

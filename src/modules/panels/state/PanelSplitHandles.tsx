@@ -8,6 +8,7 @@ import { isGroup } from "../../panels/state/tree/logic";
 import { usePanelState } from "../../panels/state/StateContext";
 import { useTree } from "../../panels/state/tree/Context";
 import { ResizeHandle } from "../../../components/resizer/ResizeHandle";
+import { SPLIT_HANDLE_THICKNESS } from "../../../constants/styles";
 
 type Rect = { x: number; y: number; w: number; h: number };
 
@@ -59,7 +60,7 @@ export const PanelSplitHandles: React.FC<PanelSplitHandlesProps> = ({ containerR
       height: (containerRect.height * handle.parentRect.h) / 100,
     };
 
-    const thickness = "var(--rpl-size-split-handle-thickness, 6px)";
+    const thickness = SPLIT_HANDLE_THICKNESS;
 
     if (handle.direction === "vertical") {
       const x = parentPx.left + (parentPx.width * (handle.linePos - handle.parentRect.x)) / handle.parentRect.w;

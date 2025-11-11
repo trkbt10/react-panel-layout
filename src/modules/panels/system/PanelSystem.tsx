@@ -2,7 +2,6 @@
  * @file VSCode-like PanelSystem composed via module contexts and presentational components.
  */
 import * as React from "react";
-import styles from "../../../components/panels/PanelSystem.module.css";
 import type { GroupId, PanelSystemProps } from "../state/types";
 import { KeybindingsProvider } from "../../keybindings/KeybindingsProvider";
 import { buildGridForAbsolutePanels, buildGridFromRects } from "../layout/adapter";
@@ -17,6 +16,13 @@ import { useCommitHandlers } from "../state/commands";
 import { RenderBridge } from "../rendering/RenderBridge";
 import { DomRegistryProvider } from "../dom/DomRegistry";
 import { PanelSplitHandles } from "../state/PanelSplitHandles";
+
+const rootStyle: React.CSSProperties = {
+  position: "relative",
+  display: "flex",
+  width: "100%",
+  height: "100%",
+};
 
 export const PanelSystem: React.FC<PanelSystemProps> = ({
   initialState,
@@ -72,6 +78,10 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({
       return buildGridForAbsolutePanels(state, onRenderGroup);
     }, [layoutMode, gridTracksInteractive, state, onRenderGroup]);
 
+    const containerStyle = React.useMemo(() => {
+      return { ...rootStyle, ...style };
+    }, [style]);
+
     return (
       <DomRegistryProvider>
         <InteractionsProvider
@@ -81,7 +91,7 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({
           onCommitTabDrop={onCommitTabDrop}
         >
           <RenderBridge>
-            <div ref={containerRef} className={className ? `${styles.root} ${className}` : styles.root} style={style}>
+            <div ref={containerRef} className={className} style={containerStyle}>
               <GridLayout config={grid.config} layers={grid.layers} />
             </div>
           </RenderBridge>

@@ -3,7 +3,6 @@
  */
 import * as React from "react";
 import type { PanelGroupRenderProps } from "../../modules/panels/state/types";
-import groupStyles from "./PanelGroupView.module.css";
 
 export type PanelGroupViewProps = PanelGroupRenderProps & {
   /** Custom component for the group container */
@@ -16,10 +15,25 @@ export type PanelGroupViewProps = PanelGroupRenderProps & {
   contentElement?: React.ReactElement;
 };
 
+const groupStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  height: "100%",
+};
+
+const contentStyle: React.CSSProperties = {
+  flex: "1 1 auto",
+  minWidth: 0,
+  minHeight: 0,
+  position: "relative",
+  overflow: "hidden",
+};
+
 function createContentNode(
   contentElement: React.ReactElement | undefined,
   ContentComponent: React.ComponentType<React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }> | undefined,
-  contentProps: React.HTMLAttributes<HTMLDivElement> & { ref: React.Ref<HTMLDivElement> },
+  contentProps: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> },
   content: React.ReactNode
 ): React.ReactNode {
   if (contentElement) {
@@ -34,7 +48,7 @@ function createContentNode(
 function createGroupNode(
   element: React.ReactElement | undefined,
   GroupComponent: React.ComponentType<React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }> | undefined,
-  groupProps: React.HTMLAttributes<HTMLDivElement> & { ref: React.Ref<HTMLDivElement> },
+  groupProps: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> },
   groupContent: React.ReactNode
 ): React.ReactNode {
   if (element) {
@@ -60,13 +74,13 @@ const RawPanelGroupView: React.FC<PanelGroupViewProps> = ({
 }) => {
   const groupProps = {
     ref: groupRef,
-    className: groupStyles.group,
+    style: groupStyle,
     "data-group-id": group.id,
   };
 
   const contentProps = {
     ref: contentRef,
-    className: groupStyles.content,
+    style: contentStyle,
     "data-dnd-zone": "content",
     onPointerDown: onContentPointerDown,
   };

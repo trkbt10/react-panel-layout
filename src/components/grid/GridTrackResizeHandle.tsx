@@ -3,7 +3,8 @@
  */
 import * as React from "react";
 import { ResizeHandle } from "../resizer/ResizeHandle";
-import styles from "./GridTrackResizeHandle.module.css";
+import { GRID_HANDLE_THICKNESS } from "../../constants/styles";
+
 type TrackDirection = "row" | "col";
 
 type GridTrackResizeHandleProps = {
@@ -14,7 +15,21 @@ type GridTrackResizeHandleProps = {
   onResize: (direction: TrackDirection, index: number, delta: number) => void;
 };
 
-const HANDLE_THICKNESS = 4;
+const resizeHandleWrapperVerticalStyle: React.CSSProperties = {
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  width: GRID_HANDLE_THICKNESS,
+  pointerEvents: "auto",
+};
+
+const resizeHandleWrapperHorizontalStyle: React.CSSProperties = {
+  position: "absolute",
+  left: 0,
+  right: 0,
+  height: GRID_HANDLE_THICKNESS,
+  pointerEvents: "auto",
+};
 
 export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
   direction,
@@ -32,7 +47,8 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
     [direction, trackIndex, onResize],
   );
 
-  const wrapperClass = direction === "col" ? styles.resizeHandleWrapperVertical : styles.resizeHandleWrapperHorizontal;
+  const baseWrapperStyle = direction === "col" ? resizeHandleWrapperVerticalStyle : resizeHandleWrapperHorizontalStyle;
+
   const placementStyle = React.useMemo<React.CSSProperties>(() => {
     if (direction === "col") {
       return {
@@ -48,11 +64,12 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
 
   const wrapperStyle = React.useMemo<React.CSSProperties>(() => {
     const halfGap = Math.max(0, gap) / 2;
-    const offset = halfGap + HANDLE_THICKNESS / 2;
+    const offset = halfGap + GRID_HANDLE_THICKNESS / 2;
 
     if (direction === "col") {
       return {
-        width: HANDLE_THICKNESS,
+        ...baseWrapperStyle,
+        width: GRID_HANDLE_THICKNESS,
         top: 0,
         bottom: 0,
         ...(align === "start" ? { left: -offset } : { right: -offset }),
@@ -60,16 +77,17 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
     }
 
     return {
-      height: HANDLE_THICKNESS,
+      ...baseWrapperStyle,
+      height: GRID_HANDLE_THICKNESS,
       left: 0,
       right: 0,
       ...(align === "start" ? { top: -offset } : { bottom: -offset }),
     };
-  }, [align, direction, gap]);
+  }, [align, direction, gap, baseWrapperStyle]);
 
   return (
     <div data-resizable="true" style={{ ...placementStyle, position: "relative", pointerEvents: "none" }}>
-      <div className={wrapperClass} data-direction={resizeDirection} data-align={align} data-handle="true" style={wrapperStyle}>
+      <div data-direction={resizeDirection} data-align={align} data-handle="true" style={wrapperStyle}>
         <ResizeHandle direction={resizeDirection} onResize={handleResize} />
       </div>
     </div>

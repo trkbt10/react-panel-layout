@@ -35,6 +35,13 @@
   --rpl-color-insert-guide: rgba(120, 160, 255, 0.95);
   --rpl-color-insert-guide-shadow: 0 0 0 2px rgba(120, 160, 255, 0.2);
 
+  /* Node editor / floating panel colors */
+  --node-editor-surface: #fff;
+  --node-editor-surface-2: #fafafa;
+  --node-editor-border: #e5e7eb;
+  --node-editor-muted-fg: #6b7280;
+  --node-editor-card-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
   /* ========== Sizes & Spacing ========== */
 
   /* Tab sizing */
@@ -66,4 +73,45 @@
 
   --rpl-z-overlay: 9998;
   --rpl-z-tabdrag-overlay: 9999;
+  --rpl-z-dialog-overlay: 10000;
+  --rpl-z-resize-handle: 1000;
+
+  /* ========== Grid Layer Hit Areas ========== */
+
+  --rpl-size-grid-layer-corner-hit: 14px;
+  --rpl-size-grid-layer-edge-hit-thickness: 12px;
+
+  /* ========== Tab Drag Overlay ========== */
+
+  --rpl-space-tab-drag-preview-offset-x: 12px;
+  --rpl-space-tab-drag-preview-offset-y: 12px;
+  --rpl-radius-tab-drag-preview: 6px;
+  --rpl-space-tab-drag-preview-padding-y: 4px;
+  --rpl-space-tab-drag-preview-padding-x: 8px;
+  --rpl-size-tab-drag-preview-font: 12px;
+  --rpl-size-tab-drag-insert-guide-width: 2px;
+  --rpl-radius-tab-drag-insert-guide: 1px;
+
+  /* ========== Floating Panel Frame ========== */
+
+  --rpl-radius-floating-panel: 8px;
+  --rpl-space-floating-panel-gap: 8px;
+  --rpl-space-floating-panel-header-padding-y: 8px;
+  --rpl-space-floating-panel-header-padding-x: 12px;
+  --rpl-space-floating-panel-content-padding: 12px;
+  --rpl-size-floating-panel-meta-font: 12px;
+  --rpl-space-floating-panel-controls-gap: 6px;
+
+  /* ========== Drawer ========== */
+
+  --rpl-space-drawer-header-padding-y: 10px;
+  --rpl-space-drawer-header-padding-x: 12px;
+  --rpl-space-drawer-header-gap: 8px;
+  --rpl-space-drawer-content-padding: 12px;
+  --rpl-size-drawer-close-button-font: 18px;
+
+  /* ========== Horizontal Divider ========== */
+
+  --rpl-size-horizontal-divider-width: 4px;
+  --rpl-space-horizontal-divider-hit-area-offset: 4px;
 }

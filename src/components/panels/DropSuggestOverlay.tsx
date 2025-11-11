@@ -2,8 +2,29 @@
  * @file Overlay renderer and helpers for drop suggestion zones.
  */
 import * as React from "react";
-import styles from "./DropSuggestOverlay.module.css";
 import type { DropZone } from "../../modules/panels/state/types";
+import {
+  DROP_SUGGEST_Z_INDEX,
+  DROP_SUGGEST_BORDER_WIDTH,
+  DROP_SUGGEST_BORDER_RADIUS,
+  DROP_SUGGEST_BORDER_COLOR,
+  DROP_SUGGEST_BG_COLOR,
+  DROP_SUGGEST_PADDING,
+} from "../../constants/styles";
+
+const overlayStyle: React.CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  pointerEvents: "none",
+  zIndex: DROP_SUGGEST_Z_INDEX,
+};
+
+const suggestRectBaseStyle: React.CSSProperties = {
+  position: "absolute",
+  border: `${DROP_SUGGEST_BORDER_WIDTH} dashed ${DROP_SUGGEST_BORDER_COLOR}`,
+  background: DROP_SUGGEST_BG_COLOR,
+  borderRadius: DROP_SUGGEST_BORDER_RADIUS,
+};
 
 export type SuggestInfo = {
   rect: DOMRectReadOnly;
@@ -30,10 +51,11 @@ export const DropSuggestOverlay: React.FC<DropSuggestOverlayProps> = ({ suggest 
   } as React.CSSProperties;
 
   const compute = (): React.CSSProperties => {
-    const pad = "var(--rpl-space-drop-suggest-padding, 6px)";
+    const pad = DROP_SUGGEST_PADDING;
 
     if (zone === "center") {
       return {
+        ...suggestRectBaseStyle,
         ...baseStyle,
         left: `calc(var(--rect-left) + ${pad})`,
         top: `calc(var(--rect-top) + ${pad})`,
@@ -43,6 +65,7 @@ export const DropSuggestOverlay: React.FC<DropSuggestOverlayProps> = ({ suggest 
     }
     if (zone === "left") {
       return {
+        ...suggestRectBaseStyle,
         ...baseStyle,
         left: `calc(var(--rect-left) + ${pad})`,
         top: `calc(var(--rect-top) + ${pad})`,
@@ -52,6 +75,7 @@ export const DropSuggestOverlay: React.FC<DropSuggestOverlayProps> = ({ suggest 
     }
     if (zone === "right") {
       return {
+        ...suggestRectBaseStyle,
         ...baseStyle,
         left: `calc(var(--rect-left) + var(--rect-width) / 2 + ${pad} / 2)`,
         top: `calc(var(--rect-top) + ${pad})`,
@@ -61,6 +85,7 @@ export const DropSuggestOverlay: React.FC<DropSuggestOverlayProps> = ({ suggest 
     }
     if (zone === "top") {
       return {
+        ...suggestRectBaseStyle,
         ...baseStyle,
         left: `calc(var(--rect-left) + ${pad})`,
         top: `calc(var(--rect-top) + ${pad})`,
@@ -69,6 +94,7 @@ export const DropSuggestOverlay: React.FC<DropSuggestOverlayProps> = ({ suggest 
       };
     }
     return {
+      ...suggestRectBaseStyle,
       ...baseStyle,
       left: `calc(var(--rect-left) + ${pad})`,
       top: `calc(var(--rect-top) + var(--rect-height) / 2 + ${pad} / 2)`,
@@ -80,8 +106,8 @@ export const DropSuggestOverlay: React.FC<DropSuggestOverlayProps> = ({ suggest 
   const style = compute();
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.suggestRect} style={style} />
+    <div style={overlayStyle}>
+      <div style={style} />
     </div>
   );
 };
