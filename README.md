@@ -1,4 +1,18 @@
-# Repository
+# React Panel Layout
+
+> A flexible and customizable panel layout system for React applications
+
+## 🎨 Live Demo
+
+**[View Live Demo →](https://trkbt10.github.io/react-panel-layout/)**
+
+Explore interactive examples of all components, including:
+- Panel layouts with resizable grids
+- Tab systems with drag & drop
+- Floating panels and overlays
+- Various UI patterns and configurations
+
+---
 
 ## Panel System – Customizing Look & Feel
 

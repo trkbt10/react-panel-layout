@@ -13,7 +13,6 @@ const SidebarNav: React.FC = () => {
   const topLinks = [
     { path: "/", label: "Home", icon: "🏠" },
     { path: "/panel-demo", label: "Panel Layout Demo", icon: "📐" },
-    { path: "/about", label: "About", icon: "ℹ️" },
   ] as const;
 
   return (

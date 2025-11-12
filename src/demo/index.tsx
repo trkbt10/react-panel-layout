@@ -35,47 +35,6 @@ function Home() {
   );
 }
 
-function About() {
-  return (
-    <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "1rem" }}>About</h1>
-      <div style={{ marginTop: "2rem" }}>
-        <h2>About This Demo</h2>
-        <p>
-          This demo showcases the React Panel Layout library, a flexible and type-safe panel system for building
-          complex UI layouts.
-        </p>
-        <h3>Components:</h3>
-        <ul>
-          <li>
-            <strong>GridLayout</strong> - Main layout component using CSS Grid
-          </li>
-          <li>
-            <strong>Drawer</strong> - Mobile-friendly slide-in panels
-          </li>
-          <li>
-            <strong>FloatingPanelFrame</strong> - Floating panel components
-          </li>
-          <li>
-            <strong>ResizeHandle</strong> - Interactive resize handles
-          </li>
-          <li>
-            <strong>HorizontalDivider</strong> - Horizontal panel divider with resize functionality
-          </li>
-          <li>
-            <strong>ContextMenuOverlay</strong> - Context menu overlay system
-          </li>
-        </ul>
-        <h3 style={{ marginTop: "2rem" }}>Layout System</h3>
-        <p>
-          This demo application itself uses the GridLayout component to create the sidebar and main content area layout.
-          The sidebar is resizable - try dragging the edge to resize it!
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function App() {
   const CategoryOutlet: React.FC = () => {
     return <Outlet />;
@@ -102,7 +61,6 @@ function App() {
               ))}
             </Route>
           ))}
-          <Route path="about" element={<About />} />
         </Route>
       </Routes>
     </BrowserRouter>
