@@ -7,7 +7,26 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Custom plugin to prevent CSS file emission
+    {
+      name: 'remove-css-emission',
+      enforce: 'post',
+      generateBundle(options, bundle) {
+        // Remove CSS files from the bundle
+        const filesToDelete: string[] = [];
+        for (const fileName in bundle) {
+          if (fileName.endsWith('.css')) {
+            filesToDelete.push(fileName);
+          }
+        }
+        filesToDelete.forEach(fileName => {
+          delete bundle[fileName];
+        });
+      },
+    },
+  ],
   build: {
     outDir: "dist",
     lib: {
@@ -38,7 +57,7 @@ export default defineConfig({
       ],
     },
     sourcemap: true,
-    // Ensure CSS is emitted as a single file
+    // Do not emit CSS files - users should import variables.css directly
     cssCodeSplit: false,
   },
   css: {

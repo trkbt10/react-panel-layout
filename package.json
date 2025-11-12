@@ -29,7 +29,6 @@
       "import": "./dist/floating.js",
       "require": "./dist/floating.cjs"
     },
-    "./style.css": "./dist/react-panel-layout.css",
     "./package.json": "./package.json"
   },
   "files": [
