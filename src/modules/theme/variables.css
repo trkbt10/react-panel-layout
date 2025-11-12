@@ -36,11 +36,11 @@
   --rpl-color-insert-guide-shadow: 0 0 0 2px rgba(120, 160, 255, 0.2);
 
   /* Node editor / floating panel colors */
-  --node-editor-surface: #fff;
-  --node-editor-surface-2: #fafafa;
-  --node-editor-border: #e5e7eb;
-  --node-editor-muted-fg: #6b7280;
-  --node-editor-card-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --rpl-color-surface: #fff;
+  --rpl-color-surface-2: #fafafa;
+  --rpl-color-border: #e5e7eb;
+  --rpl-color-muted-fg: #6b7280;
+  --rpl-shadow-card: 0 2px 10px rgba(0, 0, 0, 0.08);
 
   /* ========== Sizes & Spacing ========== */
 

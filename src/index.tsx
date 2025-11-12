@@ -59,6 +59,11 @@ export type { ResizeHandleProps } from "./components/resizer/ResizeHandle";
 export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";
 
 // ============================================================================
+// Style Constants
+// ============================================================================
+export { CSS_VAR_PREFIX } from "./constants/styles";
+
+// ============================================================================
 // Panel System (tabs + splits)
 // ============================================================================
 export { PanelSystem } from "./modules/panels/system/PanelSystem";

@@ -5,8 +5,25 @@
  * This allows users to override theme values via CSS while maintaining
  * type-safe constants in TypeScript.
  *
- * Users can override these via CSS variables (--rpl-*, --node-editor-*)
+ * All CSS variables use the unified prefix: --rpl- (react-panel-layout)
+ * Users can override these via CSS variables (--rpl-*)
+ *
+ * @example
+ * // In your CSS:
+ * :root {
+ *   --rpl-color-primary: #ff0000;
+ * }
  */
+
+// ========================================
+// CSS VARIABLE PREFIX
+// ========================================
+
+/**
+ * Unified CSS variable prefix for all react-panel-layout variables
+ * All theme variables use this prefix: --rpl-*
+ */
+export const CSS_VAR_PREFIX = 'rpl';
 
 // ========================================
 // COLORS
@@ -54,11 +71,11 @@ export const COLOR_INSERT_GUIDE_SHADOW = "var(--rpl-color-insert-guide-shadow)";
  * Node editor / floating panel colors
  * These are used by Drawer and FloatingPanelFrame components
  */
-export const COLOR_NODE_EDITOR_SURFACE = "var(--node-editor-surface)";
-export const COLOR_NODE_EDITOR_SURFACE_2 = "var(--node-editor-surface-2)";
-export const COLOR_NODE_EDITOR_BORDER = "var(--node-editor-border)";
-export const COLOR_NODE_EDITOR_MUTED_FG = "var(--node-editor-muted-fg)";
-export const COLOR_NODE_EDITOR_CARD_SHADOW = "var(--node-editor-card-shadow)";
+export const COLOR_NODE_EDITOR_SURFACE = "var(--rpl-color-surface)";
+export const COLOR_NODE_EDITOR_SURFACE_2 = "var(--rpl-color-surface-2)";
+export const COLOR_NODE_EDITOR_BORDER = "var(--rpl-color-border)";
+export const COLOR_NODE_EDITOR_MUTED_FG = "var(--rpl-color-muted-fg)";
+export const COLOR_NODE_EDITOR_CARD_SHADOW = "var(--rpl-shadow-card)";
 
 // ========================================
 // SIZING & SPACING
