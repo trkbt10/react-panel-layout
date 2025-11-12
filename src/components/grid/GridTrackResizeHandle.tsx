@@ -20,6 +20,7 @@ const resizeHandleWrapperVerticalStyle: React.CSSProperties = {
   top: 0,
   bottom: 0,
   width: GRID_HANDLE_THICKNESS,
+  height: "100%",
   pointerEvents: "auto",
 };
 
@@ -27,6 +28,7 @@ const resizeHandleWrapperHorizontalStyle: React.CSSProperties = {
   position: "absolute",
   left: 0,
   right: 0,
+  width: "100%",
   height: GRID_HANDLE_THICKNESS,
   pointerEvents: "auto",
 };

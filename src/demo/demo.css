@@ -32,6 +32,10 @@
   --rpl-demo-card-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   --rpl-demo-card-hover-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   --rpl-demo-color-primary: #2196f3;
+
+  /* Panel split drop suggestion colors */
+  --rpl-color-drop-suggest-border: rgba(33, 150, 243, 0.9);
+  --rpl-color-drop-suggest-bg: rgba(33, 150, 243, 0.15);
 }
 
 * {
