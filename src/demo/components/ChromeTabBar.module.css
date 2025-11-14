@@ -53,3 +53,22 @@
 .spacer {
   flex: 1 1 auto;
 }
+
+.addButton {
+  margin-left: 6px;
+  border: 1px solid #b8babd;
+  background: #ffffff;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.closeButton {
+  margin-left: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}

@@ -21,6 +21,7 @@ export type TabBarTabProps = {
   tabElement?: TabBarProps["tabElement"];
   onClickTab: TabBarProps["onClickTab"];
   onStartDrag: TabBarProps["onStartDrag"];
+  onCloseTab?: (groupId: string, tabId: string) => void;
 };
 
 const tabStyle: React.CSSProperties = {
@@ -36,6 +37,7 @@ export const TabBarTab: React.FC<TabBarTabProps> = ({
   dragging,
   onClickTab,
   onStartDrag,
+  onCloseTab,
   tabComponent: TabComponent,
   tabElement,
 }) => {
@@ -53,17 +55,48 @@ export const TabBarTab: React.FC<TabBarTabProps> = ({
     onStartDrag(tab.id, groupId, e);
   });
 
+  const renderCloseButton = (): React.ReactNode => {
+    const hasClose = Boolean(onCloseTab);
+    return (
+      <React.Activity mode={hasClose ? "visible" : "hidden"}>
+        <button
+          type="button"
+          aria-label={`Close tab ${tab.title}`}
+          onClick={(e) => {
+            if (!onCloseTab) {
+              return;
+            }
+            e.stopPropagation();
+            onCloseTab(groupId, tab.id);
+          }}
+          style={{ marginLeft: 6 }}
+          tabIndex={hasClose ? undefined : -1}
+          disabled={!hasClose}
+          aria-hidden={hasClose ? undefined : true}
+        >
+          ×
+        </button>
+      </React.Activity>
+    );
+  };
+
   const tabProps: TabButtonProps = {
     type: "button",
     role: "tab",
     "aria-selected": active,
+    tabIndex: active ? 0 : -1,
     style: tabStyle,
     onClick: handleClick,
     onPointerDown: handlePointerDown,
     "data-tab-id": tab.id,
     "data-active": active ? "true" : "false",
     "data-dragging": dragging ? "true" : "false",
-    children: <span>{tab.title}</span>,
+    children: (
+      <>
+        <span>{tab.title}</span>
+        {renderCloseButton()}
+      </>
+    ),
   };
 
   if (tabElement) {

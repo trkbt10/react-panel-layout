@@ -6,58 +6,78 @@ import { usePanelInteractions } from "../interactions/InteractionsContext";
 import { PanelRenderProvider } from "./RenderContext";
 import { usePanelState } from "../state/StateContext";
 
-export const RenderBridge: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
+export const RenderBridge: React.FC<React.PropsWithChildren<{ emptyContentComponent?: React.ComponentType }>> = ({
+  children,
+  emptyContentComponent,
+}) => {
   const interactions = usePanelInteractions();
   const { state, actions } = usePanelState();
-  const emptyContent = React.useMemo(
-    () => React.createElement("div", { style: { color: "#888", fontSize: 12, padding: 12 } }, "No tabs"),
-    [],
+
+  const DefaultEmpty: React.FC = React.useCallback(() => {
+    return React.createElement("div", { style: { color: "#888", fontSize: 12, padding: 12 } }, "No tabs");
+  }, []);
+  const Empty = emptyContentComponent ?? DefaultEmpty;
+
+  const getGroup = React.useCallback(
+    (id: string) => {
+      const g = state.groups[id];
+      if (!g) {
+        return null;
+      }
+      const tabs = g.tabIds.map((tid) => state.panels[tid]).filter(Boolean);
+      return { ...g, tabs };
+    },
+    [state.groups, state.panels],
   );
-  return (
-    <PanelRenderProvider
-      value={{
-        getGroup: (id) => {
-          const g = state.groups[id];
-          if (!g) {
-            return null;
-          }
-          // Synthesize tabs from registry + tabIds to avoid duplicated tab definitions
-          const tabs = g.tabIds.map((tid) => state.panels[tid]).filter(Boolean);
-          return { ...g, tabs };
-        },
-        getGroupContent: (id) => {
-          const group = state.groups[id];
-          if (!group) {
-            return emptyContent;
-          }
-          const activeTabId = group.activeTabId;
-          if (!activeTabId) {
-            return emptyContent;
-          }
-          const tab = state.panels[activeTabId];
-          if (!tab) {
-            return emptyContent;
-          }
-          return tab.render();
-        },
-        onClickTab: (gid, tabId) => {
-          actions.setActiveTab(gid, tabId);
-        },
-        onStartTabDrag: (tabId, groupId, e) => {
-          // Enforce activation before any drag logic (centralized; no duplication in TabBars)
-          actions.setActiveTab(groupId, tabId);
-          interactions.onStartTabDrag(tabId, groupId, e);
-        },
-        onStartContentDrag: (groupId, e) => {
-          const g = state.groups[groupId];
-          if (!g || !g.activeTabId) {
-            return;
-          }
-          interactions.onStartContentDrag(groupId, g.activeTabId, e);
-        },
-      }}
-    >
-      {children}
-    </PanelRenderProvider>
+
+  const getGroupContent = React.useCallback(
+    (id: string) => {
+      const group = state.groups[id];
+      if (!group) {
+        return <Empty />;
+      }
+      const activeTabId = group.activeTabId;
+      if (!activeTabId) {
+        return <Empty />;
+      }
+      const tab = state.panels[activeTabId];
+      if (!tab) {
+        return <Empty />;
+      }
+      return tab.render();
+    },
+    [state.groups, state.panels, Empty],
   );
+
+  const onClickTab = React.useCallback((gid: string, tabId: string) => {
+    actions.setActiveTab(gid, tabId);
+  }, [actions]);
+
+  const onAddTab = React.useCallback((gid: string) => {
+    actions.addNewTab({ groupId: gid, title: "New Tab", makeActive: true });
+  }, [actions]);
+
+  const onCloseTab = React.useCallback((gid: string, tabId: string) => {
+    actions.removeTab(gid, tabId);
+  }, [actions]);
+
+  const onStartTabDrag = React.useCallback((tabId: string, groupId: string, e: React.PointerEvent) => {
+    actions.setActiveTab(groupId, tabId);
+    interactions.onStartTabDrag(tabId, groupId, e);
+  }, [actions, interactions]);
+
+  const onStartContentDrag = React.useCallback((groupId: string, e: React.PointerEvent<HTMLDivElement>) => {
+    const g = state.groups[groupId];
+    if (!g || !g.activeTabId) {
+      return;
+    }
+    interactions.onStartContentDrag(groupId, g.activeTabId, e);
+  }, [state.groups, interactions]);
+
+  const value = React.useMemo(
+    () => ({ getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag }),
+    [getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag],
+  );
+
+  return <PanelRenderProvider value={value}>{children}</PanelRenderProvider>;
 };

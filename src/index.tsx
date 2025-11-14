@@ -68,7 +68,6 @@ export { CSS_VAR_PREFIX } from "./constants/styles";
 // ============================================================================
 export { PanelSystem } from "./modules/panels/system/PanelSystem";
 export { buildInitialState } from "./modules/panels";
-export { createPanelView } from "./modules/panels/rendering/createPanelView";
 export type {
   PanelSystemProps,
   PanelSystemState,

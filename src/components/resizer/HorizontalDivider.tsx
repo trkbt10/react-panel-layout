@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { useResizeDrag } from "../../modules/resizer/useResizeDrag";
-import { HORIZONTAL_DIVIDER_WIDTH } from "../../constants/styles";
+import { HORIZONTAL_DIVIDER_WIDTH, COLOR_RESIZE_HANDLE_IDLE, COLOR_RESIZE_HANDLE_HOVER, COLOR_RESIZE_HANDLE_ACTIVE } from "../../constants/styles";
 
 export type HorizontalDividerProps = {
   onResize: (deltaX: number) => void;
@@ -13,11 +13,15 @@ export type HorizontalDividerProps = {
   element?: React.ReactElement;
 };
 
-const horizontalDividerStyle: React.CSSProperties = {
-  width: HORIZONTAL_DIVIDER_WIDTH,
-  cursor: "col-resize",
-  position: "relative",
-  userSelect: "none",
+const buildDividerStyle = (state: "idle" | "hover" | "drag"): React.CSSProperties => {
+  const backgroundColor = state === "drag" ? COLOR_RESIZE_HANDLE_ACTIVE : state === "hover" ? COLOR_RESIZE_HANDLE_HOVER : COLOR_RESIZE_HANDLE_IDLE;
+  return {
+    width: HORIZONTAL_DIVIDER_WIDTH,
+    cursor: "col-resize",
+    position: "relative",
+    userSelect: "none",
+    backgroundColor,
+  };
 };
 
 export const HorizontalDivider: React.FC<HorizontalDividerProps> = ({ onResize, component: Component, element }) => {
@@ -25,14 +29,17 @@ export const HorizontalDivider: React.FC<HorizontalDividerProps> = ({ onResize, 
     axis: "x",
     onResize: onResize,
   });
+  const [hovered, setHovered] = React.useState(false);
 
   const dividerProps = {
     ref,
-    style: horizontalDividerStyle,
+    style: buildDividerStyle(isDragging ? "drag" : hovered ? "hover" : "idle"),
     role: "separator" as const,
     "aria-orientation": "vertical" as const,
     "data-dragging": isDragging ? "true" : undefined,
     onPointerDown,
+    onPointerEnter: () => setHovered(true),
+    onPointerLeave: () => setHovered(false),
   };
 
   if (element) {

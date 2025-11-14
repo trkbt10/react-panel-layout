@@ -92,6 +92,10 @@ export type TabBarRenderProps = {
   onClickTab: (tabId: string) => void;
   onStartDrag?: (tabId: string, groupId: string, e: React.PointerEvent) => void;
   rootRef?: React.Ref<HTMLDivElement>;
+  /** Optional: request to add a tab to this group (UI triggers only; state lives in context) */
+  onAddTab?: (groupId: GroupId) => void;
+  /** Optional: request to close a tab (UI triggers only; state lives in context) */
+  onCloseTab?: (groupId: GroupId, tabId: PanelId) => void;
 };
 
 export type PanelGroupRenderProps = {
@@ -108,6 +112,8 @@ export type PanelSystemProps = {
   initialState: PanelSystemState;
   /** Explicit group id factory. Required by no-magic policy. */
   createGroupId: () => GroupId;
+  /** Explicit panel id factory for newly-created tabs. Required by no-magic policy when adding tabs via UI. */
+  createPanelId?: () => PanelId;
   /** Adapter layout mode: explicit selection required by no-magic policy. */
   layoutMode: "absolute" | "grid";
   /** When layoutMode==='grid', whether grid track resize is interactive (single source if false). */
@@ -116,6 +122,8 @@ export type PanelSystemProps = {
   dragThresholdPx: number;
   /** View component for a group (no operation injection at PanelSystem layer). */
   view?: React.ComponentType<{ groupId: GroupId }>;
+  /** Optional component for empty content in a group (when no active tab). */
+  emptyContentComponent?: React.ComponentType;
   /** Optional controlled state */
   state?: PanelSystemState;
   onStateChange?: (next: PanelSystemState) => void;

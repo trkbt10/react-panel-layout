@@ -36,6 +36,7 @@ type PanelSystemContentProps = {
   tabBarComponent?: PanelSystemProps["tabBarComponent"];
   panelGroupComponent?: PanelSystemProps["panelGroupComponent"];
   splitLimits: NormalizedSplitLimits;
+  emptyContentComponent?: PanelSystemProps["emptyContentComponent"];
 };
 
 const GridLayoutRenderer = ({
@@ -79,6 +80,7 @@ const PanelSystemContent: React.FC<PanelSystemContentProps> = ({
   tabBarComponent,
   panelGroupComponent,
   splitLimits,
+  emptyContentComponent,
 }) => {
   const { state } = usePanelState();
   const { onCommitContentDrop, onCommitTabDrop } = useCommitHandlers();
@@ -105,7 +107,7 @@ const PanelSystemContent: React.FC<PanelSystemContentProps> = ({
         onCommitTabDrop={onCommitTabDrop}
         isContentZoneAllowed={isZoneAllowed}
       >
-        <RenderBridge>
+        <RenderBridge emptyContentComponent={emptyContentComponent}>
           <div ref={containerRef} className={className} style={containerStyle}>
             <GridLayoutRenderer
               state={state}
@@ -137,10 +139,12 @@ const OverlayWithinProvider: React.FC = () => {
 export const PanelSystem: React.FC<PanelSystemProps> = ({
   initialState,
   createGroupId,
+  createPanelId,
   layoutMode,
   gridTracksInteractive,
   dragThresholdPx,
   view,
+  emptyContentComponent,
   state: controlled,
   onStateChange,
   className,
@@ -172,6 +176,7 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({
     <PanelStateProvider
       initialState={initialState}
       createGroupId={createGroupId}
+      createPanelId={createPanelId}
       state={controlled}
       onStateChange={onStateChange}
       splitLimits={splitLimits}
@@ -189,6 +194,7 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({
           tabBarComponent={tabBarComponent}
           panelGroupComponent={panelGroupComponent}
           splitLimits={normalizedSplitLimits}
+          emptyContentComponent={emptyContentComponent}
         />
       </KeybindingsProvider>
     </PanelStateProvider>

@@ -15,7 +15,7 @@ export type ConnectedGroupContainerProps = {
 };
 
 export const GroupContainer: React.FC<ConnectedGroupContainerProps> = ({ id, TabBarComponent, PanelGroupComponent }) => {
-  const { getGroup, getGroupContent, onClickTab, onStartContentDrag, onStartTabDrag } = usePanelRenderContext();
+  const { getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartContentDrag, onStartTabDrag } = usePanelRenderContext();
   const { setGroupEl, setTabbarEl, setContentEl } = useDomRegistry();
   const groupRef = React.useCallback(
     (el: HTMLDivElement | null) => {
@@ -50,6 +50,8 @@ export const GroupContainer: React.FC<ConnectedGroupContainerProps> = ({ id, Tab
           rootRef={tabbarRef}
           group={group}
           onClickTab={(tabId) => onClickTab(id, tabId)}
+          onAddTab={onAddTab}
+          onCloseTab={onCloseTab}
           onStartDrag={(tabId, groupId, e) => onStartTabDrag(tabId, groupId, e)}
         />
       }

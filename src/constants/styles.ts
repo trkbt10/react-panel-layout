@@ -46,6 +46,7 @@ export const COLOR_PANEL_BG = "var(--rpl-color-panel-bg)";
  * Primary color - used for resize handles, highlights
  */
 export const COLOR_PRIMARY = "var(--rpl-color-primary)";
+export const COLOR_RESIZE_HANDLE_IDLE = "var(--rpl-color-resize-handle-idle)";
 export const COLOR_RESIZE_HANDLE_HOVER = "var(--rpl-color-resize-handle-hover)";
 export const COLOR_RESIZE_HANDLE_ACTIVE = "var(--rpl-color-resize-handle-active)";
 

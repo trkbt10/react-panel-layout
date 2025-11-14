@@ -57,3 +57,24 @@
 .spacer {
   flex: 1 1 auto;
 }
+
+.addButton {
+  margin-left: 8px;
+  border: 1px solid #d0d7de;
+  background: #f6f8fa;
+  color: #24292f;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  line-height: 24px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.closeButton {
+  margin-left: 8px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}

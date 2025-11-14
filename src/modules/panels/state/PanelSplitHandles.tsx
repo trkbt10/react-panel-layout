@@ -48,11 +48,46 @@ export const PanelSplitHandles: React.FC<PanelSplitHandlesProps> = ({ containerR
 
   const handles = React.useMemo(() => collectHandles(state.tree, [], { x: 0, y: 0, w: 100, h: 100 }, []), [state.tree]);
 
-  const renderHandle = (handle: Handle, index: number): React.ReactNode => {
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    if (!containerRect) {
-      return null;
+  // Measure container rect after layout to avoid reading stale geometry during render
+  const [containerRect, setContainerRect] = React.useState<Pick<DOMRect, "left" | "top" | "width" | "height"> | null>(null);
+  React.useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!el) {
+      return;
     }
+    const measure = (): void => {
+      const r = el.getBoundingClientRect();
+      setContainerRect({ left: r.left, top: r.top, width: r.width, height: r.height });
+    };
+    measure();
+    function getResizeObserverCtor(): typeof ResizeObserver | null {
+      try {
+        const ctor = (window as { ResizeObserver?: typeof ResizeObserver }).ResizeObserver;
+        return typeof ctor === "function" ? ctor : null;
+      } catch {
+        return null;
+      }
+    }
+    const RO = getResizeObserverCtor();
+    const ro: ResizeObserver | null = RO ? new RO(() => measure()) : null;
+    if (ro) {
+      ro.observe(el);
+    }
+    const onScroll = (): void => measure();
+    window.addEventListener("scroll", onScroll, true);
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      if (ro) {
+        ro.disconnect();
+      }
+    };
+  }, [containerRef, state.tree]);
+  if (!containerRect) {
+    return null;
+  }
+
+  const renderHandle = (handle: Handle, index: number): React.ReactNode => {
+    // Compute viewport-fixed coordinates by adding container offsets
     const parentPx = {
       left: containerRect.left + (containerRect.width * handle.parentRect.x) / 100,
       top: containerRect.top + (containerRect.height * handle.parentRect.y) / 100,
@@ -74,11 +109,7 @@ export const PanelSplitHandles: React.FC<PanelSplitHandlesProps> = ({ containerR
         pointerEvents: "auto",
       };
       const onResize = (delta: number): void => {
-        const containerRectNow = containerRef.current?.getBoundingClientRect();
-        if (!containerRectNow) {
-          return;
-        }
-        const parentWidth = (containerRectNow.width * handle.parentRect.w) / 100;
+        const parentWidth = (containerRect.width * handle.parentRect.w) / 100;
         const dRatio = parentWidth === 0 ? 0 : delta / parentWidth;
         adjustSplitRatio({ path: handle.path, deltaRatio: dRatio });
       };
@@ -100,11 +131,7 @@ export const PanelSplitHandles: React.FC<PanelSplitHandlesProps> = ({ containerR
       pointerEvents: "auto",
     };
     const onResize = (delta: number): void => {
-      const containerRectNow = containerRef.current?.getBoundingClientRect();
-      if (!containerRectNow) {
-        return;
-      }
-      const parentHeight = (containerRectNow.height * handle.parentRect.h) / 100;
+      const parentHeight = (containerRect.height * handle.parentRect.h) / 100;
       const dRatio = parentHeight === 0 ? 0 : delta / parentHeight;
       adjustSplitRatio({ path: handle.path, deltaRatio: dRatio });
     };

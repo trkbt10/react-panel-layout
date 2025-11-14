@@ -21,9 +21,35 @@ const makeGroup = (id: GroupId): GroupModel => {
 const Page: React.FC = () => {
   const [group, setGroup] = React.useState<GroupModel>(() => makeGroup("g_demo"));
   const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const nextId = React.useRef<number>(1);
 
   const onClickTab = (tabId: PanelId): void => {
     setGroup((prev) => ({ ...prev, activeTabId: tabId }));
+  };
+
+  const handleAddTab = (groupId: GroupId): void => {
+    if (groupId !== group.id) {
+      return;
+    }
+    const id = `new-${nextId.current++}`;
+    const tab = { id, title: `New ${id}`, render: () => `Tab ${id}` };
+    setGroup((prev) => {
+      const tabs = prev.tabs.concat([tab]);
+      const tabIds = tabs.map((t) => t.id);
+      return { ...prev, tabs, tabIds, activeTabId: id } as GroupModel;
+    });
+  };
+
+  const handleCloseTab = (groupId: GroupId, tabId: PanelId): void => {
+    if (groupId !== group.id) {
+      return;
+    }
+    setGroup((prev) => {
+      const tabs = prev.tabs.filter((t) => t.id !== tabId);
+      const tabIds = tabs.map((t) => t.id);
+      const activeTabId = prev.activeTabId === tabId ? (tabIds[0] ?? null) : prev.activeTabId;
+      return { ...prev, tabs, tabIds, activeTabId } as GroupModel;
+    });
   };
 
   return (
@@ -55,7 +81,7 @@ const Page: React.FC = () => {
                 });
               }}
             >
-              <TabBar group={group} onClickTab={onClickTab} />
+              <TabBar group={group} onClickTab={onClickTab} onAddTab={handleAddTab} onCloseTab={handleCloseTab} />
             </InteractionsProvider>
           </DomRegistryProvider>
       </div>

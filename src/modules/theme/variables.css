@@ -20,6 +20,8 @@
 
   /* Primary color (for resize handles, etc.) */
   --rpl-color-primary: #2196f3;
+  /* Resize/Divider visibility */
+  --rpl-color-resize-handle-idle: rgba(255, 255, 255, 0.12);
   --rpl-color-resize-handle-hover: rgba(33, 150, 243, 0.35);
   --rpl-color-resize-handle-active: rgba(33, 150, 243, 0.55);
 

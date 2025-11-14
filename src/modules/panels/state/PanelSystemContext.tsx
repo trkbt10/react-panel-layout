@@ -3,9 +3,9 @@
  * Provides unified state and dispatch while exposing domain-specific actions via subcontexts.
  */
 import * as React from "react";
-import type { DropZone, GroupId, PanelId, PanelSplitLimits, PanelSystemState, SplitDirection } from "./types";
+import type { DropZone, GroupId, PanelId, PanelSplitLimits, PanelSystemState, SplitDirection, TabDefinition } from "./types";
 import { cleanupEmptyGroups } from "./cleanup";
-import { moveTab, setActiveTab } from "./groups/logic";
+import { addTabToGroup, addTabToGroupAtIndex, moveTab, removeTabFromGroup, setActiveTab } from "./groups/logic";
 import { setFocusedGroup, focusGroupIndex as focusIdx, nextGroup, prevGroup } from "./focus/logic";
 import { splitGroup } from "../index";
 import { getAtPath, isGroup, setSplitRatio, type NodePath } from "./tree/logic";
@@ -18,6 +18,7 @@ import { canSplitDirection, normalizeSplitLimits, type NormalizedSplitLimits } f
 type ReducerExtra = {
   createGroupId: () => GroupId;
   splitLimits: NormalizedSplitLimits;
+  createPanelId?: () => PanelId;
 };
 
 const actions = {
@@ -26,6 +27,15 @@ const actions = {
   focusNextGroup: createAction("panelState/focusNextGroup"),
   focusPrevGroup: createAction("panelState/focusPrevGroup"),
   setActiveTab: createAction("panelState/setActiveTab", (groupId: GroupId, tabId: PanelId) => ({ groupId, tabId })),
+  addTab: createAction(
+    "panelState/addTab",
+    (payload: { groupId: GroupId; tab: TabDefinition; index?: number; makeActive?: boolean }) => payload,
+  ),
+  addNewTab: createAction(
+    "panelState/addNewTab",
+    (payload: { groupId: GroupId; title: string; index?: number; makeActive?: boolean }) => payload,
+  ),
+  removeTab: createAction("panelState/removeTab", (groupId: GroupId, tabId: PanelId) => ({ groupId, tabId })),
   contentDrop: createAction(
     "panelState/contentDrop",
     (payload: { fromGroupId: GroupId; tabId: PanelId; targetGroupId: GroupId; zone: DropZone }) => payload,
@@ -125,6 +135,26 @@ const handlers = createActionHandlerMap<PanelSystemState, typeof actions, Reduce
   focusNextGroup: (state) => nextGroup(state),
   focusPrevGroup: (state) => prevGroup(state),
   setActiveTab: (state, action) => setActiveTab(state, action.payload.groupId, action.payload.tabId),
+  addTab: (state, action) => {
+    const { groupId, tab, index, makeActive } = action.payload;
+    if (typeof index === "number") {
+      return addTabToGroupAtIndex(state, groupId, tab, index, makeActive ?? true);
+    }
+    return addTabToGroup(state, groupId, tab, makeActive ?? true);
+  },
+  addNewTab: (state, action, extra) => {
+    if (!extra.createPanelId) {
+      throw new Error("addNewTab requires PanelSystemProvider.createPanelId");
+    }
+    const id = extra.createPanelId();
+    const tab: TabDefinition = { id, title: action.payload.title, render: () => action.payload.title };
+    const { groupId, index, makeActive } = action.payload;
+    if (typeof index === "number") {
+      return addTabToGroupAtIndex(state, groupId, tab, index, makeActive ?? true);
+    }
+    return addTabToGroup(state, groupId, tab, makeActive ?? true);
+  },
+  removeTab: (state, action) => removeTabFromGroup(state, action.payload.groupId, action.payload.tabId),
   contentDrop: (state, action, extra) => handleContentDrop(state, action.payload, extra),
   tabDrop: (state, action) => handleTabDrop(state, action.payload),
   adjustSplitRatio: (state, action) => {
@@ -165,6 +195,7 @@ export const usePanelSystem = (): PanelSystemContextValue => {
 export type PanelSystemProviderProps = React.PropsWithChildren<{
   initialState: PanelSystemState;
   createGroupId: () => GroupId;
+  createPanelId?: () => PanelId;
   state?: PanelSystemState;
   onStateChange?: (next: PanelSystemState) => void;
   splitLimits?: PanelSplitLimits;
@@ -173,6 +204,7 @@ export type PanelSystemProviderProps = React.PropsWithChildren<{
 export const PanelSystemProvider: React.FC<PanelSystemProviderProps> = ({
   initialState,
   createGroupId,
+  createPanelId,
   state: controlled,
   onStateChange,
   splitLimits,
@@ -180,9 +212,10 @@ export const PanelSystemProvider: React.FC<PanelSystemProviderProps> = ({
 }) => {
   const initialSanitized = React.useMemo(() => cleanupEmptyGroups(initialState), [initialState]);
   const normalizedSplitLimits = React.useMemo(() => normalizeSplitLimits(splitLimits), [splitLimits]);
-  const extraRef = React.useRef<ReducerExtra>({ createGroupId, splitLimits: normalizedSplitLimits });
+  const extraRef = React.useRef<ReducerExtra>({ createGroupId, splitLimits: normalizedSplitLimits, createPanelId });
   extraRef.current.createGroupId = createGroupId;
   extraRef.current.splitLimits = normalizedSplitLimits;
+  extraRef.current.createPanelId = createPanelId;
   const [uncontrolled, baseDispatch] = React.useReducer(
     (prev: PanelSystemState, action: PanelStateAction) => reducePanelState(prev, action, extraRef.current),
     initialSanitized,

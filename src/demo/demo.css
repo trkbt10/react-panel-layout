@@ -36,6 +36,10 @@
   /* Panel split drop suggestion colors */
   --rpl-color-drop-suggest-border: rgba(33, 150, 243, 0.9);
   --rpl-color-drop-suggest-bg: rgba(33, 150, 243, 0.15);
+
+  /* Resize/Divider colors for demo visibility */
+  --rpl-color-resize-handle-idle: rgba(0, 0, 0, 0.12);
+  /* keep hover/active as defaults from library unless overridden here */
 }
 
 * {

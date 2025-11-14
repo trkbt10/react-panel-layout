@@ -6,6 +6,7 @@ import { useResizeDrag } from "../../modules/resizer/useResizeDrag";
 import {
   RESIZE_HANDLE_THICKNESS,
   RESIZE_HANDLE_Z_INDEX,
+  COLOR_RESIZE_HANDLE_IDLE,
   COLOR_RESIZE_HANDLE_ACTIVE,
   COLOR_RESIZE_HANDLE_HOVER,
 } from "../../constants/styles";
@@ -46,14 +47,12 @@ const sizeStylesByDirection: Record<ResizeHandleDirection, React.CSSProperties> 
   },
 };
 
-const resolveResizeHandleBackground = (dragging: boolean, hovered: boolean): string => {
-  if (dragging) {
-    return COLOR_RESIZE_HANDLE_ACTIVE;
-  }
-  if (hovered) {
-    return COLOR_RESIZE_HANDLE_HOVER;
-  }
-  return "transparent";
+type ResizeHandleVisualState = "idle" | "hovered" | "dragging";
+
+const backgroundByVisualState: Record<ResizeHandleVisualState, string> = {
+  idle: COLOR_RESIZE_HANDLE_IDLE,
+  hovered: COLOR_RESIZE_HANDLE_HOVER,
+  dragging: COLOR_RESIZE_HANDLE_ACTIVE,
 };
 
 /**
@@ -80,15 +79,24 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
     element,
     component: Component,
   });
+  const visualState: ResizeHandleVisualState = React.useMemo(() => {
+    if (isDragging) {
+      return "dragging";
+    }
+    if (isHovered) {
+      return "hovered";
+    }
+    return "idle";
+  }, [isDragging, isHovered]);
 
   const style = React.useMemo(() => {
     return {
       ...baseResizeHandleStyle,
       ...sizeStylesByDirection[direction],
-      backgroundColor: resolveResizeHandleBackground(isDragging, isHovered),
+      backgroundColor: backgroundByVisualState[visualState],
       touchAction: "none",
     };
-  }, [direction, isDragging, isHovered]);
+  }, [direction, visualState]);
 
   return (
     <Wrapper
