@@ -15,21 +15,8 @@ type GridTrackResizeHandleProps = {
   onResize: (direction: TrackDirection, index: number, delta: number) => void;
 };
 
-const resizeHandleWrapperVerticalStyle: React.CSSProperties = {
+const resizeHandleWrapperBaseStyle: React.CSSProperties = {
   position: "absolute",
-  top: 0,
-  bottom: 0,
-  width: GRID_HANDLE_THICKNESS,
-  height: "100%",
-  pointerEvents: "auto",
-};
-
-const resizeHandleWrapperHorizontalStyle: React.CSSProperties = {
-  position: "absolute",
-  left: 0,
-  right: 0,
-  width: "100%",
-  height: GRID_HANDLE_THICKNESS,
   pointerEvents: "auto",
 };
 
@@ -48,8 +35,6 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
     },
     [direction, trackIndex, onResize],
   );
-
-  const baseWrapperStyle = direction === "col" ? resizeHandleWrapperVerticalStyle : resizeHandleWrapperHorizontalStyle;
 
   const placementStyle = React.useMemo<React.CSSProperties>(() => {
     if (direction === "col") {
@@ -70,8 +55,9 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
 
     if (direction === "col") {
       return {
-        ...baseWrapperStyle,
+        ...resizeHandleWrapperBaseStyle,
         width: GRID_HANDLE_THICKNESS,
+        height: "100%",
         top: 0,
         bottom: 0,
         ...(align === "start" ? { left: -offset } : { right: -offset }),
@@ -79,13 +65,14 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
     }
 
     return {
-      ...baseWrapperStyle,
+      ...resizeHandleWrapperBaseStyle,
+      width: "100%",
       height: GRID_HANDLE_THICKNESS,
       left: 0,
       right: 0,
       ...(align === "start" ? { top: -offset } : { bottom: -offset }),
     };
-  }, [align, direction, gap, baseWrapperStyle]);
+  }, [align, direction, gap]);
 
   return (
     <div data-resizable="true" style={{ ...placementStyle, position: "relative", pointerEvents: "none" }}>

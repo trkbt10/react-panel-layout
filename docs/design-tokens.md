@@ -28,6 +28,13 @@ The library provides a comprehensive set of CSS variables that control the appea
 | `--rpl-color-panel-bg` | `#0b0b0c` | Panel content background |
 | `--rpl-color-primary` | `#2196f3` | Primary accent color (resize handles) |
 
+#### Resize Handle Colors
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--rpl-color-resize-handle-hover` | `rgba(33, 150, 243, 0.35)` | Divider color when hovered |
+| `--rpl-color-resize-handle-active` | `rgba(33, 150, 243, 0.55)` | Divider color while dragging |
+
 #### Drag & Drop Colors
 
 | Variable | Default | Description |

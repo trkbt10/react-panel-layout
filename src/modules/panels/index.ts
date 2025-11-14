@@ -13,6 +13,7 @@ export type {
   DraggingTab,
   PanelCommands,
   PanelSystemProps,
+  PanelSplitLimits,
 } from "./state/types";
 
 export { collectGroupsInOrder, splitLeaf, closeLeaf, isGroup, setSplitRatio } from "./state/tree/logic";

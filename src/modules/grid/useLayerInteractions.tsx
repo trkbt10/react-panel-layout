@@ -6,6 +6,7 @@ import { useDocumentPointerEvents } from "../../hooks/useDocumentPointerEvents";
 import { useEffectEvent } from "../../hooks/useEffectEvent";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
 import type { LayerDefinition, WindowPosition, WindowSize } from "../../types";
+import { clampNumber } from "../../utils/math";
 // Inline style computation previously in layerStyles to keep hook-local logic
 import type { CSSProperties } from "react";
 import type { GridLayerHandleProps, GridLayoutContextValue, ResizeHandleConfig } from "./GridLayoutContext";
@@ -183,8 +184,9 @@ const isInteractiveElement = (target: EventTarget | null): target is HTMLElement
 
 
 const clampDimension = (value: number, min?: number, max?: number): number => {
-  const withMinimum = min !== undefined ? Math.max(value, min) : value;
-  return max !== undefined ? Math.min(withMinimum, max) : withMinimum;
+  const resolvedMin = min ?? Number.NEGATIVE_INFINITY;
+  const resolvedMax = max ?? Number.POSITIVE_INFINITY;
+  return clampNumber(value, resolvedMin, resolvedMax);
 };
 
 const ensureNumericOffset = (value: number | string | undefined, key: keyof WindowPosition, layerId: string): number => {

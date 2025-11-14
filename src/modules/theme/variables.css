@@ -20,6 +20,8 @@
 
   /* Primary color (for resize handles, etc.) */
   --rpl-color-primary: #2196f3;
+  --rpl-color-resize-handle-hover: rgba(33, 150, 243, 0.35);
+  --rpl-color-resize-handle-active: rgba(33, 150, 243, 0.55);
 
   /* Drop suggestion overlay */
   --rpl-color-drop-suggest-border: rgba(90, 150, 255, 0.9);

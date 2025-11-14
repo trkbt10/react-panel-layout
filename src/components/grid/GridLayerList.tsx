@@ -13,22 +13,22 @@ type GridLayerListProps = {
   layers: LayerDefinition[];
 };
 
+type ResizeHandleRenderRequest = {
+  layerId: string;
+  onPointerDown: (config: ResizeHandleConfig, event: React.PointerEvent<HTMLDivElement>) => void;
+};
+
 export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
   const { handleLayerPointerDown, getLayerRenderState } = useGridLayoutContext();
 
-  const renderResizeHandles = React.useCallback(
-    (
-      show: boolean,
-      onPointerDown: (config: ResizeHandleConfig, event: React.PointerEvent<HTMLDivElement>) => void,
-      layerId: string,
-    ): React.ReactNode => {
-      if (!show) {
-        return null;
-      }
-      return <GridLayerResizeHandles layerId={layerId} onPointerDown={onPointerDown} />;
-    },
-    [],
-  );
+  const renderResizeHandles = React.useCallback((requests: ResizeHandleRenderRequest[]): React.ReactNode => {
+    if (requests.length === 0) {
+      return null;
+    }
+    return requests.map((request) => (
+      <GridLayerResizeHandles key={request.layerId} layerId={request.layerId} onPointerDown={request.onPointerDown} />
+    ));
+  }, []);
 
   return (
     <>
@@ -58,6 +58,19 @@ export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
         };
         const combinedStyle = buildCombinedStyle();
 
+        const buildResizeHandleRequests = (): ResizeHandleRenderRequest[] => {
+          if (!isResizable) {
+            return [];
+          }
+          return [
+            {
+              layerId: layer.id,
+              onPointerDown: onResizeHandlePointerDown,
+            },
+          ];
+        };
+        const resizeHandles = renderResizeHandles(buildResizeHandleRequests());
+
         return (
           <div
             key={layer.id}
@@ -69,7 +82,7 @@ export const GridLayerList: React.FC<GridLayerListProps> = ({ layers }) => {
             onPointerDown={handleLayerPointerDown}
           >
             <LayerInstanceProvider layerId={layer.id}>{layer.component}</LayerInstanceProvider>
-            {renderResizeHandles(isResizable, (config, event) => onResizeHandlePointerDown(config, event), layer.id)}
+            {resizeHandles}
           </div>
         );
       })}

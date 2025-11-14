@@ -90,9 +90,17 @@ export type InteractionsProviderProps = React.PropsWithChildren<{
   dragThresholdPx: number;
   onCommitContentDrop: (payload: { fromGroupId: GroupId; tabId: PanelId; targetGroupId: GroupId; zone: DropZone }) => void;
   onCommitTabDrop: (payload: { fromGroupId: GroupId; tabId: PanelId; targetGroupId: GroupId; targetIndex: number }) => void;
+  isContentZoneAllowed?: (payload: { targetGroupId: GroupId; zone: DropZone }) => boolean;
 }>;
 
-export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ containerRef, dragThresholdPx, onCommitContentDrop, onCommitTabDrop, children }) => {
+export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({
+  containerRef,
+  dragThresholdPx,
+  onCommitContentDrop,
+  onCommitTabDrop,
+  isContentZoneAllowed,
+  children,
+}) => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const dom = useDomRegistry();
 
@@ -134,6 +142,10 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
           return;
         }
         const zone = pickDropZone(candidate.rect, x, y);
+        if (isContentZoneAllowed && !isContentZoneAllowed({ targetGroupId: candidate.gid, zone })) {
+          dispatch(actions.setSuggest(null));
+          return;
+        }
         dispatch(actions.setSuggest({ rect: candidate.rect, zone }));
         return;
       }
@@ -180,6 +192,10 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
           return;
         }
         const zone = pickDropZone(candidate.rect, x, y);
+        if (isContentZoneAllowed && !isContentZoneAllowed({ targetGroupId: candidate.gid, zone })) {
+          dispatch(actions.setSuggest(null));
+          return;
+        }
         dispatch(actions.setSuggest({ rect: candidate.rect, zone }));
       }
     };
@@ -215,6 +231,9 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
           return;
         }
         const zone = pickDropZone(hit.rect, x, y);
+        if (isContentZoneAllowed && !isContentZoneAllowed({ targetGroupId: targetGroupId, zone })) {
+          return;
+        }
         onCommitContentDrop({ fromGroupId: snapshot.phase.fromGroupId, tabId: snapshot.phase.tabId, targetGroupId, zone });
         return;
       }
@@ -252,6 +271,9 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
             return;
           }
           const zone = pickDropZone(contentHit.rect, x, y);
+          if (isContentZoneAllowed && !isContentZoneAllowed({ targetGroupId, zone })) {
+            return;
+          }
           onCommitContentDrop({ fromGroupId: snapshot.phase.fromGroupId, tabId: snapshot.phase.tabId, targetGroupId, zone });
         }
       }
@@ -262,7 +284,7 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({ cont
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
     };
-  }, [state.phase, containerRef, dragThresholdPx, onCommitContentDrop, onCommitTabDrop, dom]);
+  }, [state.phase, containerRef, dragThresholdPx, onCommitContentDrop, onCommitTabDrop, dom, isContentZoneAllowed]);
 
   const value = React.useMemo<InteractionsContextValue>(() => ({
     suggest: state.suggest,

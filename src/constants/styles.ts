@@ -46,6 +46,8 @@ export const COLOR_PANEL_BG = "var(--rpl-color-panel-bg)";
  * Primary color - used for resize handles, highlights
  */
 export const COLOR_PRIMARY = "var(--rpl-color-primary)";
+export const COLOR_RESIZE_HANDLE_HOVER = "var(--rpl-color-resize-handle-hover)";
+export const COLOR_RESIZE_HANDLE_ACTIVE = "var(--rpl-color-resize-handle-active)";
 
 /**
  * Drop suggestion overlay colors
@@ -157,6 +159,7 @@ export const DROP_SUGGEST_BORDER_RADIUS = RADIUS_SUGGEST;
 export const DROP_SUGGEST_BORDER_COLOR = COLOR_DROP_SUGGEST_BORDER;
 export const DROP_SUGGEST_BG_COLOR = COLOR_DROP_SUGGEST_BG;
 export const DROP_SUGGEST_PADDING = SPACE_DROP_SUGGEST_PADDING;
+export const DROP_SUGGEST_PADDING_PX = 6;
 
 /**
  * Tab Drag Overlay
@@ -220,4 +223,3 @@ export const SPLIT_HANDLE_THICKNESS = SIZE_SPLIT_HANDLE_THICKNESS;
  */
 export const HORIZONTAL_DIVIDER_WIDTH = "var(--rpl-size-horizontal-divider-width)";
 export const HORIZONTAL_DIVIDER_HIT_AREA_OFFSET = "var(--rpl-space-horizontal-divider-hit-area-offset)";
-

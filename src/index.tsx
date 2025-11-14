@@ -77,4 +77,5 @@ export type {
   SplitDirection,
   TabBarRenderProps,
   PanelGroupRenderProps,
+  PanelSplitLimits,
 } from "./modules/panels/state/types";

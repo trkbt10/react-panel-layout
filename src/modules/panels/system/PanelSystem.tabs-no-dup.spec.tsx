@@ -16,10 +16,10 @@ const makeTabs = (): TabDefinition[] => {
 };
 
 const idFactory = () => {
-  let i = 2;
+  const counter = { value: 2 };
   return () => {
-    i += 1;
-    return `g_${String(i)}`;
+    counter.value += 1;
+    return `g_${String(counter.value)}`;
   };
 };
 

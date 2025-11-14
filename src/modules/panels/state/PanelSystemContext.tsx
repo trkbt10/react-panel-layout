@@ -3,7 +3,7 @@
  * Provides unified state and dispatch while exposing domain-specific actions via subcontexts.
  */
 import * as React from "react";
-import type { DropZone, GroupId, PanelId, PanelSystemState, SplitDirection } from "./types";
+import type { DropZone, GroupId, PanelId, PanelSplitLimits, PanelSystemState, SplitDirection } from "./types";
 import { cleanupEmptyGroups } from "./cleanup";
 import { moveTab, setActiveTab } from "./groups/logic";
 import { setFocusedGroup, focusGroupIndex as focusIdx, nextGroup, prevGroup } from "./focus/logic";
@@ -13,9 +13,11 @@ import { bindActionCreators, createAction, createActionHandlerMap, type BoundAct
 import { GroupsProvider, type GroupsActions } from "./groups/Context";
 import { TreeProvider, type TreeActions } from "./tree/Context";
 import { FocusProvider, type FocusActions } from "./focus/Context";
+import { canSplitDirection, normalizeSplitLimits, type NormalizedSplitLimits } from "./splitLimits";
 
 type ReducerExtra = {
   createGroupId: () => GroupId;
+  splitLimits: NormalizedSplitLimits;
 };
 
 const actions = {
@@ -60,6 +62,9 @@ const handleContentDrop = (
     return setFocusedGroup(moved, payload.targetGroupId);
   }
   const direction: SplitDirection = payload.zone === "left" || payload.zone === "right" ? "vertical" : "horizontal";
+  if (!canSplitDirection(state.tree, payload.targetGroupId, direction, extra.splitLimits)) {
+    return state;
+  }
   const newGroupId = extra.createGroupId();
   const afterSplit = splitGroup(state, payload.targetGroupId, direction, () => newGroupId);
   const destination = payload.zone === "left" || payload.zone === "top" ? payload.targetGroupId : newGroupId;
@@ -111,6 +116,9 @@ const handlers = createActionHandlerMap<PanelSystemState, typeof actions, Reduce
     if (!gid) {
       return state;
     }
+    if (!canSplitDirection(state.tree, gid, action.payload.direction, extra.splitLimits)) {
+      return state;
+    }
     return splitGroup(state, gid, action.payload.direction, extra.createGroupId);
   },
   focusGroupIndex: (state, action) => focusIdx(state, action.payload.index1Based),
@@ -159,12 +167,22 @@ export type PanelSystemProviderProps = React.PropsWithChildren<{
   createGroupId: () => GroupId;
   state?: PanelSystemState;
   onStateChange?: (next: PanelSystemState) => void;
+  splitLimits?: PanelSplitLimits;
 }>;
 
-export const PanelSystemProvider: React.FC<PanelSystemProviderProps> = ({ initialState, createGroupId, state: controlled, onStateChange, children }) => {
+export const PanelSystemProvider: React.FC<PanelSystemProviderProps> = ({
+  initialState,
+  createGroupId,
+  state: controlled,
+  onStateChange,
+  splitLimits,
+  children,
+}) => {
   const initialSanitized = React.useMemo(() => cleanupEmptyGroups(initialState), [initialState]);
-  const extraRef = React.useRef<ReducerExtra>({ createGroupId });
+  const normalizedSplitLimits = React.useMemo(() => normalizeSplitLimits(splitLimits), [splitLimits]);
+  const extraRef = React.useRef<ReducerExtra>({ createGroupId, splitLimits: normalizedSplitLimits });
   extraRef.current.createGroupId = createGroupId;
+  extraRef.current.splitLimits = normalizedSplitLimits;
   const [uncontrolled, baseDispatch] = React.useReducer(
     (prev: PanelSystemState, action: PanelStateAction) => reducePanelState(prev, action, extraRef.current),
     initialSanitized,

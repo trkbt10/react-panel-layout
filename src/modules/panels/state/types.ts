@@ -8,6 +8,36 @@ export type GroupId = string;
 
 export type SplitDirection = "vertical" | "horizontal";
 
+type RowsColsSplitLimits = {
+  /**
+   * Maximum number of rows (horizontal panes stacked vertically). Mirrors the HTML `rows` attribute.
+   * Value of 1 disables horizontal splits.
+   */
+  rows?: number;
+  /**
+   * Maximum number of columns (vertical panes stacked horizontally). Mirrors the HTML `cols` attribute.
+   * Value of 1 disables vertical splits.
+   */
+  cols?: number;
+};
+
+type LegacySplitLimits = {
+  /**
+   * @deprecated Use `rows` instead.
+   */
+  maxHorizontal?: number;
+  /**
+   * @deprecated Use `cols` instead.
+   */
+  maxVertical?: number;
+};
+
+/**
+ * Controls how many times panes may be split. Accepts a single number (applied to both rows/cols)
+ * or an object that mirrors HTML's `rows`/`cols` attributes for clarity.
+ */
+export type PanelSplitLimits = number | RowsColsSplitLimits | LegacySplitLimits;
+
 export type TabDefinition = {
   id: PanelId;
   title: string;
@@ -95,4 +125,6 @@ export type PanelSystemProps = {
   /** Pluggable UI components */
   tabBarComponent?: React.ComponentType<TabBarRenderProps>;
   panelGroupComponent?: React.ComponentType<PanelGroupRenderProps>;
+  /** Optional limits controlling split directions. */
+  splitLimits?: PanelSplitLimits;
 };
