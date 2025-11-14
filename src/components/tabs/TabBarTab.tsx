@@ -6,7 +6,7 @@ import type { TabBarProps } from "./TabBar";
 
 type TabItem = TabBarProps["group"]["tabs"][number];
 
-type TabButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+type TabButtonProps = React.HTMLAttributes<HTMLDivElement> & {
   "data-tab-id": string;
   "data-active": "true" | "false";
   "data-dragging": "true" | "false";
@@ -45,7 +45,7 @@ export const TabBarTab: React.FC<TabBarTabProps> = ({
     onClickTab(tab.id);
   });
 
-  const handlePointerDown = React.useEffectEvent((e: React.PointerEvent<HTMLButtonElement>) => {
+  const handlePointerDown = React.useEffectEvent((e: React.PointerEvent<HTMLDivElement>) => {
     if (!onStartDrag) {
       return;
     }
@@ -80,8 +80,7 @@ export const TabBarTab: React.FC<TabBarTabProps> = ({
     );
   };
 
-  const tabProps: TabButtonProps = {
-    type: "button",
+  const divProps: TabButtonProps = {
     role: "tab",
     "aria-selected": active,
     tabIndex: active ? 0 : -1,
@@ -99,11 +98,32 @@ export const TabBarTab: React.FC<TabBarTabProps> = ({
     ),
   };
 
+  const buttonProps: React.ButtonHTMLAttributes<HTMLButtonElement> = {
+    type: "button",
+    role: "tab",
+    "aria-selected": active,
+    tabIndex: active ? 0 : -1,
+    style: tabStyle,
+    onClick: () => {
+      onClickTab(tab.id);
+    },
+    onPointerDown: (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (!onStartDrag) {
+        return;
+      }
+      if (e.button !== 0) {
+        return;
+      }
+      onStartDrag(tab.id, groupId, e);
+    },
+    children: <span>{tab.title}</span>,
+  };
+
   if (tabElement) {
-    return tabElement(tabProps);
+    return tabElement(buttonProps);
   }
   if (TabComponent) {
-    return <TabComponent {...tabProps} />;
+    return <TabComponent {...buttonProps} />;
   }
-  return <button {...tabProps} />;
+  return <div {...divProps} />;
 };

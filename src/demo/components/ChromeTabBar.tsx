@@ -75,9 +75,8 @@ export const ChromeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
         const dragging = draggingTabId === tab.id;
         const className = `${styles.tab} ${active ? styles.tabActive : ""} ${dragging ? styles.tabDragging : ""}`.trim();
         items.push(
-          <button
+          <div
             key={`${group.id}:${tab.id}:${index}`}
-            type="button"
             role="tab"
             aria-selected={active}
             className={className}
@@ -99,7 +98,7 @@ export const ChromeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
             <React.Activity mode={onCloseTab ? "visible" : "hidden"}>
               {renderCloseButton(tab.title, tab.id)}
             </React.Activity>
-          </button>
+          </div>
         );
         if (addPlacement === "after-active" && active) {
           items.push(<span key={`add-after-${tab.id}`}>{renderAddButton()}</span>);
