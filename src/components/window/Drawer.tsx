@@ -224,7 +224,16 @@ export const Drawer: React.FC<DrawerProps> = ({
     <>
       {renderBackdrop()}
       <React.Activity mode={isOpen ? "visible" : "hidden"}>
-        <div className={className} data-layer-id={id} data-placement={placement} style={drawerStyle}>
+        <div
+          className={className}
+          data-layer-id={id}
+          data-placement={placement}
+          style={drawerStyle}
+          role="dialog"
+          aria-modal={dismissible ? true : undefined}
+          aria-hidden={isOpen ? undefined : true}
+          aria-label={header?.title ?? "Drawer"}
+        >
           {renderHeader()}
           <div style={contentFinalStyle}>{children}</div>
         </div>

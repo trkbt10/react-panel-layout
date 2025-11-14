@@ -785,6 +785,9 @@ export const useLayerInteractions = ({
     (layerId: string): GridLayerHandleProps => {
       return {
         "data-drag-handle": "true",
+        role: "button",
+        "aria-roledescription": "Drag handle",
+        "aria-label": "Drag layer",
         onPointerDown: (event: React.PointerEvent<HTMLElement>) => {
           handleDragHandlePointerDown(layerId, event);
         },

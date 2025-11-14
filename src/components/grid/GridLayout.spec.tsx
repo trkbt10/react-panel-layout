@@ -634,17 +634,10 @@ describe("GridLayout", () => {
       />,
     );
 
-    const handleWrappers = Array.from(container.querySelectorAll('[data-resize-handle="true"]')).map((handle) => {
-      const wrapper = handle.parentElement;
-      if (!wrapper) {
-        throw new Error("Expected resize handle wrapper element");
-      }
-      return wrapper;
-    });
-
-    expect(handleWrappers).toHaveLength(2);
-    expect(handleWrappers.some((wrapper) => wrapper.getAttribute("data-direction") === "vertical")).toBe(true);
-    expect(handleWrappers.some((wrapper) => wrapper.getAttribute("data-direction") === "horizontal")).toBe(true);
+    const handles = Array.from(container.querySelectorAll('[role="separator"]')) as HTMLElement[];
+    expect(handles).toHaveLength(2);
+    expect(handles.some((el) => el.getAttribute("aria-orientation") === "vertical")).toBe(true);
+    expect(handles.some((el) => el.getAttribute("aria-orientation") === "horizontal")).toBe(true);
   });
 
   it("increases the width of the targeted column when dragging the vertical handle to the right", async () => {
@@ -671,7 +664,7 @@ describe("GridLayout", () => {
     );
 
     const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
-    const handles = container.querySelectorAll('[data-resize-handle="true"][data-direction="vertical"]');
+    const handles = container.querySelectorAll('[role="separator"][aria-orientation="vertical"]');
 
     if (!gridElement || handles.length === 0) {
       throw new Error("Expected grid element and vertical handle to exist");
@@ -726,7 +719,7 @@ describe("GridLayout", () => {
     );
 
     const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
-    const handles = container.querySelectorAll('[data-resize-handle="true"][data-direction="vertical"]');
+    const handles = container.querySelectorAll('[role="separator"][aria-orientation="vertical"]');
 
     if (!gridElement || handles.length < 1) {
       throw new Error("Expected grid element and vertical handles to exist");
@@ -779,7 +772,7 @@ describe("GridLayout", () => {
     );
 
     const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
-    const horizontalHandle = container.querySelector('[data-resize-handle="true"][data-direction="horizontal"]') as HTMLElement | null;
+    const horizontalHandle = container.querySelector('[role="separator"][aria-orientation="horizontal"]') as HTMLElement | null;
 
     if (!gridElement || !horizontalHandle) {
       throw new Error("Expected grid element and horizontal handle to exist");

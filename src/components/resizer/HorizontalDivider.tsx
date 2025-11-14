@@ -29,6 +29,8 @@ export const HorizontalDivider: React.FC<HorizontalDividerProps> = ({ onResize, 
   const dividerProps = {
     ref,
     style: horizontalDividerStyle,
+    role: "separator" as const,
+    "aria-orientation": "vertical" as const,
     "data-dragging": isDragging ? "true" : undefined,
     onPointerDown,
   };

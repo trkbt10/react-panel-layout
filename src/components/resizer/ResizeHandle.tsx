@@ -11,9 +11,11 @@ import {
 } from "../../constants/styles";
 import { useElementComponentWrapper } from "../../hooks/useElementComponentWrapper";
 
+type ResizeHandleDirection = "horizontal" | "vertical";
+
 export type ResizeHandleProps = {
   /** Direction of resize */
-  direction: "horizontal" | "vertical";
+  direction: ResizeHandleDirection;
   /** Callback when resize occurs */
   onResize?: (delta: number) => void;
   /** Custom component for the handle */
@@ -29,20 +31,29 @@ const baseResizeHandleStyle: React.CSSProperties = {
   zIndex: RESIZE_HANDLE_Z_INDEX,
 };
 
-const verticalResizeHandleStyle: React.CSSProperties = {
-  ...baseResizeHandleStyle,
-  width: RESIZE_HANDLE_THICKNESS,
-  height: "100%",
-  top: 0,
-  cursor: "col-resize",
+const sizeStylesByDirection: Record<ResizeHandleDirection, React.CSSProperties> = {
+  vertical: {
+    width: RESIZE_HANDLE_THICKNESS,
+    height: "100%",
+    top: 0,
+    cursor: "col-resize",
+  },
+  horizontal: {
+    width: "100%",
+    height: RESIZE_HANDLE_THICKNESS,
+    left: 0,
+    cursor: "row-resize",
+  },
 };
 
-const horizontalResizeHandleStyle: React.CSSProperties = {
-  ...baseResizeHandleStyle,
-  width: "100%",
-  height: RESIZE_HANDLE_THICKNESS,
-  left: 0,
-  cursor: "row-resize",
+const resolveResizeHandleBackground = (dragging: boolean, hovered: boolean): string => {
+  if (dragging) {
+    return COLOR_RESIZE_HANDLE_ACTIVE;
+  }
+  if (hovered) {
+    return COLOR_RESIZE_HANDLE_HOVER;
+  }
+  return "transparent";
 };
 
 /**
@@ -58,43 +69,40 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
   const axis = direction === "vertical" ? "x" : "y";
   const { ref, isDragging, onPointerDown } = useResizeDrag<HTMLDivElement>({ axis, onResize });
   const [isHovered, setIsHovered] = React.useState(false);
+  const handlePointerEnter = React.useCallback(() => {
+    setIsHovered(true);
+  }, []);
+  const handlePointerLeave = React.useCallback(() => {
+    setIsHovered(false);
+  }, []);
 
   const Wrapper = useElementComponentWrapper({
     element,
     component: Component,
   });
 
-  const baseStyle = direction === "vertical" ? verticalResizeHandleStyle : horizontalResizeHandleStyle;
-  const getBackgroundColor = (): string => {
-    if (isDragging) {
-      return COLOR_RESIZE_HANDLE_ACTIVE;
-    }
-    if (isHovered) {
-      return COLOR_RESIZE_HANDLE_HOVER;
-    }
-    return "transparent";
-  };
-  const backgroundColor = getBackgroundColor();
-  const style: React.CSSProperties = {
-    ...baseStyle,
-    backgroundColor,
-    touchAction: "none",
-  };
+  const style = React.useMemo(() => {
+    return {
+      ...baseResizeHandleStyle,
+      ...sizeStylesByDirection[direction],
+      backgroundColor: resolveResizeHandleBackground(isDragging, isHovered),
+      touchAction: "none",
+    };
+  }, [direction, isDragging, isHovered]);
 
   return (
     <Wrapper
       ref={ref}
       style={style}
+      role="separator"
+      aria-orientation={direction}
+      aria-hidden={undefined}
       data-resize-handle="true"
       data-direction={direction}
       data-is-dragging={isDragging ? "true" : undefined}
       onPointerDown={onPointerDown}
-      onPointerEnter={() => {
-        setIsHovered(true);
-      }}
-      onPointerLeave={() => {
-        setIsHovered(false);
-      }}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
     >
       {children}
     </Wrapper>
