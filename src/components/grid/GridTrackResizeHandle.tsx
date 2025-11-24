@@ -12,6 +12,7 @@ type GridTrackResizeHandleProps = {
   trackIndex: number;
   align: "start" | "end";
   gap: number;
+  span: { start: number; end: number };
   onResize: (direction: TrackDirection, index: number, delta: number) => void;
 };
 
@@ -25,6 +26,7 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
   trackIndex,
   align,
   gap,
+  span,
   onResize,
 }) => {
   const resizeDirection = direction === "col" ? "vertical" : "horizontal";
@@ -40,14 +42,14 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
     if (direction === "col") {
       return {
         gridColumn: `${trackIndex + 1} / ${trackIndex + 2}`,
-        gridRow: "1 / -1",
+        gridRow: `${span.start} / ${span.end}`,
       };
     }
     return {
       gridRow: `${trackIndex + 1} / ${trackIndex + 2}`,
-      gridColumn: "1 / -1",
+      gridColumn: `${span.start} / ${span.end}`,
     };
-  }, [direction, trackIndex]);
+  }, [direction, trackIndex, span]);
 
   const wrapperStyle = React.useMemo<React.CSSProperties>(() => {
     const halfGap = Math.max(0, gap) / 2;

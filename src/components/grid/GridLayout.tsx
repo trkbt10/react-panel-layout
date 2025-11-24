@@ -78,24 +78,26 @@ const GridLayoutInner: React.FC<{
           <GridLayerList layers={regularLayers} />
         </GridLayoutProvider>
 
-        {columnHandles.map(({ trackIndex, align }) => (
+        {columnHandles.map(({ trackIndex, align, span }) => (
           <GridTrackResizeHandle
             key={`col-${trackIndex}:${align}`}
             direction="col"
             trackIndex={trackIndex}
             align={align}
             gap={gapSizes.columnGap}
+            span={span}
             onResize={handleResize}
           />
         ))}
 
-        {rowHandles.map(({ trackIndex, align }) => (
+        {rowHandles.map(({ trackIndex, align, span }) => (
           <GridTrackResizeHandle
             key={`row-${trackIndex}:${align}`}
             direction="row"
             trackIndex={trackIndex}
             align={align}
             gap={gapSizes.rowGap}
+            span={span}
             onResize={handleResize}
           />
         ))}
