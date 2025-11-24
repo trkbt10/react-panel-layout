@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -15,7 +19,15 @@
     "jsx": "react-jsx",
     "declaration": true,
     "outDir": "dist",
-    "types": ["node", "vitest/globals", "vite/client"]
+    "types": [
+      "node",
+      "vitest/globals",
+      "vite/client",
+      "@testing-library/jest-dom"
+    ]
   },
-  "include": ["src/**/*", "spec/**/*"]
+  "include": [
+    "src/**/*",
+    "spec/**/*"
+  ]
 }
