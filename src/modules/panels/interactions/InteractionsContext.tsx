@@ -42,9 +42,10 @@ type State = {
   suggest: SuggestInfo;
   pointer: { x: number; y: number } | null;
   tabbarHover: { groupId: GroupId; index: number; rect: DOMRectReadOnly; insertX: number } | null;
+  draggingTabElement: HTMLElement | null;
 };
 
-const initialState: State = { phase: { kind: "idle" }, suggest: null, pointer: null, tabbarHover: null };
+const initialState: State = { phase: { kind: "idle" }, suggest: null, pointer: null, tabbarHover: null, draggingTabElement: null };
 
 const actions = {
   startContent: createAction(
@@ -53,7 +54,7 @@ const actions = {
   ),
   startTab: createAction(
     "START_TAB",
-    (payload: { x: number; y: number; groupId: GroupId; tabId: PanelId; cache: LayoutCache }) => payload,
+    (payload: { x: number; y: number; groupId: GroupId; tabId: PanelId; cache: LayoutCache; element: HTMLElement | null }) => payload,
   ),
   setSuggest: createAction("SET_SUGGEST", (payload: SuggestInfo) => payload),
   setPointer: createAction("SET_POINTER", (payload: { x: number; y: number } | null) => payload),
@@ -77,6 +78,7 @@ const reducerHandlers = createActionHandlerMap<State, typeof actions, void>(acti
     suggest: null,
     pointer: null,
     tabbarHover: null,
+    draggingTabElement: null,
   }),
   startTab: (_state, action) => ({
     phase: {
@@ -90,6 +92,7 @@ const reducerHandlers = createActionHandlerMap<State, typeof actions, void>(acti
     suggest: null,
     pointer: null,
     tabbarHover: null,
+    draggingTabElement: action.payload.element,
   }),
   setSuggest: (state, action) => ({ ...state, suggest: action.payload }),
   setPointer: (state, action) => ({ ...state, pointer: action.payload }),
@@ -115,6 +118,7 @@ export type InteractionsContextValue = {
   draggingTabId: PanelId | null;
   dragPointer: { x: number; y: number } | null;
   tabbarHover: { groupId: GroupId; index: number; rect: DOMRectReadOnly; insertX: number } | null;
+  draggingTabElement: HTMLElement | null;
 };
 
 const InteractionsContext = React.createContext<InteractionsContextValue | null>(null);
@@ -367,9 +371,12 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({
     if (e.button !== 0) {
       return;
     }
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    const target = e.currentTarget as Element | null;
+    if (target) {
+      target.setPointerCapture(e.pointerId);
+    }
     const cache = captureLayout();
-    dispatch(actions.startTab({ x: e.clientX, y: e.clientY, groupId, tabId, cache }));
+    dispatch(actions.startTab({ x: e.clientX, y: e.clientY, groupId, tabId, cache, element: target as HTMLElement | null }));
   }, [captureLayout]);
 
   const value = React.useMemo<InteractionsContextValue>(() => ({
@@ -378,9 +385,10 @@ export const InteractionsProvider: React.FC<InteractionsProviderProps> = ({
     draggingTabId: state.phase.kind === "tab" ? state.phase.tabId : null,
     dragPointer: state.pointer,
     tabbarHover: state.tabbarHover,
+    draggingTabElement: state.draggingTabElement,
     onStartContentDrag,
     onStartTabDrag,
-  }), [state.suggest, state.pointer, state.tabbarHover, state.phase, onStartContentDrag, onStartTabDrag]);
+  }), [state.suggest, state.pointer, state.tabbarHover, state.phase, state.draggingTabElement, onStartContentDrag, onStartTabDrag]);
 
   return <InteractionsContext.Provider value={value}>{children}</InteractionsContext.Provider>;
 };
