@@ -96,6 +96,8 @@ export type TabBarRenderProps = {
   onAddTab?: (groupId: GroupId) => void;
   /** Optional: request to close a tab (UI triggers only; state lives in context) */
   onCloseTab?: (groupId: GroupId, tabId: PanelId) => void;
+  /** Enable double-click on empty tabbar area to add a new tab (default: false) */
+  doubleClickToAdd?: boolean;
 };
 
 export type PanelGroupRenderProps = {
@@ -135,4 +137,6 @@ export type PanelSystemProps = {
   panelGroupComponent?: React.ComponentType<PanelGroupRenderProps>;
   /** Optional limits controlling split directions. */
   splitLimits?: PanelSplitLimits;
+  /** Enable double-click on empty tabbar area to add a new tab (default: false) */
+  doubleClickToAdd?: boolean;
 };

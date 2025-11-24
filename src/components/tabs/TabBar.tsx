@@ -29,6 +29,7 @@ const tabbarStyle: React.CSSProperties = {
 
 const spacerStyle: React.CSSProperties = {
   flex: "1 1 auto",
+  alignSelf: "stretch",
 };
 
 export const TabBar: React.FC<TabBarProps> = ({
@@ -42,6 +43,7 @@ export const TabBar: React.FC<TabBarProps> = ({
   tabElement,
   onAddTab,
   onCloseTab,
+  doubleClickToAdd,
 }) => {
   const { isTabDragging, draggingTabId } = usePanelInteractions();
   const localRef = React.useRef<HTMLDivElement | null>(null);
@@ -191,8 +193,14 @@ export const TabBar: React.FC<TabBarProps> = ({
     );
   };
 
+  const handleTabbarDoubleClick = React.useCallback((): void => {
+    if (doubleClickToAdd && onAddTab) {
+      onAddTab(group.id);
+    }
+  }, [doubleClickToAdd, onAddTab, group.id]);
+
   return (
-    <Wrapper {...containerProps} ref={setRefs}>
+    <Wrapper {...containerProps} ref={setRefs} onDoubleClick={handleTabbarDoubleClick}>
       {group.tabs.map((tab, index) => (
         <TabBarTab
           key={`${group.id}:${tab.id}:${index}`}
@@ -205,6 +213,7 @@ export const TabBar: React.FC<TabBarProps> = ({
           onCloseTab={onCloseTab}
           tabComponent={TabComponent}
           tabElement={tabElement}
+          onDoubleClick={(e) => e.stopPropagation()}
         />
       ))}
       <span style={spacerStyle} />

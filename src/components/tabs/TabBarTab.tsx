@@ -22,6 +22,7 @@ export type TabBarTabProps = {
   onClickTab: TabBarProps["onClickTab"];
   onStartDrag: TabBarProps["onStartDrag"];
   onCloseTab?: (groupId: string, tabId: string) => void;
+  onDoubleClick?: (e: React.MouseEvent) => void;
 };
 
 const tabStyle: React.CSSProperties = {
@@ -40,6 +41,7 @@ export const TabBarTab: React.FC<TabBarTabProps> = ({
   onCloseTab,
   tabComponent: TabComponent,
   tabElement,
+  onDoubleClick,
 }) => {
   const handleClick = React.useEffectEvent(() => {
     onClickTab(tab.id);
@@ -87,6 +89,7 @@ export const TabBarTab: React.FC<TabBarTabProps> = ({
     style: tabStyle,
     onClick: handleClick,
     onPointerDown: handlePointerDown,
+    onDoubleClick,
     "data-tab-id": tab.id,
     "data-active": active ? "true" : "false",
     "data-dragging": dragging ? "true" : "false",
@@ -116,6 +119,7 @@ export const TabBarTab: React.FC<TabBarTabProps> = ({
       }
       onStartDrag(tab.id, groupId, e);
     },
+    onDoubleClick,
     children: <span>{tab.title}</span>,
   };
 

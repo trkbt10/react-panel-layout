@@ -7,9 +7,15 @@ import type { TabBarRenderProps } from "../../../modules/panels/state/types";
 import { useDemoTabbarConfig } from "../../contexts/TabbarDemoConfig";
 import { usePanelInteractions } from "../../../modules/panels/interactions/InteractionsContext";
 
-export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef, onAddTab, onCloseTab }) => {
+export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef, onAddTab, onCloseTab, doubleClickToAdd }) => {
   const { isTabDragging, draggingTabId } = usePanelInteractions();
-  const { addPlacement, AddButton, CloseButton } = useDemoTabbarConfig();
+  const { addPlacement, doubleClickToAdd: configDoubleClick, AddButton, CloseButton } = useDemoTabbarConfig();
+  const enableDoubleClick = doubleClickToAdd ?? configDoubleClick;
+  const handleTabbarDoubleClick = React.useCallback((): void => {
+    if (enableDoubleClick && onAddTab) {
+      onAddTab(group.id);
+    }
+  }, [enableDoubleClick, onAddTab, group.id]);
   const renderAddButton = (): React.ReactNode => {
     if (!onAddTab) {
       return null;
@@ -24,7 +30,7 @@ export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
     );
   };
   return (
-    <div ref={rootRef} className={styles.tabbar} role="tablist" data-tabbar="true" data-group-id={group.id} data-dragging={isTabDragging ? "true" : "false"}>
+    <div ref={rootRef} className={styles.tabbar} role="tablist" data-tabbar="true" data-group-id={group.id} data-dragging={isTabDragging ? "true" : "false"} onDoubleClick={handleTabbarDoubleClick}>
       {buildTabs()}
       <span className={styles.spacer} />
       {addPlacement === "trailing" ? renderAddButton() : null}
@@ -32,33 +38,21 @@ export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
   );
 
   function renderCloseButton(tabTitle: string, tabId: string): React.ReactNode {
-    if (CloseButton) {
-      return (
-        <CloseButton
-          onClick={(ev) => {
-            if (!onCloseTab) {
-              return;
-            }
-            ev.stopPropagation();
-            onCloseTab(group.id, tabId);
-          }}
-          ariaLabel={`Close tab ${tabTitle}`}
-          className={styles.closeButton}
-        />
-      );
-    }
-    return (
+    const handleClick = (ev: React.MouseEvent): void => {
+      if (!onCloseTab) {
+        return;
+      }
+      ev.stopPropagation();
+      onCloseTab(group.id, tabId);
+    };
+    const button = CloseButton ? (
+      <CloseButton onClick={handleClick} ariaLabel={`Close tab ${tabTitle}`} className={styles.closeButton} />
+    ) : (
       <button
         type="button"
         aria-label={`Close tab ${tabTitle}`}
         className={styles.closeButton}
-        onClick={(ev) => {
-          if (!onCloseTab) {
-            return;
-          }
-          ev.stopPropagation();
-          onCloseTab(group.id, tabId);
-        }}
+        onClick={handleClick}
         tabIndex={onCloseTab ? undefined : -1}
         disabled={!onCloseTab}
         aria-hidden={onCloseTab ? undefined : true}
@@ -66,6 +60,7 @@ export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
         ×
       </button>
     );
+    return <span onPointerDown={(ev) => ev.stopPropagation()}>{button}</span>;
   }
 
   function buildTabs(): React.ReactNode[] {
@@ -83,6 +78,7 @@ export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
             onClick={() => {
               onClickTab(tab.id);
             }}
+            onDoubleClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => {
               if (!onStartDrag) {
                 return;

@@ -37,6 +37,7 @@ type PanelSystemContentProps = {
   panelGroupComponent?: PanelSystemProps["panelGroupComponent"];
   splitLimits: NormalizedSplitLimits;
   emptyContentComponent?: PanelSystemProps["emptyContentComponent"];
+  doubleClickToAdd?: boolean;
 };
 
 const GridLayoutRenderer = ({
@@ -81,6 +82,7 @@ const PanelSystemContent: React.FC<PanelSystemContentProps> = ({
   panelGroupComponent,
   splitLimits,
   emptyContentComponent,
+  doubleClickToAdd,
 }) => {
   const { state } = usePanelState();
   const { onCommitContentDrop, onCommitTabDrop } = useCommitHandlers();
@@ -107,7 +109,7 @@ const PanelSystemContent: React.FC<PanelSystemContentProps> = ({
         onCommitTabDrop={onCommitTabDrop}
         isContentZoneAllowed={isZoneAllowed}
       >
-        <RenderBridge emptyContentComponent={emptyContentComponent}>
+        <RenderBridge emptyContentComponent={emptyContentComponent} doubleClickToAdd={doubleClickToAdd}>
           <div ref={containerRef} className={className} style={containerStyle}>
             <GridLayoutRenderer
               state={state}
@@ -152,6 +154,7 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({
   tabBarComponent,
   panelGroupComponent,
   splitLimits,
+  doubleClickToAdd,
 }) => {
   if (!initialState) {
     throw new Error("PanelSystem requires initialState.");
@@ -195,6 +198,7 @@ export const PanelSystem: React.FC<PanelSystemProps> = ({
           panelGroupComponent={panelGroupComponent}
           splitLimits={normalizedSplitLimits}
           emptyContentComponent={emptyContentComponent}
+          doubleClickToAdd={doubleClickToAdd}
         />
       </KeybindingsProvider>
     </PanelStateProvider>

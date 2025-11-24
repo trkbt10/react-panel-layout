@@ -6,9 +6,10 @@ import { usePanelInteractions } from "../interactions/InteractionsContext";
 import { PanelRenderProvider } from "./RenderContext";
 import { usePanelState } from "../state/StateContext";
 
-export const RenderBridge: React.FC<React.PropsWithChildren<{ emptyContentComponent?: React.ComponentType }>> = ({
+export const RenderBridge: React.FC<React.PropsWithChildren<{ emptyContentComponent?: React.ComponentType; doubleClickToAdd?: boolean }>> = ({
   children,
   emptyContentComponent,
+  doubleClickToAdd,
 }) => {
   const interactions = usePanelInteractions();
   const { state, actions } = usePanelState();
@@ -75,8 +76,8 @@ export const RenderBridge: React.FC<React.PropsWithChildren<{ emptyContentCompon
   }, [state.groups, interactions]);
 
   const value = React.useMemo(
-    () => ({ getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag }),
-    [getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag],
+    () => ({ getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag, doubleClickToAdd }),
+    [getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag, doubleClickToAdd],
   );
 
   return <PanelRenderProvider value={value}>{children}</PanelRenderProvider>;
