@@ -11,7 +11,7 @@ import {
   FloatingPanelContent,
 } from "../../components/paneling/FloatingPanelFrame";
 import { useLayerDragHandle } from "../../modules/grid/useLayerDragHandle";
-import { Section, Story } from "../components/Story";
+import { Story } from "../components/Story";
 import { CodePreview } from "../components/CodePreview";
 import { DemoPage } from "./components";
 import styles from "./ResizableFloatingPanelsPreview.module.css";
@@ -202,8 +202,10 @@ const FloatingWorkspaceDemo: React.FC = () => {
   ];
 
   return (
-    <div className={styles.demoSurface}>
-      <GridLayout config={config} layers={layers} />
+    <div className={styles.previewFrame}>
+      <div className={styles.demoSurface}>
+        <GridLayout config={config} layers={layers} style={{ width: "100%", height: "100%" }} />
+      </div>
     </div>
   );
 };
@@ -211,7 +213,7 @@ const FloatingWorkspaceDemo: React.FC = () => {
 export const ResizableFloatingPanelsPreview: React.FC = () => {
   return (
     <DemoPage
-      title="Resizable Floating Panels"
+      title="Floating Panel Interactions"
       padding="var(--rpl-demo-space-lg)"
       intro={
         <p className={styles.intro}>
@@ -220,15 +222,13 @@ export const ResizableFloatingPanelsPreview: React.FC = () => {
         </p>
       }
     >
-      <Section title="Floating Panel Interactions">
-        <Story
-          title="Edge Resize Handles"
-          description="Hover near the panel edges to reveal resize handles. All edges and corners are interactive when resizable is enabled."
-        >
-          <FloatingWorkspaceDemo />
-        </Story>
-        <CodePreview code={EDGE_RESIZE_DEMO_CODE} title="Edge Resize Demo Code" />
-      </Section>
+      <Story
+        title="Edge-resizable floating panels"
+        description="Drag the header to move the floating panels and resize them from any edge or corner with live dimension updates and constraints."
+      >
+        <FloatingWorkspaceDemo />
+      </Story>
+      <CodePreview code={EDGE_RESIZE_DEMO_CODE} title="Edge Resize Demo Code" />
     </DemoPage>
   );
 };

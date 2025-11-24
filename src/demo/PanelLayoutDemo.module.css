@@ -1,102 +1,174 @@
 .demoPanel {
   width: 100%;
   height: 100%;
-  padding: 1rem;
-  box-sizing: border-box;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--rpl-demo-surface-secondary);
+  border-radius: var(--rpl-demo-radius-md);
+  border: 1px solid var(--rpl-demo-sidebar-border);
+  overflow: hidden;
+  transition: var(--rpl-demo-transition);
 }
 
 .panelTitle {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
+  margin: 0;
+  padding: var(--rpl-demo-space-md);
+  font-size: var(--rpl-demo-font-size-sm);
   font-weight: 600;
+  color: var(--rpl-demo-text-primary);
+  border-bottom: 1px solid var(--rpl-demo-sidebar-border);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.panelContent {
+  flex: 1;
+  overflow: auto;
+  padding: var(--rpl-demo-space-md);
 }
 
 .panelText {
   margin: 0;
-  font-size: 0.875rem;
-  color: #666;
+  font-size: var(--rpl-demo-font-size-sm);
+  color: var(--rpl-demo-text-secondary);
+  line-height: 1.5;
 }
 
+/* Toolbar */
 .toolbar {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--rpl-demo-space-xs);
   align-items: center;
+  padding: var(--rpl-demo-space-xs);
 }
 
 .toolbarButton {
-  padding: 0.5rem 1rem;
+  padding: var(--rpl-demo-space-sm) var(--rpl-demo-space-md);
   cursor: pointer;
+  border: none;
+  background: transparent;
+  border-radius: var(--rpl-demo-radius-sm);
+  font-size: var(--rpl-demo-font-size-sm);
+  color: var(--rpl-demo-text-secondary);
+  transition: var(--rpl-demo-transition);
 }
 
+.toolbarButton:hover {
+  background: var(--rpl-demo-control-bg-hover);
+  color: var(--rpl-demo-text-primary);
+}
+
+/* Sidebar */
 .sidebarList {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rpl-demo-space-xs);
 }
 
 .sidebarItem {
-  padding: 0.5rem;
+  padding: var(--rpl-demo-space-sm);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--rpl-demo-radius-sm);
+  font-size: var(--rpl-demo-font-size-sm);
+  color: var(--rpl-demo-text-secondary);
+  transition: var(--rpl-demo-transition);
+  display: flex;
+  align-items: center;
+  gap: var(--rpl-demo-space-sm);
 }
 
+.sidebarItem:hover {
+  background: var(--rpl-demo-control-bg-hover);
+  color: var(--rpl-demo-text-primary);
+}
+
+/* Canvas */
 .canvasArea {
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  padding: 2rem;
+  border: 1px dashed var(--rpl-demo-sidebar-border);
+  border-radius: var(--rpl-demo-radius-md);
+  padding: var(--rpl-demo-space-xl);
   text-align: center;
-  min-height: 200px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .canvasText {
-  color: #999;
-  font-size: 1rem;
+  color: var(--rpl-demo-text-tertiary);
+  font-size: var(--rpl-demo-font-size-md);
 }
 
+/* Inspector */
 .inspectorForm {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--rpl-demo-space-md);
 }
 
 .formLabel {
   display: block;
-  font-size: 0.75rem;
-  margin-bottom: 0.25rem;
+  font-size: var(--rpl-demo-font-size-xs);
+  font-weight: 500;
+  color: var(--rpl-demo-text-secondary);
+  margin-bottom: var(--rpl-demo-space-xs);
 }
 
-.formInputNumber {
+.formInputNumber,
+.formInputColor {
   width: 100%;
-  padding: 0.5rem;
+  padding: var(--rpl-demo-space-sm);
+  border: 1px solid var(--rpl-demo-sidebar-border);
+  border-radius: var(--rpl-demo-radius-sm);
+  font-family: inherit;
+  font-size: var(--rpl-demo-font-size-sm);
+  background: #fff;
+  transition: var(--rpl-demo-transition);
+}
+
+.formInputNumber:focus,
+.formInputColor:focus {
+  outline: none;
+  border-color: var(--rpl-demo-accent);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
 }
 
 .formInputColor {
-  width: 100%;
-  padding: 0.25rem;
+  padding: 2px;
+  height: 32px;
 }
 
+/* StatusBar */
 .statusBar {
   width: 100%;
   height: 100%;
-  background-color: #34495e;
-  padding: 0 1rem;
+  background: var(--rpl-demo-text-primary);
+  /* Dark background */
+  padding: 0 var(--rpl-demo-space-md);
   display: flex;
   align-items: center;
-  color: #ecf0f1;
-  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--rpl-demo-font-size-xs);
+  font-family: monospace;
 }
 
 .intro {
   margin: 0;
-  color: #555;
+  color: var(--rpl-demo-text-secondary);
   line-height: 1.6;
+  font-size: var(--rpl-demo-font-size-md);
 }
 
 .featuredContainer {
   width: 100%;
   height: 600px;
+  border-radius: var(--rpl-demo-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--rpl-demo-shadow-md);
+  border: 1px solid var(--rpl-demo-sidebar-border);
+  background: #fff;
 }

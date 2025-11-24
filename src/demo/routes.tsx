@@ -23,6 +23,7 @@ import PL_SimpleGrid from "./pages/PanelLayout/simple-grid";
 import PL_IDE from "./pages/PanelLayout/ide-layout";
 import PL_Dashboard from "./pages/PanelLayout/dashboard";
 import PL_Overlays from "./pages/PanelLayout/draggable-overlays";
+import PL_DrawerMenu from "./pages/PanelLayout/drawer-menu";
 
 import PS_Preview from "./pages/PanelSystem/preview";
 import PS_Tabbar from "./pages/PanelSystem/tabbar";
@@ -56,6 +57,7 @@ export const demoCategories: DemoCategory[] = [
       { id: "ide-layout", label: "IDE Layout", path: "ide-layout", element: <PL_IDE /> },
       { id: "dashboard", label: "Dashboard", path: "dashboard", element: <PL_Dashboard /> },
       { id: "draggable-overlays", label: "Draggable Overlays", path: "draggable-overlays", element: <PL_Overlays /> },
+      { id: "drawer-menu", label: "Drawer Menu", path: "drawer-menu", element: <PL_DrawerMenu /> },
     ],
   },
   {

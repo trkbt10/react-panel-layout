@@ -17,12 +17,22 @@
   line-height: 1.6;
 }
 
+.previewFrame {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .demoSurface {
+  width: min(1200px, 100%);
+  min-width: min(960px, 100%);
+  height: clamp(420px, 55vw, 640px);
   border-radius: var(--rpl-demo-radius-xl);
   padding: var(--rpl-demo-space-lg);
   background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 60%, #ffffff 100%);
   border: 1px solid rgba(79, 70, 229, 0.12);
   box-shadow: var(--rpl-demo-shadow-lg);
+  overflow: hidden;
 }
 
 .workspace {

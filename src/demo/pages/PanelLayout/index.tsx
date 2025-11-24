@@ -8,6 +8,7 @@ import { IDELayout, code as ideLayoutCode } from "./IDELayout";
 import { SimpleGrid, code as simpleGridCode } from "./SimpleGrid";
 import { DashboardLayout, code as dashboardLayoutCode } from "./DashboardLayout";
 import { DraggableOverlays, code as draggableOverlaysCode } from "./DraggableOverlays";
+import { DrawerMenuLayout, code as drawerMenuCode } from "./DrawerMenuLayout";
 import { DemoPage } from "../components";
 
 export const PanelLayoutPreview: React.FC = () => {
@@ -44,6 +45,18 @@ export const PanelLayoutPreview: React.FC = () => {
           </div>
         </Story>
         <CodePreview code={dashboardLayoutCode} title="Dashboard Layout Code" />
+      </Section>
+
+      <Section title="Drawer Menu Layout">
+        <Story
+          title="Workspace + Drawer"
+          description="A desktop workspace with a slide-in navigation drawer controlled via DrawerLayers."
+        >
+          <div style={{ width: "100%", height: "640px" }}>
+            <DrawerMenuLayout />
+          </div>
+        </Story>
+        <CodePreview code={drawerMenuCode} title="Drawer Menu Code" />
       </Section>
 
       <Section title="Draggable Overlays">
