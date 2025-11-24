@@ -4,7 +4,7 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route, Outlet, Link } from "react-router";
+import { HashRouter, Routes, Route, Outlet, Link } from "react-router";
 import { Layout } from "./Layout";
 import { PanelLayoutDemo } from "./PanelLayoutDemo";
 import { demoCategories } from "./routes";
@@ -242,12 +242,8 @@ function App() {
     return <Outlet />;
   };
 
-  // Use Vite's BASE_URL for React Router basename
-  // This automatically matches the base path set in vite.config.ts
-  const basename = import.meta.env.BASE_URL;
-
   return (
-    <BrowserRouter basename={basename}>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
@@ -265,7 +261,7 @@ function App() {
           ))}
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
