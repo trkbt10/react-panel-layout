@@ -1,11 +1,14 @@
+/**
+ * @file Demo panel component
+ */
 import * as React from "react";
 import styles from "./DemoPanel.module.css";
 
-interface DemoPanelProps extends React.HTMLAttributes<HTMLDivElement> {
+type DemoPanelProps = React.HTMLAttributes<HTMLDivElement> & {
     variant?: "default" | "secondary" | "main";
     flex?: boolean;
     children: React.ReactNode;
-}
+};
 
 export const DemoPanel: React.FC<DemoPanelProps> = ({
     variant = "default",
@@ -18,7 +21,7 @@ export const DemoPanel: React.FC<DemoPanelProps> = ({
     const classNames = [
         styles.panel,
         styles[variant],
-        flex && styles.flex,
+        flex ? styles.flex : "",
         className,
     ].filter(Boolean).join(" ");
 

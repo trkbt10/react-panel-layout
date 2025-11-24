@@ -1,4 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+/**
+ * @file InteractionsContext integration tests
+ */
+/* eslint-disable no-restricted-imports, no-restricted-properties, no-restricted-syntax -- integration test requires vitest APIs for timer/pointer mocks */
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import * as React from "react";
 import { InteractionsProvider, usePanelInteractions } from "./InteractionsContext";
@@ -13,8 +17,12 @@ const TestComponent = () => {
     const contentRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        if (groupRef.current) setGroupEl("group-1", groupRef.current);
-        if (contentRef.current) setContentEl("group-1", contentRef.current);
+        if (groupRef.current) {
+            setGroupEl("group-1", groupRef.current);
+        }
+        if (contentRef.current) {
+            setContentEl("group-1", contentRef.current);
+        }
         return () => {
             setGroupEl("group-1", null);
             setContentEl("group-1", null);
@@ -47,10 +55,17 @@ const TestComponent = () => {
                     Content
                 </div>
             </div>
-            {dragPointer && <div data-testid="drag-pointer">Dragging</div>}
-            {suggest && <div data-testid="suggest">Suggest: {suggest.zone}</div>}
+            {dragPointer ? <div data-testid="drag-pointer">Dragging</div> : null}
+            {suggest ? <div data-testid="suggest">Suggest: {suggest.zone}</div> : null}
         </div>
     );
+};
+
+const noopContentDrop = (): void => {
+    // no-op fake
+};
+const noopTabDrop = (): void => {
+    // no-op fake
 };
 
 const Wrapper = () => {
@@ -62,8 +77,8 @@ const Wrapper = () => {
                 <InteractionsProvider
                     containerRef={containerRef}
                     dragThresholdPx={5}
-                    onCommitContentDrop={vi.fn()}
-                    onCommitTabDrop={vi.fn()}
+                    onCommitContentDrop={noopContentDrop}
+                    onCommitTabDrop={noopTabDrop}
                 >
                     <TestComponent />
                 </InteractionsProvider>

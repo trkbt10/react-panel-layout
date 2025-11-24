@@ -4,92 +4,73 @@
  */
 import * as React from "react";
 import { useLayerDragHandle } from "../../modules/grid/useLayerDragHandle";
+import styles from "./DataPreview.module.css";
 
 export type DataPreviewProps = {
   width?: number;
   height?: number;
 };
 
-/**
- * Render properties tab content
- */
 const renderPropertiesTab = (width: number, height: number): React.ReactNode => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+    <div className={styles.propertyList}>
       <div>
-        <div style={{ color: "#858585", fontSize: "0.6875rem", marginBottom: "0.25rem" }}>ID</div>
-        <div style={{ fontFamily: "monospace" }}>data-preview-001</div>
+        <div className={styles.propertyLabel}>ID</div>
+        <div className={styles.propertyValue}>data-preview-001</div>
       </div>
       <div>
-        <div style={{ color: "#858585", fontSize: "0.6875rem", marginBottom: "0.25rem" }}>Type</div>
+        <div className={styles.propertyLabel}>Type</div>
         <div>Floating Panel</div>
       </div>
       <div>
-        <div style={{ color: "#858585", fontSize: "0.6875rem", marginBottom: "0.25rem" }}>Position Mode</div>
-        <div style={{ fontFamily: "monospace", color: "#4ec9b0" }}>absolute</div>
+        <div className={styles.propertyLabel}>Position Mode</div>
+        <div className={styles.propertyValueHighlight}>absolute</div>
       </div>
       <div>
-        <div style={{ color: "#858585", fontSize: "0.6875rem", marginBottom: "0.25rem" }}>Dimensions</div>
-        <div style={{ fontFamily: "monospace" }}>
+        <div className={styles.propertyLabel}>Dimensions</div>
+        <div className={styles.propertyValue}>
           {width}px × {height}px
         </div>
       </div>
       <div>
-        <div style={{ color: "#858585", fontSize: "0.6875rem", marginBottom: "0.25rem" }}>Draggable</div>
-        <div style={{ color: "#4ec9b0" }}>✓ Yes</div>
+        <div className={styles.propertyLabel}>Draggable</div>
+        <div className={styles.propertyValueHighlight}>✓ Yes</div>
       </div>
       <div>
-        <div style={{ color: "#858585", fontSize: "0.6875rem", marginBottom: "0.25rem" }}>Z-Index</div>
-        <div style={{ fontFamily: "monospace" }}>20</div>
+        <div className={styles.propertyLabel}>Z-Index</div>
+        <div className={styles.propertyValue}>20</div>
       </div>
     </div>
   );
 };
 
-/**
- * Render data tab content
- */
 const renderDataTab = (): React.ReactNode => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-      <div
-        style={{
-          padding: "0.5rem",
-          backgroundColor: "#2d2d30",
-          borderRadius: "4px",
-          fontFamily: "monospace",
-          fontSize: "0.75rem",
-        }}
-      >
-        <div style={{ color: "#858585" }}>// Sample data structure</div>
+    <div className={styles.dataList}>
+      <div className={styles.codeBlock}>
+        <div className={styles.codeComment}>// Sample data structure</div>
         <div>
-          <span style={{ color: "#569cd6" }}>const</span> <span style={{ color: "#9cdcfe" }}>config</span>{" "}
-          <span style={{ color: "#d4d4d4" }}>=</span> <span style={{ color: "#d4d4d4" }}>{"{"}</span>
+          <span className={styles.codeKeyword}>const</span> <span className={styles.codeVariable}>config</span>{" "}
+          <span className={styles.codeOperator}>=</span> <span className={styles.codeOperator}>{"{"}</span>
         </div>
-        <div style={{ paddingLeft: "1rem" }}>
-          <span style={{ color: "#9cdcfe" }}>id</span>: <span style={{ color: "#ce9178" }}>"preview-001"</span>,
+        <div className={styles.codeIndent}>
+          <span className={styles.codeVariable}>id</span>: <span className={styles.codeString}>"preview-001"</span>,
         </div>
-        <div style={{ paddingLeft: "1rem" }}>
-          <span style={{ color: "#9cdcfe" }}>draggable</span>: <span style={{ color: "#569cd6" }}>true</span>,
+        <div className={styles.codeIndent}>
+          <span className={styles.codeVariable}>draggable</span>: <span className={styles.codeKeyword}>true</span>,
         </div>
-        <div style={{ paddingLeft: "1rem" }}>
-          <span style={{ color: "#9cdcfe" }}>zIndex</span>: <span style={{ color: "#b5cea8" }}>20</span>
+        <div className={styles.codeIndent}>
+          <span className={styles.codeVariable}>zIndex</span>: <span className={styles.codeNumber}>20</span>
         </div>
         <div>
-          <span style={{ color: "#d4d4d4" }}>{"}"}</span>;
+          <span className={styles.codeOperator}>{"}"}</span>;
         </div>
       </div>
-      <div style={{ color: "#858585", fontSize: "0.6875rem", marginTop: "0.5rem" }}>
-        💡 Try dragging this panel around the canvas
-      </div>
+      <div className={styles.hint}>💡 Try dragging this panel around the canvas</div>
     </div>
   );
 };
 
-/**
- * Data Preview Component
- * Displays sample data in a draggable floating panel
- */
 export const DataPreview: React.FC<DataPreviewProps> = ({ width = 300, height = 400 }) => {
   const [selectedTab, setSelectedTab] = React.useState<"properties" | "data">("properties");
   const dragHandleProps = useLayerDragHandle();
@@ -102,102 +83,33 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ width = 300, height = 
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: "#1e1e1e",
-        color: "#d4d4d4",
-        borderRadius: "8px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        userSelect: "none",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: "0.75rem 1rem",
-          backgroundColor: "#2d2d30",
-          borderBottom: "1px solid #3e3e42",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          cursor: "grab",
-        }}
-        {...dragHandleProps}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <div style={{ fontSize: "1.125rem" }}>📊</div>
-          <h4 style={{ margin: 0, fontSize: "0.875rem", fontWeight: 600 }}>Data Preview</h4>
+    <div className={styles.container}>
+      <div className={styles.header} {...dragHandleProps}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerIcon}>📊</div>
+          <h4 className={styles.headerTitle}>Data Preview</h4>
         </div>
-        <div style={{ fontSize: "0.75rem", color: "#858585" }}>Draggable</div>
+        <div className={styles.headerBadge}>Draggable</div>
       </div>
 
-      {/* Tabs */}
-      <div
-        style={{
-          display: "flex",
-          gap: "0.5rem",
-          padding: "0.5rem 1rem",
-          backgroundColor: "#252526",
-          borderBottom: "1px solid #3e3e42",
-        }}
-      >
+      <div className={styles.tabs}>
         <button
-          style={{
-            padding: "0.375rem 0.75rem",
-            backgroundColor: selectedTab === "properties" ? "#007acc" : "transparent",
-            color: selectedTab === "properties" ? "#ffffff" : "#cccccc",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "0.75rem",
-            cursor: "pointer",
-            transition: "all 0.15s",
-          }}
-          onClick={() => {
-            setSelectedTab("properties");
-          }}
+          className={`${styles.tab} ${selectedTab === "properties" ? styles.tabActive : ""}`}
+          onClick={() => setSelectedTab("properties")}
         >
           Properties
         </button>
         <button
-          style={{
-            padding: "0.375rem 0.75rem",
-            backgroundColor: selectedTab === "data" ? "#007acc" : "transparent",
-            color: selectedTab === "data" ? "#ffffff" : "#cccccc",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "0.75rem",
-            cursor: "pointer",
-            transition: "all 0.15s",
-          }}
-          onClick={() => {
-            setSelectedTab("data");
-          }}
+          className={`${styles.tab} ${selectedTab === "data" ? styles.tabActive : ""}`}
+          onClick={() => setSelectedTab("data")}
         >
           Data
         </button>
       </div>
 
-      {/* Content */}
-      <div style={{ flex: 1, padding: "1rem", overflow: "auto", fontSize: "0.8125rem" }}>{renderContent()}</div>
+      <div className={styles.content}>{renderContent()}</div>
 
-      {/* Footer */}
-      <div
-        style={{
-          padding: "0.5rem 1rem",
-          backgroundColor: "#2d2d30",
-          borderTop: "1px solid #3e3e42",
-          fontSize: "0.6875rem",
-          color: "#858585",
-          textAlign: "center",
-        }}
-      >
-        Drag from header to reposition
-      </div>
+      <div className={styles.footer}>Drag from header to reposition</div>
     </div>
   );
 };

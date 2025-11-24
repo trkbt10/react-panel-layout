@@ -8,7 +8,7 @@ import { SimpleResizablePanels, code as simpleCode } from "./SimpleResizablePane
 import { PanelsWithRichContent, code as richContentCode } from "./PanelsWithRichContent";
 import { ThreePanelLayout, code as threePanelCode } from "./ThreePanelLayout";
 import { DemoPage } from "../components";
-import styles from "./page.module.css";
+import styles from "./index.module.css";
 
 export const HorizontalDividerPreview: React.FC = () => {
   return (

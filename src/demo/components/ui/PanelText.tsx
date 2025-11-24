@@ -1,10 +1,13 @@
+/**
+ * @file Panel text component
+ */
 import * as React from "react";
 import styles from "./PanelText.module.css";
 
-interface PanelTextProps extends React.HTMLAttributes<HTMLParagraphElement> {
+type PanelTextProps = React.HTMLAttributes<HTMLParagraphElement> & {
     variant?: "default" | "info" | "muted";
     children: React.ReactNode;
-}
+};
 
 export const PanelText: React.FC<PanelTextProps> = ({
     variant = "default",

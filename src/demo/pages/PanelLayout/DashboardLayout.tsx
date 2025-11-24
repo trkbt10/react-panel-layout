@@ -4,6 +4,7 @@
 import * as React from "react";
 import { GridLayout } from "../../../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../types";
+import styles from "./DashboardLayout.module.css";
 
 import { DemoCard } from "../../components/ui/DemoCard";
 
@@ -14,22 +15,13 @@ const DashboardCard: React.FC<{ title: string; value: string; icon: string; colo
   color,
 }) => {
   return (
-    <DemoCard
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        padding: "var(--rpl-demo-space-lg)",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+    <DemoCard className={styles.dashboardCard}>
+      <div className={styles.cardHeader}>
         <div>
-          <div style={{ fontSize: "0.875rem", color: "var(--rpl-demo-text-secondary)", marginBottom: "0.5rem" }}>{title}</div>
-          <div style={{ fontSize: "2rem", fontWeight: 700, color }}>{value}</div>
+          <div className={styles.cardTitle}>{title}</div>
+          <div className={styles.cardValue} style={{ color }}>{value}</div>
         </div>
-        <div style={{ fontSize: "2rem", opacity: 0.3 }}>{icon}</div>
+        <div className={styles.cardIcon}>{icon}</div>
       </div>
     </DemoCard>
   );
@@ -37,25 +29,9 @@ const DashboardCard: React.FC<{ title: string; value: string; icon: string; colo
 
 const ChartCard: React.FC<{ title: string }> = ({ title }) => {
   return (
-    <DemoCard
-      style={{
-        width: "100%",
-        height: "100%",
-        padding: "var(--rpl-demo-space-lg)",
-      }}
-    >
-      <h3 style={{ margin: "0 0 1rem 0", fontSize: "1rem", fontWeight: 600 }}>{title}</h3>
-      <div
-        style={{
-          height: "calc(100% - 2rem)",
-          backgroundColor: "var(--rpl-demo-surface-secondary)",
-          borderRadius: "var(--rpl-demo-radius-sm)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "var(--rpl-demo-text-tertiary)",
-        }}
-      >
+    <DemoCard className={styles.chartCard}>
+      <h3 className={styles.chartTitle}>{title}</h3>
+      <div className={styles.chartArea}>
         Chart Area
       </div>
     </DemoCard>
@@ -80,22 +56,9 @@ export const DashboardLayout = () => {
     {
       id: "header",
       component: (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#fff",
-            padding: "1.5rem",
-            boxSizing: "border-box",
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 700 }}>Dashboard</h1>
-          <div style={{ fontSize: "0.875rem", color: "#666" }}>Last updated: Just now</div>
+        <div className={styles.header}>
+          <h1 className={styles.headerTitle}>Dashboard</h1>
+          <div className={styles.headerMeta}>Last updated: Just now</div>
         </div>
       ),
       gridArea: "header",
@@ -138,27 +101,14 @@ export const DashboardLayout = () => {
     {
       id: "activity",
       component: (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#fff",
-            padding: "1.5rem",
-            boxSizing: "border-box",
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            overflow: "auto",
-          }}
-        >
-          <h3 style={{ margin: "0 0 1rem 0", fontSize: "1rem", fontWeight: 600 }}>Recent Activity</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {["New order #1234", "User registered", "Payment received", "Support ticket #567"].map((activity, i) => {
-              return (
-                <div key={i} style={{ padding: "0.5rem", backgroundColor: "#f8f9fa", borderRadius: "4px", fontSize: "0.875rem" }}>
-                  {activity}
-                </div>
-              );
-            })}
+        <div className={styles.activityCard}>
+          <h3 className={styles.activityTitle}>Recent Activity</h3>
+          <div className={styles.activityList}>
+            {["New order #1234", "User registered", "Payment received", "Support ticket #567"].map((activity, i) => (
+              <div key={i} className={styles.activityItem}>
+                {activity}
+              </div>
+            ))}
           </div>
         </div>
       ),
@@ -167,7 +117,7 @@ export const DashboardLayout = () => {
   ];
 
   return (
-    <div style={{ width: "100%", height: "600px", overflow: "auto", border: "1px solid var(--rpl-demo-sidebar-border)", borderRadius: "var(--rpl-demo-radius-lg)", boxShadow: "var(--rpl-demo-shadow-md)" }}>
+    <div className={styles.container}>
       <GridLayout config={config} layers={layers} />
     </div>
   );

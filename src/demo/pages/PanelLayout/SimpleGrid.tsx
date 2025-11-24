@@ -4,6 +4,7 @@
 import * as React from "react";
 import { GridLayout } from "../../../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../types";
+import styles from "./SimpleGrid.module.css";
 
 import { DemoCard } from "../../components/ui/DemoCard";
 
@@ -11,20 +12,8 @@ const GridCell: React.FC<{ title: string; color: string }> = ({ title, color }) 
   return (
     <DemoCard
       hoverEffect
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: color,
-        padding: "var(--rpl-demo-space-lg)",
-        boxSizing: "border-box",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "1.25rem",
-        fontWeight: 600,
-        color: "#fff",
-        textShadow: "0 2px 4px rgba(0,0,0,0.2)",
-      }}
+      className={styles.gridCell}
+      style={{ backgroundColor: color }}
     >
       {title}
     </DemoCard>
@@ -66,7 +55,7 @@ export const SimpleGrid = () => {
   ];
 
   return (
-    <div style={{ width: "100%", height: "400px", border: "1px solid #ddd" }}>
+    <div className={styles.container}>
       <GridLayout config={config} layers={layers} />
     </div>
   );

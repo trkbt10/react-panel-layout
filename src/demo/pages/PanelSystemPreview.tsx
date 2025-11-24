@@ -13,9 +13,14 @@ import {
   type TabStyle,
 } from "../contexts/TabbarDemoConfig";
 import type { TabBarRenderProps } from "../../modules/panels/state/types";
+import styles from "./PanelSystemPreview.module.css";
 
 const makeTabs = (): TabDefinition[] => {
-  const mk = (id: string, title: string): TabDefinition => ({ id, title, render: () => React.createElement("div", { style: { padding: 12 } }, `${title} content`) });
+  const mk = (id: string, title: string): TabDefinition => ({
+    id,
+    title,
+    render: () => React.createElement("div", { className: styles.tabContent }, `${title} content`),
+  });
   return [mk("welcome", "Welcome"), mk("explorer", "Explorer"), mk("preview", "Preview")];
 };
 
@@ -50,7 +55,7 @@ export const PanelSystemPreview: React.FC = () => {
   const View = React.useMemo(() => createPanelView(tabBarMap[config.tabStyle]), [config.tabStyle]);
 
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+    <div className={styles.container}>
       <TabbarConfigControls
         tabStyle={config.tabStyle}
         setTabStyle={config.setTabStyle}
@@ -61,7 +66,7 @@ export const PanelSystemPreview: React.FC = () => {
         useCustomButtons={config.useCustomButtons}
         setUseCustomButtons={config.setUseCustomButtons}
       />
-      <div style={{ flex: 1, minHeight: 0 }}>
+      <div className={styles.panelContainer}>
         <DemoTabbarConfigProvider value={config.configValue}>
           <PanelSystem
             initialState={initialState}
@@ -71,7 +76,7 @@ export const PanelSystemPreview: React.FC = () => {
             gridTracksInteractive={false}
             dragThresholdPx={6}
             doubleClickToAdd={config.doubleClickToAdd}
-            style={{ width: "100%", height: "100%" }}
+            className={styles.panelSystem}
             view={View}
           />
         </DemoTabbarConfigProvider>

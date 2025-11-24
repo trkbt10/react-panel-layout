@@ -9,12 +9,9 @@ import { DataPreview } from "./components/DataPreview";
 import { Section, Story } from "./components/Story";
 import { CodePreview } from "./components/CodePreview";
 import { DemoPage } from "./pages/components";
-// Keep only the featured workspace sample on this page to ensure single-sample per page.
+import styles from "./PanelLayoutDemo.module.css";
 import "./demo.css";
 
-/**
- * Demo Panel Component
- */
 const DemoPanel: React.FC<{ title: string; bgColor?: string; children?: React.ReactNode }> = ({
   title,
   bgColor = "#f0f0f0",
@@ -24,21 +21,12 @@ const DemoPanel: React.FC<{ title: string; bgColor?: string; children?: React.Re
     if (children) {
       return children;
     }
-    return <p style={{ margin: 0, fontSize: "0.875rem", color: "#666" }}>Panel content goes here...</p>;
+    return <p className={styles.panelText}>Panel content goes here...</p>;
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: bgColor,
-        padding: "1rem",
-        boxSizing: "border-box",
-        overflow: "auto",
-      }}
-    >
-      <h3 style={{ margin: "0 0 1rem 0", fontSize: "1rem", fontWeight: 600 }}>{title}</h3>
+    <div className={styles.demoPanel} style={{ backgroundColor: bgColor }}>
+      <h3 className={styles.panelTitle}>{title}</h3>
       {renderContent()}
     </div>
   );
@@ -68,10 +56,10 @@ const featuredLayers: LayerDefinition[] = [
     id: "toolbar",
     component: (
       <DemoPanel title="Toolbar" bgColor="#2c3e50">
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <button style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>File</button>
-          <button style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>Edit</button>
-          <button style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>View</button>
+        <div className={styles.toolbar}>
+          <button className={styles.toolbarButton}>File</button>
+          <button className={styles.toolbarButton}>Edit</button>
+          <button className={styles.toolbarButton}>View</button>
         </div>
       </DemoPanel>
     ),
@@ -83,10 +71,10 @@ const featuredLayers: LayerDefinition[] = [
     id: "sidebar",
     component: (
       <DemoPanel title="Sidebar" bgColor="#ecf0f1">
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          <li style={{ padding: "0.5rem", cursor: "pointer", borderRadius: "4px" }}>📁 Project Files</li>
-          <li style={{ padding: "0.5rem", cursor: "pointer", borderRadius: "4px" }}>🔍 Search</li>
-          <li style={{ padding: "0.5rem", cursor: "pointer", borderRadius: "4px" }}>⚙️ Settings</li>
+        <ul className={styles.sidebarList}>
+          <li className={styles.sidebarItem}>📁 Project Files</li>
+          <li className={styles.sidebarItem}>🔍 Search</li>
+          <li className={styles.sidebarItem}>⚙️ Settings</li>
         </ul>
       </DemoPanel>
     ),
@@ -98,19 +86,8 @@ const featuredLayers: LayerDefinition[] = [
     id: "canvas",
     component: (
       <DemoPanel title="Canvas" bgColor="#ffffff">
-        <div
-          style={{
-            border: "2px dashed #ccc",
-            borderRadius: "8px",
-            padding: "2rem",
-            textAlign: "center",
-            minHeight: "200px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <p style={{ color: "#999", fontSize: "1rem" }}>Main canvas area - your content goes here</p>
+        <div className={styles.canvasArea}>
+          <p className={styles.canvasText}>Main canvas area - your content goes here</p>
         </div>
       </DemoPanel>
     ),
@@ -122,18 +99,18 @@ const featuredLayers: LayerDefinition[] = [
     id: "inspector",
     component: (
       <DemoPanel title="Inspector" bgColor="#ecf0f1">
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className={styles.inspectorForm}>
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.25rem" }}>Width</label>
-            <input type="number" defaultValue={100} style={{ width: "100%", padding: "0.5rem" }} />
+            <label className={styles.formLabel}>Width</label>
+            <input type="number" defaultValue={100} className={styles.formInputNumber} />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.25rem" }}>Height</label>
-            <input type="number" defaultValue={100} style={{ width: "100%", padding: "0.5rem" }} />
+            <label className={styles.formLabel}>Height</label>
+            <input type="number" defaultValue={100} className={styles.formInputNumber} />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.25rem" }}>Color</label>
-            <input type="color" defaultValue="#3498db" style={{ width: "100%", padding: "0.25rem" }} />
+            <label className={styles.formLabel}>Color</label>
+            <input type="color" defaultValue="#3498db" className={styles.formInputColor} />
           </div>
         </div>
       </DemoPanel>
@@ -145,18 +122,7 @@ const featuredLayers: LayerDefinition[] = [
   {
     id: "statusbar",
     component: (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          backgroundColor: "#34495e",
-          padding: "0 1rem",
-          display: "flex",
-          alignItems: "center",
-          color: "#ecf0f1",
-          fontSize: "0.75rem",
-        }}
-      >
+      <div className={styles.statusBar}>
         Ready | Line 1, Column 1
       </div>
     ),
@@ -222,16 +188,13 @@ const layers: LayerDefinition[] = [
 <GridLayout config={config} layers={layers} />;`;
 
 
-/**
- * Panel Layout Demo Component
- */
 export const PanelLayoutDemo: React.FC = () => {
   return (
     <DemoPage
       title="Panel Layout Demo"
       padding="2rem"
       intro={
-        <p style={{ margin: 0, color: "#555", lineHeight: 1.6 }}>
+        <p className={styles.intro}>
           Explore the featured workspace configuration and browse additional panel layout presets grouped similarly to
           the Component Previews section.
         </p>
@@ -242,14 +205,12 @@ export const PanelLayoutDemo: React.FC = () => {
           title="Creative Studio"
           description="Primary demo used across the documentation with toolbar, canvas, inspector, and draggable overlays."
         >
-          <div style={{ width: "100%", height: "600px" }}>
+          <div className={styles.featuredContainer}>
             <GridLayout config={featuredConfig} layers={featuredLayers} />
           </div>
         </Story>
         <CodePreview code={featuredCode} title="Creative Studio Code" />
       </Section>
-
-      {/* Intentionally no gallery here; each sample has its own page under Components / PanelLayout. */}
     </DemoPage>
   );
 };

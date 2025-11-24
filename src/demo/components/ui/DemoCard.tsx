@@ -1,10 +1,13 @@
+/**
+ * @file Demo card component
+ */
 import * as React from "react";
 import styles from "./DemoCard.module.css";
 
-interface DemoCardProps extends React.HTMLAttributes<HTMLDivElement> {
+type DemoCardProps = React.HTMLAttributes<HTMLDivElement> & {
     hoverEffect?: boolean;
     children: React.ReactNode;
-}
+};
 
 export const DemoCard: React.FC<DemoCardProps> = ({
     hoverEffect = false,
@@ -15,7 +18,7 @@ export const DemoCard: React.FC<DemoCardProps> = ({
 }) => {
     const classNames = [
         styles.card,
-        hoverEffect && styles.hoverEffect,
+        hoverEffect ? styles.hoverEffect : "",
         className,
     ].filter(Boolean).join(" ");
 

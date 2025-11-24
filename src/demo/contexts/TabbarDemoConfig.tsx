@@ -102,14 +102,6 @@ export const useTabbarConfigState = (): {
   };
 };
 
-const buttonStyle = (active: boolean): React.CSSProperties => ({
-  padding: "6px 12px",
-  background: active ? "#007acc" : "#f0f0f0",
-  color: active ? "#fff" : "#000",
-  border: "1px solid #ccc",
-  borderRadius: "4px",
-  cursor: "pointer",
-});
 
 export type TabbarConfigControlsProps = {
   tabStyle: TabStyle;

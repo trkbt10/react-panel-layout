@@ -1,11 +1,14 @@
+/**
+ * @file Demo button component
+ */
 import * as React from "react";
 import styles from "./DemoButton.module.css";
 
-interface DemoButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+type DemoButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: "primary" | "secondary" | "outline" | "ghost";
     size?: "sm" | "md" | "lg";
     children: React.ReactNode;
-}
+};
 
 export const DemoButton: React.FC<DemoButtonProps> = ({
     variant = "primary",

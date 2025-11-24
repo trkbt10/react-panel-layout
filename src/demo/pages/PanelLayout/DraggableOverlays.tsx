@@ -4,6 +4,7 @@
 import * as React from "react";
 import { GridLayout } from "../../../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../types";
+import styles from "./DraggableOverlays.module.css";
 
 import { DemoButton } from "../../components/ui/DemoButton";
 import { DemoCard } from "../../components/ui/DemoCard";
@@ -14,31 +15,12 @@ const DraggablePanel: React.FC<{ title: string; color: string; children?: React.
   children,
 }) => {
   return (
-    <DemoCard
-      style={{
-        width: "100%",
-        height: "100%",
-        padding: 0,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        boxShadow: "var(--rpl-demo-shadow-lg)",
-      }}
-    >
-      <div
-        style={{
-          padding: "var(--rpl-demo-space-md)",
-          backgroundColor: color,
-          color: "#fff",
-          fontWeight: 600,
-          cursor: "grab",
-          userSelect: "none",
-        }}
-      >
+    <DemoCard className={styles.draggablePanel}>
+      <div className={styles.panelHeader} style={{ backgroundColor: color }}>
         {title}
       </div>
-      <div style={{ flex: 1, padding: "var(--rpl-demo-space-md)", overflow: "auto" }}>
-        {children ? children : <p style={{ margin: 0, color: "var(--rpl-demo-text-secondary)" }}>Drag the header to move this panel</p>}
+      <div className={styles.panelContent}>
+        {children ? children : <p className={styles.panelText}>Drag the header to move this panel</p>}
       </div>
     </DemoCard>
   );
@@ -56,22 +38,11 @@ export const DraggableOverlays = () => {
     {
       id: "canvas",
       component: (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#f0f4f8",
-            backgroundImage: "linear-gradient(#e5e9ed 1px, transparent 1px), linear-gradient(90deg, #e5e9ed 1px, transparent 1px)",
-            backgroundSize: "20px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div style={{ textAlign: "center", color: "#999" }}>
-            <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🎨</div>
+        <div className={styles.canvas}>
+          <div className={styles.canvasContent}>
+            <div className={styles.canvasIcon}>🎨</div>
             <div>Canvas Area</div>
-            <div style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>Drag the floating panels around</div>
+            <div className={styles.canvasHint}>Drag the floating panels around</div>
           </div>
         </div>
       ),
@@ -82,7 +53,7 @@ export const DraggableOverlays = () => {
       id: "panel1",
       component: (
         <DraggablePanel title="🔧 Tools" color="#3498db">
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <div className={styles.toolsList}>
             <DemoButton variant="secondary" size="sm">✏️ Pen</DemoButton>
             <DemoButton variant="secondary" size="sm">🖌️ Brush</DemoButton>
             <DemoButton variant="secondary" size="sm">⬜ Shape</DemoButton>
@@ -101,23 +72,14 @@ export const DraggableOverlays = () => {
       id: "panel2",
       component: (
         <DraggablePanel title="🎨 Colors" color="#e74c3c">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.5rem" }}>
-            {["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6", "#1abc9c", "#34495e", "#ecf0f1"].map((color) => {
-              return (
-                <div
-                  key={color}
-                  style={{
-                    width: "100%",
-                    aspectRatio: "1",
-                    backgroundColor: color,
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    border: "2px solid #fff",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  }}
-                />
-              );
-            })}
+          <div className={styles.colorGrid}>
+            {["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6", "#1abc9c", "#34495e", "#ecf0f1"].map((color) => (
+              <div
+                key={color}
+                className={styles.colorSwatch}
+                style={{ backgroundColor: color }}
+              />
+            ))}
           </div>
         </DraggablePanel>
       ),
@@ -133,14 +95,14 @@ export const DraggableOverlays = () => {
       id: "panel3",
       component: (
         <DraggablePanel title="⚙️ Settings" color="#2ecc71">
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className={styles.settingsForm}>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.25rem" }}>Opacity</label>
-              <input type="range" min="0" max="100" defaultValue="100" style={{ width: "100%" }} />
+              <label className={styles.formLabel}>Opacity</label>
+              <input type="range" min="0" max="100" defaultValue="100" className={styles.rangeInput} />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "0.75rem", marginBottom: "0.25rem" }}>Size</label>
-              <input type="range" min="1" max="50" defaultValue="10" style={{ width: "100%" }} />
+              <label className={styles.formLabel}>Size</label>
+              <input type="range" min="1" max="50" defaultValue="10" className={styles.rangeInput} />
             </div>
           </div>
         </DraggablePanel>
@@ -156,7 +118,7 @@ export const DraggableOverlays = () => {
   ];
 
   return (
-    <div style={{ width: "100%", height: "500px", overflow: "hidden", border: "1px solid var(--rpl-demo-sidebar-border)", borderRadius: "var(--rpl-demo-radius-lg)", boxShadow: "var(--rpl-demo-shadow-md)" }}>
+    <div className={styles.container}>
       <GridLayout config={config} layers={layers} />
     </div>
   );

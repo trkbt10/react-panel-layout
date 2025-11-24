@@ -1,0 +1,102 @@
+.demoPanel {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.panelTitle {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.panelText {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.toolbarButton {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.sidebarList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebarItem {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.canvasArea {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvasText {
+  color: #999;
+  font-size: 1rem;
+}
+
+.inspectorForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.formInputNumber {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.formInputColor {
+  width: 100%;
+  padding: 0.25rem;
+}
+
+.statusBar {
+  width: 100%;
+  height: 100%;
+  background-color: #34495e;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  color: #ecf0f1;
+  font-size: 0.75rem;
+}
+
+.intro {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.featuredContainer {
+  width: 100%;
+  height: 600px;
+}

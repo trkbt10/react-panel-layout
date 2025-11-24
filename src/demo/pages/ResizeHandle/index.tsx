@@ -9,7 +9,7 @@ import { HorizontalResizeDemo, code as horizontalCode } from "./HorizontalResize
 import { BothDirectionsDemo, code as bothDirectionsCode } from "./BothDirectionsDemo";
 import { NestedPanelsDemo, code as nestedPanelsCode } from "./NestedPanelsDemo";
 import { DemoPage } from "../components";
-import styles from "./page.module.css";
+import styles from "./index.module.css";
 
 export const ResizeHandlePreview: React.FC = () => {
 

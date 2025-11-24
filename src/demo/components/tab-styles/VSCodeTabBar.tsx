@@ -44,22 +44,26 @@ export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
       ev.stopPropagation();
       onCloseTab(group.id, tabId);
     };
-    const button = CloseButton ? (
-      <CloseButton onClick={handleClick} ariaLabel={`Close tab ${tabTitle}`} className={styles.closeButton} />
-    ) : (
-      <button
-        type="button"
-        aria-label={`Close tab ${tabTitle}`}
-        className={styles.closeButton}
-        onClick={handleClick}
-        tabIndex={onCloseTab ? undefined : -1}
-        disabled={!onCloseTab}
-        aria-hidden={onCloseTab ? undefined : true}
-      >
-        ×
-      </button>
-    );
-    return <span onPointerDown={(ev) => ev.stopPropagation()}>{button}</span>;
+    const ariaLabel = `Close tab ${tabTitle}`;
+    const renderButton = (): React.ReactNode => {
+      if (CloseButton) {
+        return <CloseButton onClick={handleClick} ariaLabel={ariaLabel} className={styles.closeButton} />;
+      }
+      return (
+        <button
+          type="button"
+          aria-label={ariaLabel}
+          className={styles.closeButton}
+          onClick={handleClick}
+          tabIndex={onCloseTab ? undefined : -1}
+          disabled={!onCloseTab}
+          aria-hidden={onCloseTab ? undefined : true}
+        >
+          ×
+        </button>
+      );
+    };
+    return <span onPointerDown={(ev) => ev.stopPropagation()}>{renderButton()}</span>;
   }
 
   function buildTabs(): React.ReactNode[] {
