@@ -26,19 +26,7 @@ export const ScrollablePanel: React.FC<{ onClose?: () => void }> = ({ onClose })
     <FloatingPanelHeader>
       <FloatingPanelTitle>Long Article</FloatingPanelTitle>
       <FloatingPanelControls>
-        <button
-          onClick={onClose}
-          style={{
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1.25rem",
-            padding: "0.25rem 0.5rem",
-            color: "var(--rpl-demo-text-secondary)",
-          }}
-        >
-          ×
-        </button>
+        <button onClick={onClose}>×</button>
       </FloatingPanelControls>
     </FloatingPanelHeader>
     <FloatingPanelContent style={{ overflow: "auto" }}>
@@ -53,7 +41,7 @@ export const ScrollablePanel: React.FC<{ onClose?: () => void }> = ({ onClose })
         <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores.</p>
       </div>
     </FloatingPanelContent>
-  </FloatingPanelFrame>
+  </FloatingPanelFrame >
 );
 
 export const code = `export const ScrollablePanel = ({ onClose }) => (

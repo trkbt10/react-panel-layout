@@ -212,7 +212,7 @@ export const ResizableFloatingPanelsPreview: React.FC = () => {
   return (
     <DemoPage
       title="Resizable Floating Panels"
-      padding="2rem"
+      padding="var(--rpl-demo-space-lg)"
       intro={
         <p className={styles.intro}>
           Floating layers can now be resized from any edge in addition to the existing corner handles. This demo shows

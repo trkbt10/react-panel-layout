@@ -7,7 +7,7 @@ import { DemoPage } from "../../components";
 
 const Page: React.FC = () => {
   return (
-    <DemoPage title="PanelSystem / Preview" padding="1.5rem" fullHeight maxWidth="none">
+    <DemoPage title="PanelSystem / Preview" padding="var(--rpl-demo-space-lg)" fullHeight maxWidth="none">
       <div style={{ flex: 1, minHeight: 0 }}>
         <PanelSystemPreview />
       </div>

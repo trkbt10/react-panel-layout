@@ -45,6 +45,9 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     root: ".",
     base,
+    define: {
+      __APP_VERSION__: JSON.stringify(pkg.version),
+    },
     build: {
       outDir: "dist-demo",
       rollupOptions: {

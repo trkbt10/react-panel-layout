@@ -1,0 +1,63 @@
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--rpl-demo-font-family);
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.button:hover {
+    transform: scale(1.03);
+}
+
+/* Size variants */
+.sm {
+    padding: 6px 12px;
+    font-size: var(--rpl-demo-font-size-sm);
+    border-radius: 16px;
+}
+
+.md {
+    padding: 10px 20px;
+    font-size: var(--rpl-demo-font-size-md);
+    border-radius: 24px;
+}
+
+.lg {
+    padding: 14px 28px;
+    font-size: var(--rpl-demo-font-size-lg);
+    border-radius: 32px;
+}
+
+/* Variant styles */
+.primary {
+    background: var(--rpl-demo-accent);
+    color: var(--rpl-demo-accent-contrast);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.secondary {
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--rpl-demo-text-primary);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.secondary:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+.outline {
+    background: transparent;
+    color: var(--rpl-demo-text-primary);
+    border: 1px solid var(--rpl-demo-text-secondary);
+}
+
+.ghost {
+    background: transparent;
+    color: var(--rpl-demo-text-secondary);
+}

@@ -167,7 +167,7 @@ export const DashboardLayout = () => {
   ];
 
   return (
-    <div style={{ width: "100%", height: "600px", overflow: "auto", border: "1px solid #ddd" }}>
+    <div style={{ width: "100%", height: "600px", overflow: "auto", border: "1px solid var(--rpl-demo-sidebar-border)", borderRadius: "var(--rpl-demo-radius-lg)", boxShadow: "var(--rpl-demo-shadow-md)" }}>
       <GridLayout config={config} layers={layers} />
     </div>
   );

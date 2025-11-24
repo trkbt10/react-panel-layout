@@ -56,6 +56,8 @@ export const PanelSystemPreview: React.FC = () => {
         setTabStyle={config.setTabStyle}
         addPlacement={config.addPlacement}
         setAddPlacement={config.setAddPlacement}
+        doubleClickToAdd={config.doubleClickToAdd}
+        setDoubleClickToAdd={config.setDoubleClickToAdd}
         useCustomButtons={config.useCustomButtons}
         setUseCustomButtons={config.setUseCustomButtons}
       />
@@ -68,6 +70,7 @@ export const PanelSystemPreview: React.FC = () => {
             layoutMode="grid"
             gridTracksInteractive={false}
             dragThresholdPx={6}
+            doubleClickToAdd={config.doubleClickToAdd}
             style={{ width: "100%", height: "100%" }}
             view={View}
           />

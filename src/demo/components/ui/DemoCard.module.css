@@ -1,0 +1,15 @@
+.card {
+    background: #fff;
+    border-radius: var(--rpl-demo-radius-xl);
+    padding: var(--rpl-demo-space-lg);
+    box-shadow: var(--rpl-demo-shadow-md);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: var(--rpl-demo-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.hoverEffect:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--rpl-demo-shadow-lg);
+}

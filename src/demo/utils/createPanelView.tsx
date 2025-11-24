@@ -17,7 +17,7 @@ export const createPanelView = (
   const TabBarComp = TabBarImpl ?? DefaultTabBar;
   const PanelGroupComp: React.ComponentType<PanelGroupRenderProps> = PanelGroupImpl ?? ((p) => <PanelGroupView {...p} />);
   const View: PanelViewComponent = ({ groupId }) => {
-    const { getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartContentDrag, onStartTabDrag } = usePanelRenderContext();
+    const { getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartContentDrag, onStartTabDrag, doubleClickToAdd } = usePanelRenderContext();
     const { setGroupEl, setTabbarEl, setContentEl } = useDomRegistry();
 
     const group = getGroup(groupId);
@@ -40,6 +40,7 @@ export const createPanelView = (
             onAddTab={onAddTab}
             onCloseTab={onCloseTab}
             onStartDrag={(tabId, gid, e) => onStartTabDrag(tabId, gid, e)}
+            doubleClickToAdd={doubleClickToAdd}
           />
         }
         content={content}

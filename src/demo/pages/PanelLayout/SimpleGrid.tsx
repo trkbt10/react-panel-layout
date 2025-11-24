@@ -5,9 +5,12 @@ import * as React from "react";
 import { GridLayout } from "../../../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../types";
 
+import { DemoCard } from "../../components/ui/DemoCard";
+
 const GridCell: React.FC<{ title: string; color: string }> = ({ title, color }) => {
   return (
-    <div
+    <DemoCard
+      hoverEffect
       style={{
         width: "100%",
         height: "100%",
@@ -21,12 +24,10 @@ const GridCell: React.FC<{ title: string; color: string }> = ({ title, color }) 
         fontWeight: 600,
         color: "#fff",
         textShadow: "0 2px 4px rgba(0,0,0,0.2)",
-        borderRadius: "var(--rpl-demo-radius-md)",
-        boxShadow: "var(--rpl-demo-shadow-sm)",
       }}
     >
       {title}
-    </div>
+    </DemoCard>
   );
 };
 

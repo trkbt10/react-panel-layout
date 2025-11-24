@@ -4,7 +4,7 @@
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router";
+import { BrowserRouter, Routes, Route, Outlet, Link } from "react-router";
 import { Layout } from "./Layout";
 import { PanelLayoutDemo } from "./PanelLayoutDemo";
 import { demoCategories } from "./routes";
@@ -62,7 +62,7 @@ function Home() {
               border: "1px solid rgba(0,0,0,0.05)",
             }}
           >
-            v1.0 Public Beta
+            {__APP_VERSION__}
           </div>
           <h1
             style={{
@@ -93,12 +93,16 @@ function Home() {
             Powered by CSS Grid and designed for performance.
           </p>
           <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
-            <DemoButton variant="primary" size="lg">
-              Get Started
-            </DemoButton>
-            <DemoButton variant="secondary" size="lg">
-              View Documentation
-            </DemoButton>
+            <Link to="/components/panel-layout/simple-grid" style={{ textDecoration: "none" }}>
+              <DemoButton variant="primary" size="lg">
+                Get Started
+              </DemoButton>
+            </Link>
+            <Link to="/components/panel-system/preview" style={{ textDecoration: "none" }}>
+              <DemoButton variant="secondary" size="lg">
+                View Documentation
+              </DemoButton>
+            </Link>
           </div>
         </div>
       </div>

@@ -12,12 +12,16 @@ import {
 export const BasicPanel = () => (
   <FloatingPanelFrame
     style={{
-      width: "400px",
-      maxWidth: "100%",
-      boxShadow: "var(--rpl-demo-shadow-lg)",
-      borderRadius: "var(--rpl-demo-radius-lg)",
+      width: "100%",
+      height: "400px",
+      position: "relative",
+      backgroundColor: "var(--rpl-demo-bg-secondary)",
+      backgroundImage: "radial-gradient(var(--rpl-demo-border-primary) 1px, transparent 1px)",
+      backgroundSize: "20px 20px",
       border: "1px solid var(--rpl-demo-sidebar-border)",
-      background: "#fff",
+      borderRadius: "var(--rpl-demo-radius-lg)",
+      boxShadow: "var(--rpl-demo-shadow-md)",
+      overflow: "hidden",
     }}
   >
     <FloatingPanelHeader>

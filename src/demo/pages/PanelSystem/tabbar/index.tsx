@@ -68,12 +68,14 @@ const Page: React.FC = () => {
   const TabBarComp = tabBarMap[config.tabStyle];
 
   return (
-    <DemoPage title="PanelSystem / TabBar" padding="1.5rem" maxWidth={960}>
+    <DemoPage title="PanelSystem / TabBar" padding="var(--rpl-demo-space-lg)" maxWidth={960}>
       <TabbarConfigControls
         tabStyle={config.tabStyle}
         setTabStyle={config.setTabStyle}
         addPlacement={config.addPlacement}
         setAddPlacement={config.setAddPlacement}
+        doubleClickToAdd={config.doubleClickToAdd}
+        setDoubleClickToAdd={config.setDoubleClickToAdd}
         useCustomButtons={config.useCustomButtons}
         setUseCustomButtons={config.setUseCustomButtons}
       />
