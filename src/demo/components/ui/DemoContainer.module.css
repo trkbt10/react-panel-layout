@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  height: 300px;
+  border: 1px solid var(--rpl-demo-sidebar-border);
+  border-radius: var(--rpl-demo-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--rpl-demo-shadow-md);
+  background: #fff;
+}
+
+.tall {
+  height: 400px;
+}
+
+.medium {
+  height: 350px;
+}

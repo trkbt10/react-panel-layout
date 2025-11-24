@@ -1,0 +1,18 @@
+.text {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  line-height: 1.5;
+}
+
+.default {
+  color: var(--rpl-demo-text-secondary);
+}
+
+.info {
+  color: var(--rpl-demo-text-secondary);
+  font-size: var(--rpl-demo-font-size-sm);
+}
+
+.muted {
+  color: var(--rpl-demo-text-tertiary);
+}

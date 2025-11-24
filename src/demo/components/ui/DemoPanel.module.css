@@ -1,0 +1,23 @@
+.panel {
+  padding: var(--rpl-demo-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rpl-demo-space-sm);
+}
+
+.flex {
+  flex: 1;
+}
+
+.default {
+  background: #fff;
+}
+
+.secondary {
+  background: var(--rpl-demo-surface-secondary);
+}
+
+.main {
+  background: #fff;
+  overflow: auto;
+}

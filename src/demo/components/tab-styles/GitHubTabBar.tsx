@@ -9,13 +9,12 @@ import { usePanelInteractions } from "../../../modules/panels/interactions/Inter
 
 export const GitHubTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef, onAddTab, onCloseTab, doubleClickToAdd }) => {
   const { isTabDragging, draggingTabId } = usePanelInteractions();
-  const { addPlacement, doubleClickToAdd: configDoubleClick, AddButton, CloseButton } = useDemoTabbarConfig();
-  const enableDoubleClick = doubleClickToAdd ?? configDoubleClick;
+  const { addPlacement, AddButton, CloseButton } = useDemoTabbarConfig();
   const handleTabbarDoubleClick = React.useCallback((): void => {
-    if (enableDoubleClick && onAddTab) {
+    if (doubleClickToAdd && onAddTab) {
       onAddTab(group.id);
     }
-  }, [enableDoubleClick, onAddTab, group.id]);
+  }, [doubleClickToAdd, onAddTab, group.id]);
   const renderAddButton = (): React.ReactNode => {
     if (!onAddTab) {
       return null;

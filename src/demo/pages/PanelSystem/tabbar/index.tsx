@@ -117,7 +117,7 @@ const Page: React.FC = () => {
                 });
               }}
             >
-              <TabBarComp group={group} onClickTab={onClickTab} onAddTab={handleAddTab} onCloseTab={handleCloseTab} />
+              <TabBarComp group={group} onClickTab={onClickTab} onAddTab={handleAddTab} onCloseTab={handleCloseTab} doubleClickToAdd={config.doubleClickToAdd} />
             </InteractionsProvider>
           </DomRegistryProvider>
         </DemoTabbarConfigProvider>
