@@ -1,20 +1,3 @@
-.container {
-  padding: var(--rpl-demo-space-lg);
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.pageTitle {
-  margin-bottom: var(--rpl-demo-space-xl);
-  font-size: var(--rpl-demo-font-size-xl);
-  font-weight: 700;
-  background: var(--rpl-demo-gradient-text);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-}
-
 .demoContainer {
   display: flex;
   height: 300px;
@@ -29,47 +12,6 @@
   height: 400px;
 }
 
-.demoContainerMedium {
-  height: 350px;
-}
-
-.leftPanel {
-  background: var(--rpl-demo-surface-secondary);
-  padding: var(--rpl-demo-space-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--rpl-demo-space-sm);
-}
-
-.rightPanel {
-  flex: 1;
-  background: #fff;
-  padding: var(--rpl-demo-space-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--rpl-demo-space-sm);
-}
-
-.panelTitle {
-  margin: 0;
-  font-size: var(--rpl-demo-font-size-md);
-  font-weight: 600;
-  color: var(--rpl-demo-text-primary);
-}
-
-.panelInfo {
-  margin: 0;
-  font-size: var(--rpl-demo-font-size-sm);
-  color: var(--rpl-demo-text-secondary);
-}
-
-.panelText {
-  margin: 0;
-  font-size: var(--rpl-demo-font-size-sm);
-  color: var(--rpl-demo-text-secondary);
-  line-height: 1.5;
-}
-
 .sidebarPanel {
   background: var(--rpl-demo-surface-secondary);
   padding: var(--rpl-demo-space-lg);
@@ -80,6 +22,12 @@
   margin-top: 0;
   font-size: var(--rpl-demo-font-size-md);
   font-weight: 600;
+}
+
+.panelInfo {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  color: var(--rpl-demo-text-secondary);
 }
 
 .sidebarNav {
@@ -161,41 +109,4 @@
   margin: 0;
   font-size: var(--rpl-demo-font-size-sm);
   color: var(--rpl-demo-text-secondary);
-}
-
-.centerPanel {
-  flex: 1;
-  background: #fff;
-  padding: var(--rpl-demo-space-lg);
-  overflow: auto;
-}
-
-.centerTitle {
-  margin-top: 0;
-  font-size: var(--rpl-demo-font-size-md);
-  font-weight: 600;
-}
-
-.resetButtons {
-  margin-bottom: var(--rpl-demo-space-lg);
-  display: flex;
-  gap: var(--rpl-demo-space-sm);
-}
-
-.resetButton {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  background: var(--rpl-demo-accent);
-  color: var(--rpl-demo-accent-contrast);
-  border: none;
-  border-radius: var(--rpl-demo-radius-md);
-  font-size: var(--rpl-demo-font-size-sm);
-  font-weight: 600;
-  transition: transform 0.2s ease;
-  box-shadow: var(--rpl-demo-shadow-sm);
-}
-
-.resetButton:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--rpl-demo-shadow-md);
 }

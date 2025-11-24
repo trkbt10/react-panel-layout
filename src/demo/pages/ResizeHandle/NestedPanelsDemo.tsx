@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { ResizeHandle } from "../../../components/resizer/ResizeHandle";
-import styles from "./samples.module.css";
+import styles from "./NestedPanelsDemo.module.css";
 
 export const NestedPanelsDemo: React.FC = () => {
   const [panelWidth, setPanelWidth] = React.useState(300);

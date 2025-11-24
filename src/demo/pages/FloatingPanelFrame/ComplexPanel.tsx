@@ -10,7 +10,7 @@ import {
   FloatingPanelControls,
   FloatingPanelContent,
 } from "../../../components/paneling/FloatingPanelFrame";
-import styles from "./samples.module.css";
+import styles from "./ComplexPanel.module.css";
 
 import { DemoButton } from "../../components/ui/DemoButton";
 

@@ -1,0 +1,61 @@
+.demoContainerVertical {
+  border: 1px solid var(--rpl-demo-sidebar-border);
+  border-radius: var(--rpl-demo-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--rpl-demo-shadow-md);
+  background: #fff;
+}
+
+.horizontalHandleWrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.resizablePanelAlt {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: var(--rpl-demo-space-lg);
+  padding-top: var(--rpl-demo-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rpl-demo-space-sm);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-md);
+  font-weight: 600;
+}
+
+.panelInfo {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  opacity: 0.9;
+}
+
+.panelText {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.staticPanelMinHeight {
+  background: #fff;
+  padding: var(--rpl-demo-space-lg);
+  min-height: 100px;
+}
+
+.staticPanelTitle {
+  margin-top: 0;
+  font-size: var(--rpl-demo-font-size-md);
+  font-weight: 600;
+  color: var(--rpl-demo-text-primary);
+}

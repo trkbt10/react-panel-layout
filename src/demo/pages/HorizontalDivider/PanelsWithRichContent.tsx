@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { HorizontalDivider } from "../../../components/resizer/HorizontalDivider";
-import styles from "./samples.module.css";
+import styles from "./PanelsWithRichContent.module.css";
 
 export const PanelsWithRichContent: React.FC = () => {
   const [leftWidth, setLeftWidth] = React.useState(300);

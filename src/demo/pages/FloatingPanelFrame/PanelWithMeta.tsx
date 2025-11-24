@@ -9,7 +9,7 @@ import {
   FloatingPanelMeta,
   FloatingPanelContent,
 } from "../../../components/paneling/FloatingPanelFrame";
-import styles from "./samples.module.css";
+import styles from "./PanelWithMeta.module.css";
 
 export const PanelWithMeta = () => (
   <FloatingPanelFrame

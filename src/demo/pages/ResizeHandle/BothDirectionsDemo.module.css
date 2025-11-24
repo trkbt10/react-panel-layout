@@ -1,0 +1,72 @@
+.demoContainerInline {
+  display: inline-block;
+  position: relative;
+  border: 1px solid var(--rpl-demo-sidebar-border);
+  border-radius: var(--rpl-demo-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--rpl-demo-shadow-md);
+  background: #fff;
+}
+
+.verticalHandleWrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.horizontalHandleWrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.resizableBox {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  padding: var(--rpl-demo-space-lg);
+  padding-left: var(--rpl-demo-space-xl);
+  padding-top: var(--rpl-demo-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rpl-demo-space-sm);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-md);
+  font-weight: 600;
+}
+
+.panelInfo {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  opacity: 0.9;
+}
+
+.panelText {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.sizeInfo {
+  margin-top: var(--rpl-demo-space-md);
+}
+
+.sizeInfoText {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}

@@ -1,0 +1,46 @@
+.demoContainer {
+  display: flex;
+  height: 300px;
+  border: 1px solid var(--rpl-demo-sidebar-border);
+  border-radius: var(--rpl-demo-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--rpl-demo-shadow-md);
+  background: #fff;
+}
+
+.leftPanel {
+  background: var(--rpl-demo-surface-secondary);
+  padding: var(--rpl-demo-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rpl-demo-space-sm);
+}
+
+.rightPanel {
+  flex: 1;
+  background: #fff;
+  padding: var(--rpl-demo-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rpl-demo-space-sm);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-md);
+  font-weight: 600;
+  color: var(--rpl-demo-text-primary);
+}
+
+.panelInfo {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  color: var(--rpl-demo-text-secondary);
+}
+
+.panelText {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  color: var(--rpl-demo-text-secondary);
+  line-height: 1.5;
+}

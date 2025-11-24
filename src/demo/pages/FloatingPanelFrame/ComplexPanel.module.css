@@ -1,41 +1,3 @@
-.panelContainer {
-  width: 400px;
-  max-width: 100%;
-}
-
-.panelContainerLarge {
-  width: 500px;
-  max-width: 100%;
-}
-
-.settingsContent {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.notificationItem {
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-
-.notificationItemBlue {
-  background: #e3f2fd;
-}
-
-.notificationItemPurple {
-  background: #f3e5f5;
-}
-
-.notificationTitle {
-  font-weight: bold;
-}
-
-.notificationText {
-  margin: 0.25rem 0 0;
-  font-size: 0.875rem;
-}
-
 .profileContent {
   display: flex;
   flex-direction: column;
@@ -89,16 +51,4 @@
 .profileStatLabel {
   font-size: 0.75rem;
   color: #666;
-}
-
-.articleContent {
-  overflow: auto;
-}
-
-.articleContent h3 {
-  margin-top: 0;
-}
-
-.articleContent p {
-  line-height: 1.6;
 }

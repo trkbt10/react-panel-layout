@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { ResizeHandle } from "../../../components/resizer/ResizeHandle";
-import styles from "./samples.module.css";
+import styles from "./BothDirectionsDemo.module.css";
 
 export const BothDirectionsDemo: React.FC = () => {
   const [boxWidth, setBoxWidth] = React.useState(400);

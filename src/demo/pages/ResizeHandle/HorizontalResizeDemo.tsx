@@ -3,7 +3,7 @@
  */
 import * as React from "react";
 import { ResizeHandle } from "../../../components/resizer/ResizeHandle";
-import styles from "./samples.module.css";
+import styles from "./HorizontalResizeDemo.module.css";
 
 export const HorizontalResizeDemo: React.FC = () => {
   const [panelHeight, setPanelHeight] = React.useState(200);

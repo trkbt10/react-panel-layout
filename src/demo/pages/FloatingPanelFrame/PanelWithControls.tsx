@@ -9,7 +9,7 @@ import {
   FloatingPanelControls,
   FloatingPanelContent,
 } from "../../../components/paneling/FloatingPanelFrame";
-import styles from "./samples.module.css";
+import styles from "./PanelWithControls.module.css";
 
 export const PanelWithControls: React.FC<{ onClose?: () => void }> = ({ onClose }) => (
   <FloatingPanelFrame

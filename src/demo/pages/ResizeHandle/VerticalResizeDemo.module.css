@@ -1,0 +1,68 @@
+.demoContainer {
+  display: flex;
+  height: 300px;
+  border: 1px solid var(--rpl-demo-sidebar-border);
+  border-radius: var(--rpl-demo-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--rpl-demo-shadow-md);
+  background: #fff;
+}
+
+.resizeWrapper {
+  position: relative;
+  display: flex;
+}
+
+.verticalHandleWrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.resizablePanel {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: var(--rpl-demo-space-lg);
+  padding-left: var(--rpl-demo-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rpl-demo-space-sm);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-md);
+  font-weight: 600;
+}
+
+.panelInfo {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  opacity: 0.9;
+}
+
+.panelText {
+  margin: 0;
+  font-size: var(--rpl-demo-font-size-sm);
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.staticPanel {
+  flex: 1;
+  background: #fff;
+  padding: var(--rpl-demo-space-lg);
+}
+
+.staticPanelTitle {
+  margin-top: 0;
+  font-size: var(--rpl-demo-font-size-md);
+  font-weight: 600;
+  color: var(--rpl-demo-text-primary);
+}

@@ -10,7 +10,6 @@ export type AddButtonPlacement = "trailing" | "after-active" | "after-tabs";
 export type DemoTabbarConfig = {
   tabStyle: TabStyle;
   addPlacement: AddButtonPlacement;
-  doubleClickToAdd: boolean;
   AddButton?: React.ComponentType<{ onClick: () => void; ariaLabel?: string; className?: string }>;
   CloseButton?: React.ComponentType<{ onClick: (e: React.MouseEvent) => void; ariaLabel?: string; className?: string }>;
 };
@@ -18,7 +17,6 @@ export type DemoTabbarConfig = {
 const defaultConfig: DemoTabbarConfig = {
   tabStyle: "vscode",
   addPlacement: "trailing",
-  doubleClickToAdd: true,
 };
 
 const Ctx = React.createContext<DemoTabbarConfig>(defaultConfig);
@@ -85,8 +83,8 @@ export const useTabbarConfigState = (): {
   }, [useCustomButtons]);
 
   const configValue = React.useMemo<DemoTabbarConfig>(
-    () => ({ tabStyle, addPlacement, doubleClickToAdd, AddButton, CloseButton }),
-    [tabStyle, addPlacement, doubleClickToAdd, AddButton, CloseButton],
+    () => ({ tabStyle, addPlacement, AddButton, CloseButton }),
+    [tabStyle, addPlacement, AddButton, CloseButton],
   );
 
   return {

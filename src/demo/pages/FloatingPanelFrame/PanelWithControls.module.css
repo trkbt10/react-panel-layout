@@ -1,0 +1,21 @@
+.notificationItem {
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.notificationItemBlue {
+  background: #e3f2fd;
+}
+
+.notificationItemPurple {
+  background: #f3e5f5;
+}
+
+.notificationTitle {
+  font-weight: bold;
+}
+
+.notificationText {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+}
