@@ -695,7 +695,7 @@ describe("GridLayout", () => {
     });
   });
 
-  it("updates the width of the trailing column when dragging the second vertical handle to the left", async () => {
+  it("moves a start-aligned trailing column handle with the pointer direction", async () => {
     const resizableConfig: PanelLayoutConfig = {
       areas: [["left", "middle", "right"]],
       columns: [
@@ -739,11 +739,19 @@ describe("GridLayout", () => {
 
     await act(async () => {
       document.dispatchEvent(
-        new window.PointerEvent("pointermove", { clientX: -40, clientY: 0, bubbles: true, pointerId: 2 }),
+        new window.PointerEvent("pointermove", { clientX: 40, clientY: 0, bubbles: true, pointerId: 2 }),
       );
     });
 
     expect(gridElement.style.gridTemplateColumns).toBe("250px 1fr 260px");
+
+    await act(async () => {
+      document.dispatchEvent(
+        new window.PointerEvent("pointermove", { clientX: 0, clientY: 0, bubbles: true, pointerId: 2 }),
+      );
+    });
+
+    expect(gridElement.style.gridTemplateColumns).toBe("250px 1fr 300px");
 
     await act(async () => {
       document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, pointerId: 2 }));

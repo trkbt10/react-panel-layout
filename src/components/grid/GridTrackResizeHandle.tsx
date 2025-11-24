@@ -33,9 +33,10 @@ export const GridTrackResizeHandle: React.FC<GridTrackResizeHandleProps> = ({
 
   const handleResize = React.useCallback(
     (delta: number) => {
-      onResize(direction, trackIndex, delta);
+      const signedDelta = align === "start" ? -delta : delta;
+      onResize(direction, trackIndex, signedDelta);
     },
-    [direction, trackIndex, onResize],
+    [align, direction, trackIndex, onResize],
   );
 
   const placementStyle = React.useMemo<React.CSSProperties>(() => {
