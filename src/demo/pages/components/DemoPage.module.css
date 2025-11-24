@@ -1,6 +1,8 @@
 .page {
   width: 100%;
   box-sizing: border-box;
+  font-family: var(--rpl-demo-font-family);
+  color: var(--rpl-demo-text-primary);
 }
 
 .fullHeight {
@@ -14,7 +16,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--rpl-demo-space-lg);
   min-height: 0;
   flex: 1;
 }
@@ -22,25 +24,34 @@
 .header {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--rpl-demo-space-sm);
+  margin-bottom: var(--rpl-demo-space-md);
 }
 
 .title {
   margin: 0;
-  font-size: 2rem;
+  font-size: var(--rpl-demo-font-size-xl);
   font-weight: 700;
+  letter-spacing: -0.02em;
+  background: var(--rpl-demo-gradient-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  width: fit-content;
 }
 
 .intro {
-  color: #4a5568;
-  font-size: 1rem;
+  color: var(--rpl-demo-text-secondary);
+  font-size: var(--rpl-demo-font-size-md);
   line-height: 1.6;
+  max-width: 800px;
 }
 
 .body {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--rpl-demo-space-xl);
 }
 
 .bodyStretch {

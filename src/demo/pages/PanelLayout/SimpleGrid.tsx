@@ -12,7 +12,7 @@ const GridCell: React.FC<{ title: string; color: string }> = ({ title, color }) 
         width: "100%",
         height: "100%",
         backgroundColor: color,
-        padding: "1.5rem",
+        padding: "var(--rpl-demo-space-lg)",
         boxSizing: "border-box",
         display: "flex",
         alignItems: "center",
@@ -21,6 +21,8 @@ const GridCell: React.FC<{ title: string; color: string }> = ({ title, color }) 
         fontWeight: 600,
         color: "#fff",
         textShadow: "0 2px 4px rgba(0,0,0,0.2)",
+        borderRadius: "var(--rpl-demo-radius-md)",
+        boxShadow: "var(--rpl-demo-shadow-sm)",
       }}
     >
       {title}

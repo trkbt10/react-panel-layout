@@ -12,7 +12,17 @@ import {
 import styles from "./samples.module.css";
 
 export const ScrollablePanel: React.FC<{ onClose?: () => void }> = ({ onClose }) => (
-  <FloatingPanelFrame style={{ width: "400px", maxWidth: "100%", maxHeight: "400px" }}>
+  <FloatingPanelFrame
+    style={{
+      width: "400px",
+      maxWidth: "100%",
+      maxHeight: "400px",
+      boxShadow: "var(--rpl-demo-shadow-lg)",
+      borderRadius: "var(--rpl-demo-radius-lg)",
+      border: "1px solid var(--rpl-demo-sidebar-border)",
+      background: "#fff",
+    }}
+  >
     <FloatingPanelHeader>
       <FloatingPanelTitle>Long Article</FloatingPanelTitle>
       <FloatingPanelControls>
@@ -24,6 +34,7 @@ export const ScrollablePanel: React.FC<{ onClose?: () => void }> = ({ onClose })
             cursor: "pointer",
             fontSize: "1.25rem",
             padding: "0.25rem 0.5rem",
+            color: "var(--rpl-demo-text-secondary)",
           }}
         >
           ×

@@ -26,7 +26,9 @@ import PL_Overlays from "./pages/PanelLayout/draggable-overlays";
 
 import PS_Preview from "./pages/PanelSystem/preview";
 import PS_Tabbar from "./pages/PanelSystem/tabbar";
-import RFP_Edge from "./pages/ResizableFloatingPanels/edge-resize";
+import { ResizableFloatingPanelsPreview } from "./pages/ResizableFloatingPanelsPreview";
+
+import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu } from "react-icons/fi";
 
 export type DemoPage = {
   id: string;
@@ -38,7 +40,7 @@ export type DemoPage = {
 export type DemoCategory = {
   id: string;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   base: string; // base route path
   pages: DemoPage[];
 };
@@ -47,7 +49,7 @@ export const demoCategories: DemoCategory[] = [
   {
     id: "panel-layout",
     label: "PanelLayout",
-    icon: "📐",
+    icon: <FiGrid />,
     base: "/components/panel-layout",
     pages: [
       { id: "simple-grid", label: "Simple Grid", path: "simple-grid", element: <PL_SimpleGrid /> },
@@ -59,7 +61,7 @@ export const demoCategories: DemoCategory[] = [
   {
     id: "floating-panel-frame",
     label: "FloatingPanelFrame",
-    icon: "🧩",
+    icon: <FiLayers />,
     base: "/components/floating-panel-frame",
     pages: [
       { id: "basic", label: "Basic", path: "basic", element: <FP_Basic /> },
@@ -72,7 +74,7 @@ export const demoCategories: DemoCategory[] = [
   {
     id: "horizontal-divider",
     label: "HorizontalDivider",
-    icon: "↔️",
+    icon: <FiColumns />,
     base: "/components/horizontal-divider",
     pages: [
       { id: "simple", label: "Simple", path: "simple-resizable-panels", element: <HD_Simple /> },
@@ -83,7 +85,7 @@ export const demoCategories: DemoCategory[] = [
   {
     id: "resize-handle",
     label: "ResizeHandle",
-    icon: "🛠️",
+    icon: <FiMaximize2 />,
     base: "/components/resize-handle",
     pages: [
       { id: "vertical", label: "Vertical", path: "vertical", element: <RH_Vertical /> },
@@ -95,16 +97,16 @@ export const demoCategories: DemoCategory[] = [
   {
     id: "resizable-floating-panels",
     label: "Resizable Floating Panels",
-    icon: "🗂️",
+    icon: <FiBox />,
     base: "/components/resizable-floating-panels",
     pages: [
-      { id: "edge-resize", label: "Edge Resize", path: "edge-resize", element: <RFP_Edge /> },
+      { id: "edge-resize", label: "Edge Resize", path: "edge-resize", element: <ResizableFloatingPanelsPreview /> },
     ],
   },
   {
     id: "panel-system",
     label: "PanelSystem",
-    icon: "🧭",
+    icon: <FiCpu />,
     base: "/components/panel-system",
     pages: [
       { id: "preview", label: "Preview", path: "preview", element: <PS_Preview /> },

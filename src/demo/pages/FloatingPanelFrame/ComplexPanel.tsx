@@ -12,26 +12,28 @@ import {
 } from "../../../components/paneling/FloatingPanelFrame";
 import styles from "./samples.module.css";
 
+import { DemoButton } from "../../components/ui/DemoButton";
+
 export const ComplexPanel: React.FC<{ onClose?: () => void }> = ({ onClose }) => (
-  <FloatingPanelFrame style={{ width: "500px", maxWidth: "100%" }}>
+  <FloatingPanelFrame
+    style={{
+      width: "500px",
+      maxWidth: "100%",
+      boxShadow: "var(--rpl-demo-shadow-lg)",
+      borderRadius: "var(--rpl-demo-radius-lg)",
+      border: "1px solid var(--rpl-demo-sidebar-border)",
+      background: "#fff",
+    }}
+  >
     <FloatingPanelHeader>
       <div style={{ flex: 1 }}>
         <FloatingPanelTitle>User Profile</FloatingPanelTitle>
         <FloatingPanelMeta>ID: 12345 • Online</FloatingPanelMeta>
       </div>
       <FloatingPanelControls>
-        <button
-          style={{
-            background: "transparent",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            padding: "0.25rem 0.75rem",
-            marginRight: "0.5rem",
-            cursor: "pointer",
-          }}
-        >
+        <DemoButton variant="outline" size="sm" style={{ marginRight: "0.5rem" }}>
           Edit
-        </button>
+        </DemoButton>
         <button
           onClick={onClose}
           style={{
@@ -40,6 +42,7 @@ export const ComplexPanel: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
             cursor: "pointer",
             fontSize: "1.25rem",
             padding: "0.25rem 0.5rem",
+            color: "var(--rpl-demo-text-secondary)",
           }}
         >
           ×

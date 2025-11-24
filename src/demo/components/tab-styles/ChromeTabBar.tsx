@@ -1,13 +1,13 @@
 /**
- * @file VSCode-style tab bar component (demo only)
+ * @file Chrome-style tab bar component (demo only)
  */
 import * as React from "react";
-import styles from "./VSCodeTabBar.module.css";
-import type { TabBarRenderProps } from "../../modules/panels/state/types";
-import { useDemoTabbarConfig } from "../contexts/TabbarDemoConfig";
-import { usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
+import styles from "./ChromeTabBar.module.css";
+import type { TabBarRenderProps } from "../../../modules/panels/state/types";
+import { useDemoTabbarConfig } from "../../contexts/TabbarDemoConfig";
+import { usePanelInteractions } from "../../../modules/panels/interactions/InteractionsContext";
 
-export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef, onAddTab, onCloseTab }) => {
+export const ChromeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef, onAddTab, onCloseTab }) => {
   const { isTabDragging, draggingTabId } = usePanelInteractions();
   const { addPlacement, AddButton, CloseButton } = useDemoTabbarConfig();
   const renderAddButton = (): React.ReactNode => {
@@ -95,13 +95,18 @@ export const VSCodeTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
             data-tab-id={tab.id}
           >
             <span className={styles.tabTitle}>{tab.title}</span>
-            <React.Activity mode={onCloseTab ? "visible" : "hidden"}>{renderCloseButton(tab.title, tab.id)}</React.Activity>
+            <React.Activity mode={onCloseTab ? "visible" : "hidden"}>
+              {renderCloseButton(tab.title, tab.id)}
+            </React.Activity>
           </div>
         );
         if (addPlacement === "after-active" && active) {
           items.push(<span key={`add-after-${tab.id}`}>{renderAddButton()}</span>);
         }
       });
+    if (addPlacement === "after-tabs") {
+      items.push(<span key="add-after-tabs">{renderAddButton()}</span>);
+    }
     return items;
   }
 };

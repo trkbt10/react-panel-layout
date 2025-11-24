@@ -3,9 +3,9 @@
  */
 import * as React from "react";
 import styles from "./GitHubTabBar.module.css";
-import type { TabBarRenderProps } from "../../modules/panels/state/types";
-import { useDemoTabbarConfig } from "../contexts/TabbarDemoConfig";
-import { usePanelInteractions } from "../../modules/panels/interactions/InteractionsContext";
+import type { TabBarRenderProps } from "../../../modules/panels/state/types";
+import { useDemoTabbarConfig } from "../../contexts/TabbarDemoConfig";
+import { usePanelInteractions } from "../../../modules/panels/interactions/InteractionsContext";
 
 export const GitHubTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, onStartDrag, rootRef, onAddTab, onCloseTab }) => {
   const { isTabDragging, draggingTabId } = usePanelInteractions();
@@ -102,6 +102,9 @@ export const GitHubTabBar: React.FC<TabBarRenderProps> = ({ group, onClickTab, o
           items.push(<span key={`add-after-${tab.id}`}>{renderAddButton()}</span>);
         }
       });
+    if (addPlacement === "after-tabs") {
+      items.push(<span key="add-after-tabs">{renderAddButton()}</span>);
+    }
     return items;
   }
 };

@@ -5,27 +5,29 @@ import * as React from "react";
 import { GridLayout } from "../../../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../types";
 
+import { DemoButton } from "../../components/ui/DemoButton";
+import { DemoCard } from "../../components/ui/DemoCard";
+
 const DraggablePanel: React.FC<{ title: string; color: string; children?: React.ReactNode }> = ({
   title,
   color,
   children,
 }) => {
   return (
-    <div
+    <DemoCard
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: "#fff",
-        borderRadius: "8px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        padding: 0,
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        boxShadow: "var(--rpl-demo-shadow-lg)",
       }}
     >
       <div
         style={{
-          padding: "1rem",
+          padding: "var(--rpl-demo-space-md)",
           backgroundColor: color,
           color: "#fff",
           fontWeight: 600,
@@ -35,10 +37,10 @@ const DraggablePanel: React.FC<{ title: string; color: string; children?: React.
       >
         {title}
       </div>
-      <div style={{ flex: 1, padding: "1rem", overflow: "auto" }}>
-        {children ? children : <p style={{ margin: 0, color: "#666" }}>Drag the header to move this panel</p>}
+      <div style={{ flex: 1, padding: "var(--rpl-demo-space-md)", overflow: "auto" }}>
+        {children ? children : <p style={{ margin: 0, color: "var(--rpl-demo-text-secondary)" }}>Drag the header to move this panel</p>}
       </div>
-    </div>
+    </DemoCard>
   );
 };
 
@@ -81,9 +83,9 @@ export const DraggableOverlays = () => {
       component: (
         <DraggablePanel title="🔧 Tools" color="#3498db">
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <button style={{ padding: "0.5rem", cursor: "pointer" }}>✏️ Pen</button>
-            <button style={{ padding: "0.5rem", cursor: "pointer" }}>🖌️ Brush</button>
-            <button style={{ padding: "0.5rem", cursor: "pointer" }}>⬜ Shape</button>
+            <DemoButton variant="secondary" size="sm">✏️ Pen</DemoButton>
+            <DemoButton variant="secondary" size="sm">🖌️ Brush</DemoButton>
+            <DemoButton variant="secondary" size="sm">⬜ Shape</DemoButton>
           </div>
         </DraggablePanel>
       ),

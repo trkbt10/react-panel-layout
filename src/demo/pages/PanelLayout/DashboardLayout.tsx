@@ -5,6 +5,8 @@ import * as React from "react";
 import { GridLayout } from "../../../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../../../types";
 
+import { DemoCard } from "../../components/ui/DemoCard";
+
 const DashboardCard: React.FC<{ title: string; value: string; icon: string; color: string }> = ({
   title,
   value,
@@ -12,59 +14,51 @@ const DashboardCard: React.FC<{ title: string; value: string; icon: string; colo
   color,
 }) => {
   return (
-    <div
+    <DemoCard
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: "#fff",
-        padding: "1.5rem",
-        boxSizing: "border-box",
-        borderRadius: "8px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
+        padding: "var(--rpl-demo-space-lg)",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
-          <div style={{ fontSize: "0.875rem", color: "#666", marginBottom: "0.5rem" }}>{title}</div>
+          <div style={{ fontSize: "0.875rem", color: "var(--rpl-demo-text-secondary)", marginBottom: "0.5rem" }}>{title}</div>
           <div style={{ fontSize: "2rem", fontWeight: 700, color }}>{value}</div>
         </div>
         <div style={{ fontSize: "2rem", opacity: 0.3 }}>{icon}</div>
       </div>
-    </div>
+    </DemoCard>
   );
 };
 
 const ChartCard: React.FC<{ title: string }> = ({ title }) => {
   return (
-    <div
+    <DemoCard
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: "#fff",
-        padding: "1.5rem",
-        boxSizing: "border-box",
-        borderRadius: "8px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        padding: "var(--rpl-demo-space-lg)",
       }}
     >
       <h3 style={{ margin: "0 0 1rem 0", fontSize: "1rem", fontWeight: 600 }}>{title}</h3>
       <div
         style={{
           height: "calc(100% - 2rem)",
-          backgroundColor: "#f8f9fa",
-          borderRadius: "4px",
+          backgroundColor: "var(--rpl-demo-surface-secondary)",
+          borderRadius: "var(--rpl-demo-radius-sm)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "#999",
+          color: "var(--rpl-demo-text-tertiary)",
         }}
       >
         Chart Area
       </div>
-    </div>
+    </DemoCard>
   );
 };
 

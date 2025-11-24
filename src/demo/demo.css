@@ -3,43 +3,88 @@
  */
 
 :root {
-  /* Demo-specific variables (using rpl prefix) */
+  /* Modern LP / Bento Design Tokens */
+
+  /* Colors & Gradients */
   --rpl-demo-bg: #ffffff;
-  --rpl-demo-control-background: rgba(255, 255, 255, 0.9);
-  --rpl-demo-control-background-secondary: rgba(0, 0, 0, 0.05);
-  --rpl-demo-input-border: 1px solid rgba(0, 0, 0, 0.1);
-  --rpl-demo-radius-sm: 4px;
-  --rpl-demo-radius-md: 8px;
-  --rpl-demo-radius-xs: 2px;
-  --rpl-demo-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --rpl-demo-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --rpl-demo-sidebar-bg: #ffffff;
+  /* Reverted to white */
+  --rpl-demo-sidebar-border: rgba(0, 0, 0, 0.06);
+
+  --rpl-demo-text-primary: #000000;
+  --rpl-demo-text-secondary: #666666;
+  --rpl-demo-text-tertiary: #999999;
+
+  --rpl-demo-accent: #000000;
+  /* Bold black for primary actions */
+  --rpl-demo-accent-hover: #333333;
+  --rpl-demo-accent-contrast: #ffffff;
+
+  --rpl-demo-gradient-hero: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #F5F5F7 100%);
+  --rpl-demo-gradient-text: linear-gradient(135deg, #000000 0%, #444444 100%);
+  --rpl-demo-gradient-glow: radial-gradient(circle at 50% 50%, rgba(0, 113, 227, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+
+  --rpl-demo-control-bg: rgba(0, 0, 0, 0.04);
+  --rpl-demo-control-bg-hover: rgba(0, 0, 0, 0.08);
+  --rpl-demo-control-bg-active: rgba(0, 0, 0, 0.12);
+
+  /* Typography */
+  --rpl-demo-font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --rpl-demo-font-size-xs: 12px;
+  --rpl-demo-font-size-sm: 14px;
+  --rpl-demo-font-size-md: 16px;
+  --rpl-demo-font-size-lg: 20px;
+  --rpl-demo-font-size-xl: 24px;
+  --rpl-demo-font-size-display: 56px;
+  --rpl-demo-font-size-display-sm: 40px;
+
+  /* Spacing & Layout */
+  --rpl-demo-radius-sm: 8px;
+  --rpl-demo-radius-md: 12px;
+  --rpl-demo-radius-lg: 24px;
+  --rpl-demo-radius-xl: 32px;
+
+  --rpl-demo-space-xs: 4px;
   --rpl-demo-space-sm: 8px;
   --rpl-demo-space-md: 16px;
   --rpl-demo-space-lg: 24px;
-  --rpl-demo-font-size-xs: 12px;
-  --rpl-demo-font-size-lg: 18px;
-  --rpl-demo-text-color: #000;
-  --rpl-demo-text-secondary: #666;
-  --rpl-demo-secondary-label-color: #666;
-  --rpl-demo-header-text-color: #000;
-  --rpl-demo-border-color: rgba(0, 0, 0, 0.1);
+  --rpl-demo-space-xl: 48px;
+  --rpl-demo-space-xxl: 80px;
+
+  /* Shadows */
+  --rpl-demo-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+  --rpl-demo-shadow-md: 0 8px 16px rgba(0, 0, 0, 0.04);
+  --rpl-demo-shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.08);
+  --rpl-demo-shadow-hero: 0 40px 80px rgba(0, 0, 0, 0.12);
+
+  /* Transitions */
+  --rpl-demo-transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Apple-like springy ease */
+
+  /* Legacy/Compat variables */
+  --rpl-demo-control-background: var(--rpl-demo-control-bg);
+  --rpl-demo-control-background-secondary: rgba(0, 0, 0, 0.03);
+  --rpl-demo-input-border: 1px solid rgba(0, 0, 0, 0.1);
+  --rpl-demo-text-color: var(--rpl-demo-text-primary);
+  --rpl-demo-header-text-color: var(--rpl-demo-text-primary);
+  --rpl-demo-border-color: var(--rpl-demo-sidebar-border);
   --rpl-demo-border-width: 1px;
-  --rpl-demo-surface-secondary: rgba(0, 0, 0, 0.03);
-  --rpl-demo-title-font: 600 14px sans-serif;
+  --rpl-demo-surface-secondary: #f5f5f7;
+  --rpl-demo-title-font: 600 14px var(--rpl-demo-font-family);
   --rpl-demo-control-button-size: 32px;
-  --rpl-demo-hover-background: rgba(0, 0, 0, 0.05);
-  --rpl-demo-transition-duration: 200ms;
-  --rpl-demo-card-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --rpl-demo-card-hover-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --rpl-demo-color-primary: #2196f3;
+  --rpl-demo-hover-background: var(--rpl-demo-control-bg-hover);
+  --rpl-demo-transition-duration: 400ms;
+  --rpl-demo-card-box-shadow: var(--rpl-demo-shadow-sm);
+  --rpl-demo-card-hover-box-shadow: var(--rpl-demo-shadow-md);
+  --rpl-demo-color-primary: #0071e3;
+  /* Keep blue for functional UI elements */
 
   /* Panel split drop suggestion colors */
-  --rpl-color-drop-suggest-border: rgba(33, 150, 243, 0.9);
-  --rpl-color-drop-suggest-bg: rgba(33, 150, 243, 0.15);
+  --rpl-color-drop-suggest-border: #0071e3;
+  --rpl-color-drop-suggest-bg: rgba(0, 113, 227, 0.1);
 
-  /* Resize/Divider colors for demo visibility */
-  --rpl-color-resize-handle-idle: rgba(0, 0, 0, 0.12);
-  /* keep hover/active as defaults from library unless overridden here */
+  /* Resize/Divider colors */
+  --rpl-color-resize-handle-idle: rgba(0, 0, 0, 0.08);
 }
 
 * {

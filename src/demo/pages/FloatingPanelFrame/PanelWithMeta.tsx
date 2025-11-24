@@ -12,7 +12,16 @@ import {
 import styles from "./samples.module.css";
 
 export const PanelWithMeta = () => (
-  <FloatingPanelFrame style={{ width: "400px", maxWidth: "100%" }}>
+  <FloatingPanelFrame
+    style={{
+      width: "400px",
+      maxWidth: "100%",
+      boxShadow: "var(--rpl-demo-shadow-lg)",
+      borderRadius: "var(--rpl-demo-radius-lg)",
+      border: "1px solid var(--rpl-demo-sidebar-border)",
+      background: "#fff",
+    }}
+  >
     <FloatingPanelHeader>
       <FloatingPanelTitle>Settings</FloatingPanelTitle>
       <FloatingPanelMeta>Last updated: 2 minutes ago</FloatingPanelMeta>

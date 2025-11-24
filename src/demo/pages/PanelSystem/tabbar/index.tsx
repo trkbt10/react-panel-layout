@@ -2,11 +2,23 @@
  * @file PanelSystem - TabBar only page
  */
 import * as React from "react";
-import type { GroupModel, GroupId, PanelId } from "../../../../modules/panels/state/types";
-import { TabBar } from "../../../../components/tabs/TabBar";
+import type { GroupModel, GroupId, PanelId, TabBarRenderProps } from "../../../../modules/panels/state/types";
 import { InteractionsProvider } from "../../../../modules/panels/interactions/InteractionsContext";
 import { DomRegistryProvider } from "../../../../modules/panels/dom/DomRegistry";
 import { DemoPage } from "../../components";
+import { ChromeTabBar, VSCodeTabBar, GitHubTabBar } from "../../../components/tab-styles";
+import {
+  DemoTabbarConfigProvider,
+  useTabbarConfigState,
+  TabbarConfigControls,
+  type TabStyle,
+} from "../../../contexts/TabbarDemoConfig";
+
+const tabBarMap: Record<TabStyle, React.ComponentType<TabBarRenderProps>> = {
+  chrome: ChromeTabBar,
+  vscode: VSCodeTabBar,
+  github: GitHubTabBar,
+};
 
 const makeGroup = (id: GroupId): GroupModel => {
   const tabs = [
@@ -19,6 +31,7 @@ const makeGroup = (id: GroupId): GroupModel => {
 };
 
 const Page: React.FC = () => {
+  const config = useTabbarConfigState();
   const [group, setGroup] = React.useState<GroupModel>(() => makeGroup("g_demo"));
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const nextId = React.useRef<number>(1);
@@ -52,15 +65,36 @@ const Page: React.FC = () => {
     });
   };
 
+  const TabBarComp = tabBarMap[config.tabStyle];
+
   return (
     <DemoPage title="PanelSystem / TabBar" padding="1.5rem" maxWidth={960}>
-      <div ref={containerRef} style={{ border: "1px solid #333", borderRadius: 6, background: "#111", padding: 8 }}>
-        <DomRegistryProvider>
-          <InteractionsProvider
-            containerRef={containerRef}
-            dragThresholdPx={6}
-            onCommitContentDrop={() => {}}
-            onCommitTabDrop={({ fromGroupId, tabId, targetGroupId, targetIndex }) => {
+      <TabbarConfigControls
+        tabStyle={config.tabStyle}
+        setTabStyle={config.setTabStyle}
+        addPlacement={config.addPlacement}
+        setAddPlacement={config.setAddPlacement}
+        useCustomButtons={config.useCustomButtons}
+        setUseCustomButtons={config.setUseCustomButtons}
+      />
+      <div
+        ref={containerRef}
+        style={{
+          border: "1px solid var(--rpl-demo-sidebar-border)",
+          borderRadius: "var(--rpl-demo-radius-lg)",
+          background: "#fff",
+          padding: "var(--rpl-demo-space-md)",
+          marginTop: "var(--rpl-demo-space-lg)",
+          boxShadow: "var(--rpl-demo-shadow-md)",
+        }}
+      >
+        <DemoTabbarConfigProvider value={config.configValue}>
+          <DomRegistryProvider>
+            <InteractionsProvider
+              containerRef={containerRef}
+              dragThresholdPx={6}
+              onCommitContentDrop={() => { }}
+              onCommitTabDrop={({ fromGroupId, tabId, targetGroupId, targetIndex }) => {
                 if (fromGroupId !== targetGroupId) {
                   return;
                 }
@@ -81,9 +115,10 @@ const Page: React.FC = () => {
                 });
               }}
             >
-              <TabBar group={group} onClickTab={onClickTab} onAddTab={handleAddTab} onCloseTab={handleCloseTab} />
+              <TabBarComp group={group} onClickTab={onClickTab} onAddTab={handleAddTab} onCloseTab={handleCloseTab} />
             </InteractionsProvider>
           </DomRegistryProvider>
+        </DemoTabbarConfigProvider>
       </div>
     </DemoPage>
   );

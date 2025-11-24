@@ -8,11 +8,13 @@ import type { PanelLayoutConfig, LayerDefinition } from "../types";
 import styles from "./Layout.module.css";
 import { demoCategories } from "./routes";
 
+import { FiHome, FiLayout, FiChevronRight } from "react-icons/fi";
+
 const SidebarNav: React.FC = () => {
   const location = useLocation();
   const topLinks = [
-    { path: "/", label: "Home", icon: "🏠" },
-    { path: "/panel-demo", label: "Panel Layout Demo", icon: "📐" },
+    { path: "/", label: "Home", icon: <FiHome /> },
+    { path: "/panel-demo", label: "Panel Layout Demo", icon: <FiLayout /> },
   ] as const;
 
   return (
@@ -38,7 +40,8 @@ const SidebarNav: React.FC = () => {
             <details key={category.id} className={styles.navCategory} open={isOpen}>
               <summary className={styles.navCategorySummary}>
                 <span className={styles.navIcon}>{category.icon}</span>
-                <span>{category.label}</span>
+                <span style={{ flex: 1 }}>{category.label}</span>
+                <FiChevronRight className={styles.navArrow} />
               </summary>
               <div className={styles.navGroupChildren}>
                 {/* Category index link (optional) could be added here */}
