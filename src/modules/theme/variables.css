@@ -45,6 +45,7 @@
   --rpl-color-border: #e5e7eb;
   --rpl-color-muted-fg: #6b7280;
   --rpl-shadow-card: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --rpl-color-drawer-backdrop: rgba(0, 0, 0, 0.5);
 
   /* ========== Sizes & Spacing ========== */
 

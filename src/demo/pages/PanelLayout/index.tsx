@@ -9,6 +9,7 @@ import { SimpleGrid, code as simpleGridCode } from "./SimpleGrid";
 import { DashboardLayout, code as dashboardLayoutCode } from "./DashboardLayout";
 import { DraggableOverlays, code as draggableOverlaysCode } from "./DraggableOverlays";
 import { DrawerMenuLayout, code as drawerMenuCode } from "./DrawerMenuLayout";
+import { DrawerBasics, code as drawerBasicsCode } from "./DrawerBasics";
 import { DemoPage } from "../components";
 
 export const PanelLayoutPreview: React.FC = () => {
@@ -45,6 +46,18 @@ export const PanelLayoutPreview: React.FC = () => {
           </div>
         </Story>
         <CodePreview code={dashboardLayoutCode} title="Dashboard Layout Code" />
+      </Section>
+
+      <Section title="Drawer Basics">
+        <Story
+          title="Default drawer styling"
+          description="Shows the built-in drawer chrome and header; click the button to open the left-anchored drawer."
+        >
+          <div style={{ width: "100%", height: "520px" }}>
+            <DrawerBasics />
+          </div>
+        </Story>
+        <CodePreview code={drawerBasicsCode} title="Drawer Basics Code" />
       </Section>
 
       <Section title="Drawer Menu Layout">

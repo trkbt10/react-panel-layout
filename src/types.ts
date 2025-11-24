@@ -93,6 +93,17 @@ export type DrawerBehavior = {
   /** Whether clicking backdrop dismisses the drawer */
   dismissible?: boolean;
   onStateChange?: (open: boolean) => void;
+  /** Use the built-in chrome (background, header padding). Defaults to true. */
+  chrome?: boolean;
+  /**
+   * Render the drawer relative to its parent container instead of the viewport.
+   * Defaults to false (fixed to viewport).
+   */
+  inline?: boolean;
+  /**
+   * Accessible label when header.title is not provided or when rendering without a header.
+   */
+  ariaLabel?: string;
   header?: {
     title?: string;
     showCloseButton?: boolean;
@@ -164,4 +175,3 @@ export type PanelLayoutProps = {
   config: PanelLayoutConfig;
   layers: LayerDefinition[];
 };
-

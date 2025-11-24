@@ -24,12 +24,14 @@ import PL_IDE from "./pages/PanelLayout/ide-layout";
 import PL_Dashboard from "./pages/PanelLayout/dashboard";
 import PL_Overlays from "./pages/PanelLayout/draggable-overlays";
 import PL_DrawerMenu from "./pages/PanelLayout/drawer-menu";
+import PL_DrawerBasics from "./pages/PanelLayout/drawer-basics";
 
 import PS_Preview from "./pages/PanelSystem/preview";
 import PS_Tabbar from "./pages/PanelSystem/tabbar";
 import { ResizableFloatingPanelsPreview } from "./pages/ResizableFloatingPanelsPreview";
+import RL_AdaptiveWorkspace from "./pages/ResponsiveLayout/adaptive-workspace";
 
-import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu } from "react-icons/fi";
+import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone } from "react-icons/fi";
 
 export type DemoPage = {
   id: string;
@@ -57,7 +59,22 @@ export const demoCategories: DemoCategory[] = [
       { id: "ide-layout", label: "IDE Layout", path: "ide-layout", element: <PL_IDE /> },
       { id: "dashboard", label: "Dashboard", path: "dashboard", element: <PL_Dashboard /> },
       { id: "draggable-overlays", label: "Draggable Overlays", path: "draggable-overlays", element: <PL_Overlays /> },
+      { id: "drawer-basics", label: "Drawer Basics", path: "drawer-basics", element: <PL_DrawerBasics /> },
       { id: "drawer-menu", label: "Drawer Menu", path: "drawer-menu", element: <PL_DrawerMenu /> },
+    ],
+  },
+  {
+    id: "responsive-layout",
+    label: "Responsive Layout",
+    icon: <FiSmartphone />,
+    base: "/components/responsive-layout",
+    pages: [
+      {
+        id: "adaptive-workspace",
+        label: "Adaptive Workspace",
+        path: "adaptive-workspace",
+        element: <RL_AdaptiveWorkspace />,
+      },
     ],
   },
   {

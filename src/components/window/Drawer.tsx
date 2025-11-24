@@ -6,26 +6,27 @@
 import * as React from "react";
 import type { DrawerBehavior, WindowPosition } from "../../types";
 import {
+  FloatingPanelContent,
+  FloatingPanelFrame,
+  FloatingPanelHeader,
+  FloatingPanelTitle,
+} from "../paneling/FloatingPanelFrame";
+import {
   DRAWER_HEADER_PADDING_Y,
   DRAWER_HEADER_PADDING_X,
   DRAWER_HEADER_GAP,
-  DRAWER_CONTENT_PADDING,
   DRAWER_CLOSE_BUTTON_FONT_SIZE,
-  DRAWER_SURFACE_COLOR,
-  DRAWER_BORDER_COLOR,
-  DRAWER_SHADOW,
+  DRAWER_CONTENT_PADDING,
+  COLOR_DRAWER_BACKDROP,
 } from "../../constants/styles";
 
 const drawerBackdropStyle: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0, 0, 0, 0.5)",
+  background: COLOR_DRAWER_BACKDROP,
 };
 
 const drawerBaseStyle: React.CSSProperties = {
-  position: "fixed",
-  background: DRAWER_SURFACE_COLOR,
-  boxShadow: DRAWER_SHADOW,
   willChange: "transform",
 };
 
@@ -56,46 +57,23 @@ const drawerPlacementStyles: Record<string, React.CSSProperties> = {
   },
 };
 
-const drawerHeaderStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  padding: `${DRAWER_HEADER_PADDING_Y} ${DRAWER_HEADER_PADDING_X}`,
-  gap: DRAWER_HEADER_GAP,
-  borderBottom: `1px solid ${DRAWER_BORDER_COLOR}`,
-};
-
-const drawerHeaderTitleStyle: React.CSSProperties = {
-  fontWeight: 600,
-};
-
-const drawerHeaderCloseButtonStyle: React.CSSProperties = {
-  marginLeft: "auto",
-  border: "none",
-  background: "transparent",
-  cursor: "pointer",
-  fontSize: DRAWER_CLOSE_BUTTON_FONT_SIZE,
-};
-
-const drawerContentStyle: React.CSSProperties = {
-  padding: DRAWER_CONTENT_PADDING,
-};
-
 export type DrawerProps = {
   id: string;
   config: DrawerBehavior;
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
   zIndex?: number;
   width?: string | number;
   height?: string | number;
   position?: WindowPosition;
-  backdropStyle?: React.CSSProperties;
 };
 
-type DrawerBackdropProps = { style?: React.CSSProperties; dismissible: boolean; onClose: () => void };
+type DrawerBackdropProps = {
+  style?: React.CSSProperties;
+  dismissible: boolean;
+  onClose: () => void;
+};
 
 const DrawerBackdrop: React.FC<DrawerBackdropProps> = React.memo(({ style, dismissible, onClose }) => {
   const handleClick = dismissible ? onClose : undefined;
@@ -103,44 +81,75 @@ const DrawerBackdrop: React.FC<DrawerBackdropProps> = React.memo(({ style, dismi
   return <div style={combinedStyle} onClick={handleClick} />;
 });
 
-type DrawerHeaderProps = {
-  header: DrawerBehavior["header"];
+type DrawerViewProps = {
+  header?: DrawerBehavior["header"];
   dismissible: boolean;
   onClose: () => void;
+  chrome: boolean;
+  children: React.ReactNode;
 };
 
-const DrawerHeader: React.FC<DrawerHeaderProps> = React.memo(({ header, dismissible, onClose }) => {
+const shouldShowCloseButton = (dismissible: boolean, showClose: boolean): boolean => {
+  if (!dismissible) {
+    return false;
+  }
+  return showClose;
+};
+
+const closeButtonStyle: React.CSSProperties = {
+  marginLeft: "auto",
+  border: "none",
+  background: "transparent",
+  cursor: "pointer",
+  fontSize: DRAWER_CLOSE_BUTTON_FONT_SIZE,
+};
+
+const DrawerHeaderView: React.FC<{
+  header?: DrawerBehavior["header"];
+  dismissible: boolean;
+  onClose: () => void;
+}> = ({ header, dismissible, onClose }) => {
   if (!header) {
     return null;
   }
 
   const showCloseButton = header.showCloseButton ?? true;
-
-  const renderTitle = () => {
-    if (!header.title) {
-      return null;
-    }
-    return <div style={drawerHeaderTitleStyle}>{header.title}</div>;
-  };
-
-  const renderCloseButton = () => {
-    if (!showCloseButton || !dismissible) {
-      return null;
-    }
-    return (
-      <button style={drawerHeaderCloseButtonStyle} onClick={onClose} aria-label="Close drawer" type="button">
-        ×
-      </button>
-    );
-  };
+  const shouldShowClose = shouldShowCloseButton(dismissible, showCloseButton);
 
   return (
-    <div style={drawerHeaderStyle}>
-      {renderTitle()}
-      {renderCloseButton()}
-    </div>
+    <React.Activity mode={header ? "visible" : "hidden"}>
+      <FloatingPanelHeader
+        style={{ padding: `${DRAWER_HEADER_PADDING_Y} ${DRAWER_HEADER_PADDING_X}`, gap: DRAWER_HEADER_GAP }}
+      >
+        <React.Activity mode={header ? "visible" : "hidden"}>
+          <FloatingPanelTitle>{header.title}</FloatingPanelTitle>
+        </React.Activity>
+        <React.Activity mode={shouldShowClose ? "visible" : "hidden"}>
+          <button style={closeButtonStyle} onClick={onClose} aria-label="Close drawer" type="button">
+            ×
+          </button>
+        </React.Activity>
+      </FloatingPanelHeader>
+    </React.Activity>
   );
-});
+};
+
+const DrawerView: React.FC<DrawerViewProps> = ({ header, dismissible, onClose, chrome, children }) => {
+  if (!chrome) {
+    return <>{children}</>;
+  }
+
+  return (
+    <FloatingPanelFrame style={{ height: "100%", borderRadius: 0 }}>
+      <DrawerHeaderView header={header} dismissible={dismissible} onClose={onClose} />
+      <FloatingPanelContent
+        style={{ padding: DRAWER_CONTENT_PADDING, flex: 1, display: "flex", flexDirection: "column" }}
+      >
+        {children}
+      </FloatingPanelContent>
+    </FloatingPanelFrame>
+  );
+};
 
 export const Drawer: React.FC<DrawerProps> = ({
   id,
@@ -148,15 +157,12 @@ export const Drawer: React.FC<DrawerProps> = ({
   isOpen,
   onClose,
   children,
-  className,
-  style: styleProp,
   zIndex,
   width,
   height,
   position,
-  backdropStyle,
 }) => {
-  const { dismissible = true, header } = config;
+  const { dismissible = true, header, chrome = true, inline = false } = config;
 
   const resolvePlacement = React.useCallback((pos?: WindowPosition): "left" | "right" | "top" | "bottom" => {
     if (!pos) {
@@ -179,11 +185,20 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const placement = resolvePlacement(position);
 
+  const openTransforms: Record<string, string> = {
+    left: "translateX(0)",
+    right: "translateX(0)",
+    top: "translateY(0)",
+    bottom: "translateY(0)",
+  };
+
   const drawerStyle = React.useMemo((): React.CSSProperties => {
     const style: React.CSSProperties = {
       ...drawerBaseStyle,
+      ...(inline ? { position: "absolute" } : { position: "fixed" }),
       ...drawerPlacementStyles[placement],
-      ...styleProp,
+      transform: isOpen ? openTransforms[placement] : drawerPlacementStyles[placement].transform,
+      transition: "transform 220ms ease",
     };
 
     if (zIndex !== undefined) {
@@ -198,44 +213,30 @@ export const Drawer: React.FC<DrawerProps> = ({
     }
 
     return style;
-  }, [styleProp, zIndex, width, height, placement]);
+  }, [height, inline, isOpen, placement, width, zIndex]);
 
-  const contentFinalStyle = header ? drawerContentStyle : undefined;
+  const ariaLabel = header?.title ?? config.ariaLabel ?? "Drawer";
 
-  const renderHeader = () => {
-    if (!header) {
-      return null;
-    }
-    return <DrawerHeader header={header} dismissible={dismissible} onClose={onClose} />;
-  };
-
-  const renderBackdrop = () => {
-    if (!backdropStyle) {
-      return null;
-    }
-    return (
-      <React.Activity mode={isOpen ? "visible" : "hidden"}>
-        <DrawerBackdrop style={backdropStyle} dismissible={dismissible} onClose={onClose} />
-      </React.Activity>
-    );
-  };
+  const backdrop: React.CSSProperties = inline ? { ...drawerBackdropStyle, position: "absolute" } : drawerBackdropStyle;
 
   return (
     <>
-      {renderBackdrop()}
+      <React.Activity mode={isOpen ? "visible" : "hidden"}>
+        <DrawerBackdrop style={backdrop} dismissible={dismissible} onClose={onClose} />
+      </React.Activity>
       <React.Activity mode={isOpen ? "visible" : "hidden"}>
         <div
-          className={className}
           data-layer-id={id}
           data-placement={placement}
           style={drawerStyle}
           role="dialog"
           aria-modal={dismissible ? true : undefined}
           aria-hidden={isOpen ? undefined : true}
-          aria-label={header?.title ?? "Drawer"}
+          aria-label={ariaLabel}
         >
-          {renderHeader()}
-          <div style={contentFinalStyle}>{children}</div>
+          <DrawerView header={header} dismissible={dismissible} onClose={onClose} chrome={chrome}>
+            {children}
+          </DrawerView>
         </div>
       </React.Activity>
     </>

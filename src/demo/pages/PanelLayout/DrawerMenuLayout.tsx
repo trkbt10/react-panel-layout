@@ -11,43 +11,43 @@ const DrawerContent: React.FC = () => {
   return (
     <div className={styles.drawer}>
       <div className={styles.drawerHeader}>
-        <div className={styles.appBadge}>UX</div>
         <div>
-          <div>Design System</div>
-          <div style={{ color: "#cbd5e1", fontSize: "12px" }}>Navigation & Assets</div>
+          <div className={styles.drawerTitle}>Workspace menu</div>
+          <div className={styles.drawerMeta}>Projects, links, and quick actions</div>
         </div>
+        <span className={styles.navTag}>New</span>
       </div>
 
       <div className={styles.drawerSection}>
         <div className={styles.sectionLabel}>Projects</div>
         <ul className={styles.navList}>
           <li className={`${styles.navItem} ${styles.navItemActive}`}>
-            Workspace
+            Product design
             <span className={styles.navTag}>Live</span>
           </li>
           <li className={styles.navItem}>
-            Marketing
+            Marketing site
             <span className={styles.navTag}>QA</span>
           </li>
           <li className={styles.navItem}>
-            Mobile
+            Mobile UI kit
             <span className={styles.navTag}>Beta</span>
           </li>
         </ul>
       </div>
 
       <div className={styles.drawerSection}>
-        <div className={styles.sectionLabel}>Quick links</div>
+        <div className={styles.sectionLabel}>Shortcuts</div>
         <ul className={styles.navList}>
-          <li className={styles.navItem}>Components</li>
-          <li className={styles.navItem}>Icons</li>
+          <li className={styles.navItem}>Components library</li>
+          <li className={styles.navItem}>Tokens & theming</li>
           <li className={styles.navItem}>Changelog</li>
         </ul>
       </div>
 
-      <div className={styles.footerCard}>
-        <strong>Hand-off ready</strong>
-        Sync tokens, components, and documentation with your team.
+      <div className={styles.drawerFooter}>
+        <strong>Invite reviewers</strong>
+        Share the workspace with reviewers and track approvals in one place.
       </div>
     </div>
   );
@@ -82,6 +82,7 @@ export const DrawerMenuLayout: React.FC = () => {
                 <span className={styles.menuIcon}>☰</span>
                 Menu
               </button>
+              <span className={styles.brand}>Orion Workbench</span>
               <div className={styles.breadcrumbs}>
                 <span>Workspace</span>
                 <span>/</span>
@@ -89,7 +90,6 @@ export const DrawerMenuLayout: React.FC = () => {
               </div>
             </div>
             <div className={styles.topActions}>
-              <div className={styles.presence}>4 online</div>
               <DemoButton variant="ghost" size="sm">Share</DemoButton>
               <DemoButton variant="primary" size="sm">Publish</DemoButton>
             </div>
@@ -100,50 +100,53 @@ export const DrawerMenuLayout: React.FC = () => {
               <div className={styles.mainHeader}>
                 <div className={styles.titleGroup}>
                   <h3>Product Overview</h3>
-                  <p>Monitor performance and hand-off progress across platforms</p>
+                  <p>Monitor progress across platforms and hand-offs in one place.</p>
                 </div>
-                <DemoButton variant="secondary" size="sm">Export</DemoButton>
+                <DemoButton variant="outline" size="sm">Export</DemoButton>
               </div>
 
-              <div className={styles.statGrid}>
-                <div className={styles.statCard}>
-                  <span className={styles.statLabel}>Active screens</span>
-                  <div className={styles.statValue}>
-                    128 <span className={styles.trend}>+12 this week</span>
-                  </div>
+              <div className={styles.cardGrid}>
+                <div className={styles.card}>
+                  <p className={styles.cardTitle}>Active screens</p>
+                  <p className={styles.cardValue}>128</p>
                 </div>
-                <div className={styles.statCard}>
-                  <span className={styles.statLabel}>Components synced</span>
-                  <div className={styles.statValue}>
-                    482 <span className={styles.trend}>+4%</span>
-                  </div>
+                <div className={styles.card}>
+                  <p className={styles.cardTitle}>Components synced</p>
+                  <p className={styles.cardValue}>482</p>
                 </div>
-                <div className={styles.statCard}>
-                  <span className={styles.statLabel}>Open hand-offs</span>
-                  <div className={styles.statValue}>
-                    18 <span className={styles.trend}>-3</span>
-                  </div>
+                <div className={styles.card}>
+                  <p className={styles.cardTitle}>Open hand-offs</p>
+                  <p className={styles.cardValue}>18</p>
                 </div>
               </div>
 
-              <div className={styles.activity}>
-                <div className={styles.activityItem}>
-                  <span>Header navigation updated</span>
-                  <span className={styles.activityTag}>Figma</span>
+              <div className={styles.timeline}>
+                <div className={styles.timelineItem}>
+                  <span className={styles.badge}>1</span>
+                  <div className={styles.timelineText}>
+                    <span className={styles.timelineTitle}>Navigation updated</span>
+                    <span className={styles.timelineMeta}>2m ago • Figma</span>
+                  </div>
                 </div>
-                <div className={styles.activityItem}>
-                  <span>Tokens synced to iOS</span>
-                  <span className={styles.activityTag}>Mobile</span>
+                <div className={styles.timelineItem}>
+                  <span className={styles.badge}>2</span>
+                  <div className={styles.timelineText}>
+                    <span className={styles.timelineTitle}>Tokens synced to iOS</span>
+                    <span className={styles.timelineMeta}>18m ago • Mobile</span>
+                  </div>
                 </div>
-                <div className={styles.activityItem}>
-                  <span>Added new chart variants</span>
-                  <span className={styles.activityTag}>Charts</span>
+                <div className={styles.timelineItem}>
+                  <span className={styles.badge}>3</span>
+                  <div className={styles.timelineText}>
+                    <span className={styles.timelineTitle}>Chart variants added</span>
+                    <span className={styles.timelineMeta}>1h ago • Charts</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <aside className={styles.sidePanel}>
-              <div className={styles.sideHeader}>
+            <aside className={styles.aside}>
+              <div className={styles.asideHeader}>
                 <div>
                   <div>Review queue</div>
                   <div style={{ color: "#cbd5e1", fontSize: "12px" }}>Hand-offs pending approval</div>
@@ -177,14 +180,14 @@ export const DrawerMenuLayout: React.FC = () => {
         open: menuOpen,
         onStateChange: setMenuOpen,
         dismissible: true,
-        header: { title: "Workspace Menu" },
+        chrome: false,
+        inline: true,
+        ariaLabel: "Workspace Menu",
       },
       position: { left: 0 },
       width: 340,
       height: "100%",
       zIndex: 1200,
-      backdropStyle: { background: "linear-gradient(135deg, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.55))" },
-      style: { top: 0 },
     },
   ];
 
@@ -225,12 +228,13 @@ export function DrawerMenuLayout() {
         open,
         onStateChange: setOpen,
         dismissible: true,
-        header: { title: "Workspace Menu" },
+        chrome: false,
+        inline: true,
+        ariaLabel: "Workspace Menu",
       },
       position: { left: 0 },
       width: 340,
       height: "100%",
-      backdropStyle: { background: "rgba(15, 23, 42, 0.55)" },
     },
   ];
 

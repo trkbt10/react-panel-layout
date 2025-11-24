@@ -79,6 +79,7 @@ export const COLOR_NODE_EDITOR_SURFACE_2 = "var(--rpl-color-surface-2, #fafafa)"
 export const COLOR_NODE_EDITOR_BORDER = "var(--rpl-color-border, #e5e7eb)";
 export const COLOR_NODE_EDITOR_MUTED_FG = "var(--rpl-color-muted-fg, #6b7280)";
 export const COLOR_NODE_EDITOR_CARD_SHADOW = "var(--rpl-shadow-card, 0 2px 10px rgba(0, 0, 0, 0.08))";
+export const COLOR_DRAWER_BACKDROP = "var(--rpl-color-drawer-backdrop, rgba(0, 0, 0, 0.5))";
 
 // ========================================
 // SIZING & SPACING

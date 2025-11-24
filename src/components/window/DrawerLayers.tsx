@@ -44,12 +44,10 @@ export const DrawerLayers: React.FC<DrawerLayersProps> = ({ layers }) => {
             config={layer.drawer}
             isOpen={isOpen}
             onClose={onClose}
-            style={layer.style}
             zIndex={layer.zIndex}
             width={layer.width}
             height={layer.height}
             position={layer.position}
-            backdropStyle={layer.backdropStyle}
           >
             {layer.component}
           </Drawer>
