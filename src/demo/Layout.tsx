@@ -59,7 +59,7 @@ const SidebarNav: React.FC = () => {
           );
         })}
       </nav>
-      <div className={styles.sidebarFooter}>v1.0.0</div>
+      <div className={styles.sidebarFooter}>v{__APP_VERSION__}</div>
     </div>
   );
 };
