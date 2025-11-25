@@ -9,18 +9,36 @@ import { Layout } from "./Layout";
 import { PanelLayoutDemo } from "./PanelLayoutDemo";
 import { demoCategories } from "./routes";
 import * as React from "react";
+import { useMedia } from "./hooks/useMedia";
 import "./demo.css";
 
 import { DemoButton } from "./components/ui/DemoButton";
 import { DemoCard } from "./components/ui/DemoCard";
 
 function Home() {
+  const isMediumViewport = useMedia("(max-width: 1200px)");
+  const isSmallViewport = useMedia("(max-width: 720px)");
+
+  const pagePaddingY = isSmallViewport ? "var(--rpl-demo-space-xl)" : "var(--rpl-demo-space-xxl)";
+  const pagePaddingX = isSmallViewport ? "var(--rpl-demo-space-md)" : "var(--rpl-demo-space-lg)";
+  const heroGlowWidth = isSmallViewport ? "360px" : isMediumViewport ? "480px" : "600px";
+  const heroGlowHeight = isSmallViewport ? "260px" : isMediumViewport ? "340px" : "400px";
+  const heroTitleSize = isSmallViewport ? "var(--rpl-demo-font-size-display-sm)" : "var(--rpl-demo-font-size-display)";
+  const heroLeadSize = isSmallViewport ? "var(--rpl-demo-font-size-md)" : "var(--rpl-demo-font-size-lg)";
+  const heroMarginBottom = isSmallViewport ? "var(--rpl-demo-space-xl)" : "var(--rpl-demo-space-xxl)";
+  const actionGap = isSmallViewport ? "12px" : "16px";
+  const actionWrap = isSmallViewport ? "wrap" : "nowrap";
+  const gridColumns = isSmallViewport ? "1fr" : isMediumViewport ? "repeat(2, 1fr)" : "repeat(3, 1fr)";
+  const gridAutoRows = isSmallViewport ? "minmax(200px, auto)" : "minmax(240px, auto)";
+  const wideCardSpan = isSmallViewport ? 1 : 2;
+  const wideCardColumnStyle = wideCardSpan > 1 ? { gridColumn: `span ${wideCardSpan}` } : {};
+
   return (
     <div
       style={{
         minHeight: "100%",
         background: "var(--rpl-demo-gradient-hero)",
-        padding: "var(--rpl-demo-space-xxl) var(--rpl-demo-space-lg)",
+        padding: `${pagePaddingY} ${pagePaddingX}`,
         fontFamily: "var(--rpl-demo-font-family)",
         color: "var(--rpl-demo-text-primary)",
       }}
@@ -31,7 +49,7 @@ function Home() {
           maxWidth: "1000px",
           margin: "0 auto",
           textAlign: "center",
-          marginBottom: "var(--rpl-demo-space-xxl)",
+          marginBottom: heroMarginBottom,
           position: "relative",
         }}
       >
@@ -41,8 +59,8 @@ function Home() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "600px",
-            height: "400px",
+            width: heroGlowWidth,
+            height: heroGlowHeight,
             background: "var(--rpl-demo-gradient-glow)",
             pointerEvents: "none",
             zIndex: 0,
@@ -66,7 +84,7 @@ function Home() {
           </div>
           <h1
             style={{
-              fontSize: "var(--rpl-demo-font-size-display)",
+              fontSize: heroTitleSize,
               lineHeight: 1.1,
               fontWeight: 700,
               letterSpacing: "-0.03em",
@@ -82,17 +100,17 @@ function Home() {
           </h1>
           <p
             style={{
-              fontSize: "var(--rpl-demo-font-size-lg)",
+              fontSize: heroLeadSize,
               lineHeight: 1.5,
               color: "var(--rpl-demo-text-secondary)",
-              maxWidth: "640px",
+              maxWidth: isSmallViewport ? "100%" : "640px",
               margin: "0 auto var(--rpl-demo-space-xl)",
             }}
           >
             Build complex, resizable, and drag-and-drop interfaces with ease.
             Powered by CSS Grid and designed for performance.
           </p>
-          <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
+          <div style={{ display: "flex", gap: actionGap, justifyContent: "center", flexWrap: actionWrap }}>
             <Link to="/components/panel-layout/simple-grid" style={{ textDecoration: "none" }}>
               <DemoButton variant="primary" size="lg">
                 Get Started
@@ -113,8 +131,8 @@ function Home() {
           maxWidth: "1000px",
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gridTemplateRows: "repeat(2, minmax(240px, auto))",
+          gridTemplateColumns: gridColumns,
+          gridAutoRows,
           gap: "var(--rpl-demo-space-lg)",
         }}
       >
@@ -122,7 +140,7 @@ function Home() {
         <DemoCard
           hoverEffect
           style={{
-            gridColumn: "span 2",
+            ...wideCardColumnStyle,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -201,7 +219,7 @@ function Home() {
         <DemoCard
           hoverEffect
           style={{
-            gridColumn: "span 2",
+            ...wideCardColumnStyle,
             display: "flex",
             alignItems: "center",
             gap: "24px",

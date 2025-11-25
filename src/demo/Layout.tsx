@@ -7,8 +7,9 @@ import { GridLayout } from "../components/grid/GridLayout";
 import type { PanelLayoutConfig, LayerDefinition } from "../types";
 import styles from "./Layout.module.css";
 import { demoCategories } from "./routes";
+import { useMedia } from "./hooks/useMedia";
 
-import { FiHome, FiLayout, FiChevronRight } from "react-icons/fi";
+import { FiHome, FiLayout, FiChevronRight, FiMenu } from "react-icons/fi";
 
 const SidebarNav: React.FC = () => {
   const location = useLocation();
@@ -64,36 +65,105 @@ const SidebarNav: React.FC = () => {
   );
 };
 
-const MainContent: React.FC = () => {
+const MainContent: React.FC<{ isStacked: boolean; onOpenNav: () => void }> = ({ isStacked, onOpenNav }) => {
+  const mobileHeader = React.useMemo(() => {
+    if (!isStacked) {
+      return null;
+    }
+
+    return (
+      <div className={styles.mobileHeader}>
+        <button
+          type="button"
+          className={styles.mobileNavButton}
+          onClick={onOpenNav}
+          aria-label="Open navigation drawer"
+        >
+          <FiMenu aria-hidden />
+          <span className={styles.mobileNavLabel}>Menu</span>
+        </button>
+        <h2 className={styles.mobileTitle}>Panel Layout</h2>
+      </div>
+    );
+  }, [isStacked, onOpenNav]);
+
   return (
     <div className={styles.mainContent}>
+      {mobileHeader}
       <Outlet />
     </div>
   );
 };
 
 export const Layout: React.FC = () => {
-  const config: PanelLayoutConfig = {
-    areas: [["sidebar", "main"]],
-    columns: [
-      { size: "250px", resizable: true, minSize: 200, maxSize: 400 },
-      { size: "1fr" },
-    ],
-    rows: [{ size: "100vh" }],
-  };
+  const isStackedLayout = useMedia("(max-width: 960px)");
+  const [navOpen, setNavOpen] = React.useState(false);
+  const handleOpenNav = React.useCallback(() => setNavOpen(true), []);
 
-  const layers: LayerDefinition[] = [
-    {
-      id: "sidebar",
-      gridArea: "sidebar",
-      component: <SidebarNav />,
-    },
-    {
-      id: "main",
-      gridArea: "main",
-      component: <MainContent />,
-    },
-  ];
+  React.useEffect(() => {
+    if (!isStackedLayout && navOpen) {
+      setNavOpen(false);
+    }
+  }, [isStackedLayout, navOpen]);
+
+  const config = React.useMemo<PanelLayoutConfig>(() => {
+    if (isStackedLayout) {
+      return {
+        areas: [["main"]],
+        columns: [{ size: "1fr" }],
+        rows: [{ size: "100vh" }],
+      };
+    }
+
+    return {
+      areas: [["sidebar", "main"]],
+      columns: [
+        { size: "250px", resizable: true, minSize: 200, maxSize: 400 },
+        { size: "1fr" },
+      ],
+      rows: [{ size: "100vh" }],
+    };
+  }, [isStackedLayout]);
+
+  const layers = React.useMemo<LayerDefinition[]>(() => {
+    if (isStackedLayout) {
+      return [
+        {
+          id: "main",
+          gridArea: "main",
+          component: <MainContent isStacked onOpenNav={handleOpenNav} />,
+        },
+        {
+          id: "sidebar-drawer",
+          component: <SidebarNav />,
+          drawer: {
+            open: navOpen,
+            onStateChange: setNavOpen,
+            dismissible: true,
+            ariaLabel: "Navigation",
+            header: { title: "Navigation", showCloseButton: true },
+            transitionMode: "view-transition",
+          },
+          width: 320,
+          position: { left: 0 },
+          zIndex: 10000,
+        },
+      ];
+    }
+
+    return [
+      {
+        id: "sidebar",
+        gridArea: "sidebar",
+        component: <SidebarNav />,
+      },
+      {
+        id: "main",
+        gridArea: "main",
+        component: <MainContent isStacked={false} onOpenNav={handleOpenNav} />,
+      },
+    ];
+  }, [handleOpenNav, isStackedLayout, navOpen]);
 
   return <GridLayout config={config} layers={layers} />;
 };
