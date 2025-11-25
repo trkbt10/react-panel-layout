@@ -17,7 +17,6 @@ const gridLayoutBaseStyle: React.CSSProperties = {
   display: "grid",
   width: "100%",
   height: "100%",
-  overflow: "hidden",
 };
 
 const gridLayoutDraggingStyle: React.CSSProperties = {
