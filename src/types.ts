@@ -92,6 +92,16 @@ export type DrawerBehavior = {
   open?: boolean;
   /** Whether clicking backdrop dismisses the drawer */
   dismissible?: boolean;
+  /**
+   * Transition mode for drawer visibility.
+   * - "css" (default) uses CSS transform transitions.
+   * - "none" disables transitions.
+   */
+  transitionMode?: "css" | "none";
+  /** Override transform transition duration (e.g., "240ms"). */
+  transitionDuration?: string;
+  /** Override transform transition easing (e.g., "cubic-bezier(0.22,1,0.36,1)"). */
+  transitionEasing?: string;
   onStateChange?: (open: boolean) => void;
   /** Use the built-in chrome (background, header padding). Defaults to true. */
   chrome?: boolean;

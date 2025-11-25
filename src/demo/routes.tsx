@@ -23,15 +23,17 @@ import PL_SimpleGrid from "./pages/PanelLayout/simple-grid";
 import PL_IDE from "./pages/PanelLayout/ide-layout";
 import PL_Dashboard from "./pages/PanelLayout/dashboard";
 import PL_Overlays from "./pages/PanelLayout/draggable-overlays";
-import PL_DrawerMenu from "./pages/PanelLayout/drawer-menu";
-import PL_DrawerBasics from "./pages/PanelLayout/drawer-basics";
+
+import DR_Basics from "./pages/Drawer/basics";
+import DR_Menu from "./pages/Drawer/menu";
+import DR_Animations from "./pages/Drawer/animations";
 
 import PS_Preview from "./pages/PanelSystem/preview";
 import PS_Tabbar from "./pages/PanelSystem/tabbar";
 import { ResizableFloatingPanelsPreview } from "./pages/ResizableFloatingPanelsPreview";
 import RL_AdaptiveWorkspace from "./pages/ResponsiveLayout/adaptive-workspace";
 
-import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone } from "react-icons/fi";
+import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone, FiSidebar } from "react-icons/fi";
 
 export type DemoPage = {
   id: string;
@@ -59,8 +61,17 @@ export const demoCategories: DemoCategory[] = [
       { id: "ide-layout", label: "IDE Layout", path: "ide-layout", element: <PL_IDE /> },
       { id: "dashboard", label: "Dashboard", path: "dashboard", element: <PL_Dashboard /> },
       { id: "draggable-overlays", label: "Draggable Overlays", path: "draggable-overlays", element: <PL_Overlays /> },
-      { id: "drawer-basics", label: "Drawer Basics", path: "drawer-basics", element: <PL_DrawerBasics /> },
-      { id: "drawer-menu", label: "Drawer Menu", path: "drawer-menu", element: <PL_DrawerMenu /> },
+    ],
+  },
+  {
+    id: "drawer",
+    label: "Drawer",
+    icon: <FiSidebar />,
+    base: "/components/drawer",
+    pages: [
+      { id: "basics", label: "Basics", path: "basics", element: <DR_Basics /> },
+      { id: "menu", label: "Menu", path: "menu", element: <DR_Menu /> },
+      { id: "animations", label: "Animations", path: "animations", element: <DR_Animations /> },
     ],
   },
   {

@@ -8,8 +8,8 @@ import { IDELayout, code as ideLayoutCode } from "./IDELayout";
 import { SimpleGrid, code as simpleGridCode } from "./SimpleGrid";
 import { DashboardLayout, code as dashboardLayoutCode } from "./DashboardLayout";
 import { DraggableOverlays, code as draggableOverlaysCode } from "./DraggableOverlays";
-import { DrawerMenuLayout, code as drawerMenuCode } from "./DrawerMenuLayout";
-import { DrawerBasics, code as drawerBasicsCode } from "./DrawerBasics";
+import { DrawerMenuLayout, code as drawerMenuCode } from "../Drawer/DrawerMenuLayout";
+import { DrawerBasics, code as drawerBasicsCode } from "../Drawer/DrawerBasics";
 import { DemoPage } from "../components";
 
 export const PanelLayoutPreview: React.FC = () => {

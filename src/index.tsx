@@ -57,6 +57,8 @@ export type { ResizeHandleProps } from "./components/resizer/ResizeHandle";
 // Public Hooks
 // ============================================================================
 export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";
+export { useTransitionState, runTransition } from "./hooks/useTransitionState";
+export type { TransitionMode, TransitionOptions, UseTransitionStateOptions } from "./hooks/useTransitionState";
 
 // ============================================================================
 // Style Constants

@@ -18,6 +18,8 @@ import {
   DRAWER_CLOSE_BUTTON_FONT_SIZE,
   DRAWER_CONTENT_PADDING,
   COLOR_DRAWER_BACKDROP,
+  DRAWER_TRANSITION_DURATION,
+  DRAWER_TRANSITION_EASING,
 } from "../../constants/styles";
 
 const drawerBackdropStyle: React.CSSProperties = {
@@ -57,6 +59,21 @@ const drawerPlacementStyles: Record<string, React.CSSProperties> = {
   },
 };
 
+const computeTransitionValue = (
+  mode: DrawerBehavior["transitionMode"] | undefined,
+  duration: DrawerBehavior["transitionDuration"],
+  easing: DrawerBehavior["transitionEasing"],
+): string | undefined => {
+  if (mode === "none") {
+    return undefined;
+  }
+
+  const durationValue = duration ?? DRAWER_TRANSITION_DURATION;
+  const easingValue = easing ?? DRAWER_TRANSITION_EASING;
+
+  return `transform ${durationValue} ${easingValue}`;
+};
+
 export type DrawerProps = {
   id: string;
   config: DrawerBehavior;
@@ -68,18 +85,6 @@ export type DrawerProps = {
   height?: string | number;
   position?: WindowPosition;
 };
-
-type DrawerBackdropProps = {
-  style?: React.CSSProperties;
-  dismissible: boolean;
-  onClose: () => void;
-};
-
-const DrawerBackdrop: React.FC<DrawerBackdropProps> = React.memo(({ style, dismissible, onClose }) => {
-  const handleClick = dismissible ? onClose : undefined;
-  const combinedStyle = React.useMemo(() => ({ ...drawerBackdropStyle, ...style }), [style]);
-  return <div style={combinedStyle} onClick={handleClick} />;
-});
 
 type DrawerViewProps = {
   header?: DrawerBehavior["header"];
@@ -162,7 +167,15 @@ export const Drawer: React.FC<DrawerProps> = ({
   height,
   position,
 }) => {
-  const { dismissible = true, header, chrome = true, inline = false } = config;
+  const {
+    dismissible = true,
+    header,
+    chrome = true,
+    inline = false,
+    transitionMode = "css",
+    transitionDuration,
+    transitionEasing,
+  } = config;
 
   const resolvePlacement = React.useCallback((pos?: WindowPosition): "left" | "right" | "top" | "bottom" => {
     if (!pos) {
@@ -193,12 +206,14 @@ export const Drawer: React.FC<DrawerProps> = ({
   };
 
   const drawerStyle = React.useMemo((): React.CSSProperties => {
+    const transitionValue = computeTransitionValue(transitionMode, transitionDuration, transitionEasing);
+
     const style: React.CSSProperties = {
       ...drawerBaseStyle,
       ...(inline ? { position: "absolute" } : { position: "fixed" }),
       ...drawerPlacementStyles[placement],
       transform: isOpen ? openTransforms[placement] : drawerPlacementStyles[placement].transform,
-      transition: "transform 220ms ease",
+      transition: transitionValue,
     };
 
     if (zIndex !== undefined) {
@@ -213,32 +228,38 @@ export const Drawer: React.FC<DrawerProps> = ({
     }
 
     return style;
-  }, [height, inline, isOpen, placement, width, zIndex]);
+  }, [height, inline, isOpen, placement, transitionDuration, transitionEasing, transitionMode, width, zIndex]);
 
   const ariaLabel = header?.title ?? config.ariaLabel ?? "Drawer";
 
-  const backdrop: React.CSSProperties = inline ? { ...drawerBackdropStyle, position: "absolute" } : drawerBackdropStyle;
+  const backdropStyle = React.useMemo((): React.CSSProperties => {
+    const base = inline ? { ...drawerBackdropStyle, position: "absolute" as const } : drawerBackdropStyle;
+    const transitionValue = transitionMode === "none" ? undefined : `opacity ${transitionDuration ?? "220ms"} ease`;
+    return {
+      ...base,
+      opacity: isOpen ? 1 : 0,
+      pointerEvents: isOpen ? "auto" : "none",
+      transition: transitionValue,
+      zIndex: zIndex !== undefined ? zIndex - 1 : undefined,
+    };
+  }, [inline, isOpen, transitionDuration, transitionMode, zIndex]);
 
   return (
     <>
-      <React.Activity mode={isOpen ? "visible" : "hidden"}>
-        <DrawerBackdrop style={backdrop} dismissible={dismissible} onClose={onClose} />
-      </React.Activity>
-      <React.Activity mode={isOpen ? "visible" : "hidden"}>
-        <div
-          data-layer-id={id}
-          data-placement={placement}
-          style={drawerStyle}
-          role="dialog"
-          aria-modal={dismissible ? true : undefined}
-          aria-hidden={isOpen ? undefined : true}
-          aria-label={ariaLabel}
-        >
-          <DrawerView header={header} dismissible={dismissible} onClose={onClose} chrome={chrome}>
-            {children}
-          </DrawerView>
-        </div>
-      </React.Activity>
+      <div style={backdropStyle} onClick={dismissible ? onClose : undefined} />
+      <div
+        data-layer-id={id}
+        data-placement={placement}
+        style={drawerStyle}
+        role="dialog"
+        aria-modal={dismissible ? true : undefined}
+        aria-hidden={isOpen ? undefined : true}
+        aria-label={ariaLabel}
+      >
+        <DrawerView header={header} dismissible={dismissible} onClose={onClose} chrome={chrome}>
+          {children}
+        </DrawerView>
+      </div>
     </>
   );
 };

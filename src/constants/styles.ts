@@ -81,6 +81,12 @@ export const COLOR_NODE_EDITOR_MUTED_FG = "var(--rpl-color-muted-fg, #6b7280)";
 export const COLOR_NODE_EDITOR_CARD_SHADOW = "var(--rpl-shadow-card, 0 2px 10px rgba(0, 0, 0, 0.08))";
 export const COLOR_DRAWER_BACKDROP = "var(--rpl-color-drawer-backdrop, rgba(0, 0, 0, 0.5))";
 
+/**
+ * Drawer transitions
+ */
+export const DRAWER_TRANSITION_DURATION = "var(--rpl-drawer-transition-duration, 220ms)";
+export const DRAWER_TRANSITION_EASING = "var(--rpl-drawer-transition-easing, cubic-bezier(0.22, 1, 0.36, 1))";
+
 // ========================================
 // SIZING & SPACING
 // ========================================
