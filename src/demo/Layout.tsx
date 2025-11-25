@@ -50,7 +50,11 @@ const SidebarNav: React.FC = () => {
                   const fullPath = `${category.base}/${page.path}`;
                   const isActive = location.pathname === fullPath;
                   return (
-                    <Link key={page.id} to={fullPath} className={`${styles.navChildLink} ${isActive ? styles.active : ""}`}>
+                    <Link
+                      key={page.id}
+                      to={fullPath}
+                      className={`${styles.navChildLink} ${isActive ? styles.active : ""}`}
+                    >
                       {page.label}
                     </Link>
                   );
@@ -117,10 +121,7 @@ export const Layout: React.FC = () => {
 
     return {
       areas: [["sidebar", "main"]],
-      columns: [
-        { size: "250px", resizable: true, minSize: 200, maxSize: 400 },
-        { size: "1fr" },
-      ],
+      columns: [{ size: "250px", resizable: true, minSize: 200, maxSize: 400 }, { size: "1fr" }],
       rows: [{ size: "100vh" }],
     };
   }, [isStackedLayout]);
@@ -142,7 +143,7 @@ export const Layout: React.FC = () => {
             dismissible: true,
             ariaLabel: "Navigation",
             header: { title: "Navigation", showCloseButton: true },
-            transitionMode: "view-transition",
+            transitionMode: "css",
           },
           width: 320,
           position: { left: 0 },
