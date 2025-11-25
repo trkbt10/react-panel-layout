@@ -119,3 +119,184 @@ All available CSS variables are documented in [docs/design-tokens.md](./docs/des
 - Larger UI: Increase `--rpl-size-tab-font` and spacing variables
 - Light theme: Override color variables for light backgrounds
 - VS Code style: See examples in the design tokens documentation
+
+---
+
+## Grid Layout – Flexible Grid-Based Layouts
+
+`GridLayout` provides a declarative way to create complex grid-based layouts with resizable tracks and floating overlays.
+
+### Quick Start
+
+```tsx
+import { GridLayout } from "react-panel-layout";
+import type { PanelLayoutConfig, LayerDefinition } from "react-panel-layout";
+
+const config: PanelLayoutConfig = {
+  areas: [
+    ["cell1", "cell2"],
+    ["cell3", "cell4"],
+  ],
+  rows: [{ size: "1fr" }, { size: "1fr" }],
+  columns: [{ size: "1fr" }, { size: "1fr" }],
+  gap: "1rem",
+};
+
+const layers: LayerDefinition[] = [
+  { id: "cell1", component: <Cell1 />, gridArea: "cell1" },
+  { id: "cell2", component: <Cell2 />, gridArea: "cell2" },
+  { id: "cell3", component: <Cell3 />, gridArea: "cell3" },
+  { id: "cell4", component: <Cell4 />, gridArea: "cell4" },
+];
+
+<GridLayout config={config} layers={layers} />;
+```
+
+### PanelLayoutConfig
+
+Define your grid structure with the following properties:
+
+| Property  | Type           | Description                                   |
+|-----------|----------------|-----------------------------------------------|
+| `areas`   | `string[][]`   | Grid template areas (CSS grid-template-areas) |
+| `rows`    | `GridTrack[]`  | Row track definitions                         |
+| `columns` | `GridTrack[]`  | Column track definitions                      |
+| `gap`     | `string`       | Gap between grid cells (optional)             |
+
+### GridTrack
+
+Each track (row or column) can be configured with:
+
+```tsx
+type GridTrack = {
+  size: string;       // CSS size value: "1fr", "200px", "auto", etc.
+  resizable?: boolean; // Enable drag-to-resize
+  minSize?: number;    // Minimum size in pixels (when resizable)
+  maxSize?: number;    // Maximum size in pixels (when resizable)
+};
+```
+
+### Resizable Tracks
+
+Enable resizable sidebar columns or rows:
+
+```tsx
+const config: PanelLayoutConfig = {
+  areas: [
+    ["sidebar", "main", "inspector"],
+  ],
+  rows: [{ size: "1fr" }],
+  columns: [
+    { size: "250px", resizable: true, minSize: 200, maxSize: 400 },
+    { size: "1fr" },
+    { size: "300px", resizable: true, minSize: 250, maxSize: 500 },
+  ],
+  gap: "4px",
+};
+```
+
+### LayerDefinition
+
+Each layer defines content to place in the grid or as a floating overlay:
+
+```tsx
+type LayerDefinition = {
+  id: string;                    // Unique identifier
+  component: React.ReactNode;    // Content to render
+  visible?: boolean;             // Show/hide the layer
+
+  // Grid positioning
+  gridArea?: string;             // Grid area name from config.areas
+  gridRow?: string;              // Explicit grid-row value
+  gridColumn?: string;           // Explicit grid-column value
+
+  // Floating positioning (for overlays)
+  position?: { top?, right?, bottom?, left? };
+  width?: string | number;
+  height?: string | number;
+  zIndex?: number;
+
+  // Floating behavior
+  floating?: {
+    draggable?: boolean;
+    resizable?: boolean;
+    constraints?: { minWidth?, maxWidth?, minHeight?, maxHeight? };
+  };
+
+  // Drawer behavior (slide-in panels)
+  drawer?: DrawerBehavior;
+};
+```
+
+### Floating Overlays
+
+Add draggable floating panels on top of the grid:
+
+```tsx
+const layers: LayerDefinition[] = [
+  // Grid-based layer
+  {
+    id: "canvas",
+    component: <Canvas />,
+    gridArea: "canvas",
+    zIndex: 0,
+  },
+  // Floating panel
+  {
+    id: "tools",
+    component: <ToolsPanel />,
+    position: { left: 20, top: 20 },
+    width: 200,
+    height: 250,
+    zIndex: 10,
+    floating: {
+      draggable: true,
+    },
+  },
+];
+```
+
+### IDE-Style Layout Example
+
+A complete IDE-style layout with toolbar, sidebar, main canvas, and floating panels:
+
+```tsx
+const config: PanelLayoutConfig = {
+  areas: [
+    ["toolbar", "toolbar", "toolbar"],
+    ["sidebar", "canvas", "inspector"],
+    ["statusbar", "statusbar", "statusbar"],
+  ],
+  rows: [
+    { size: "60px" },
+    { size: "1fr" },
+    { size: "30px" },
+  ],
+  columns: [
+    { size: "250px", resizable: true, minSize: 200, maxSize: 400 },
+    { size: "1fr" },
+    { size: "300px", resizable: true, minSize: 250, maxSize: 500 },
+  ],
+  gap: "4px",
+};
+
+const layers: LayerDefinition[] = [
+  { id: "toolbar", component: <Toolbar />, gridArea: "toolbar", zIndex: 10 },
+  { id: "sidebar", component: <Sidebar />, gridArea: "sidebar" },
+  { id: "canvas", component: <Canvas />, gridArea: "canvas" },
+  { id: "inspector", component: <Inspector />, gridArea: "inspector" },
+  { id: "statusbar", component: <StatusBar />, gridArea: "statusbar", zIndex: 10 },
+  // Floating panel
+  {
+    id: "preview",
+    component: <Preview />,
+    position: { right: 20, top: 80 },
+    width: 300,
+    height: 400,
+    zIndex: 20,
+    floating: { draggable: true },
+  },
+];
+
+<GridLayout config={config} layers={layers} />;
+```
