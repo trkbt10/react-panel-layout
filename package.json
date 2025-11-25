@@ -1,6 +1,6 @@
 {
   "name": "react-panel-layout",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "Unlicense",
   "type": "module",
   "main": "dist/index.cjs",
