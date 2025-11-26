@@ -100,6 +100,31 @@ The library provides a comprehensive set of CSS variables that control the appea
 | `--rpl-z-overlay` | `9998` | Drop suggestion overlay z-index |
 | `--rpl-z-tabdrag-overlay` | `9999` | Tab drag overlay z-index |
 
+### Pivot Animations
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--rpl-pivot-animation-enter` | `none` | Animation when content becomes active |
+| `--rpl-pivot-animation-leave` | `none` | Animation when content becomes inactive |
+
+User defines `@keyframes` in their CSS and references via these tokens:
+
+```css
+@keyframes pivotEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pivotLeave {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+:root {
+  --rpl-pivot-animation-enter: pivotEnter 150ms ease-out forwards;
+  --rpl-pivot-animation-leave: pivotLeave 150ms ease-out forwards;
+}
+
 ## Usage
 
 ### Basic Import
