@@ -87,6 +87,15 @@ export const COLOR_DRAWER_BACKDROP = "var(--rpl-color-drawer-backdrop, rgba(0, 0
 export const DRAWER_TRANSITION_DURATION = "var(--rpl-drawer-transition-duration, 220ms)";
 export const DRAWER_TRANSITION_EASING = "var(--rpl-drawer-transition-easing, cubic-bezier(0.22, 1, 0.36, 1))";
 
+/**
+ * Pivot animations
+ * User defines @keyframes in their CSS and references via these tokens.
+ * - Enter: Applied when content becomes active
+ * - Leave: Applied when content becomes inactive
+ */
+export const PIVOT_ANIMATION_ENTER = "var(--rpl-pivot-animation-enter, none)";
+export const PIVOT_ANIMATION_LEAVE = "var(--rpl-pivot-animation-leave, none)";
+
 // ========================================
 // SIZING & SPACING
 // ========================================

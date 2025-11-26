@@ -33,7 +33,12 @@ import PS_Tabbar from "./pages/PanelSystem/tabbar";
 import { ResizableFloatingPanelsPreview } from "./pages/ResizableFloatingPanelsPreview";
 import RL_AdaptiveWorkspace from "./pages/ResponsiveLayout/adaptive-workspace";
 
-import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone, FiSidebar } from "react-icons/fi";
+import PV_Basics from "./pages/Pivot/basics";
+import PV_Tabs from "./pages/Pivot/tabs";
+import PV_Sidebar from "./pages/Pivot/sidebar";
+import PV_Transitions from "./pages/Pivot/transitions";
+
+import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone, FiSidebar, FiNavigation } from "react-icons/fi";
 
 export type DemoPage = {
   id: string;
@@ -141,6 +146,18 @@ export const demoCategories: DemoCategory[] = [
     pages: [
       { id: "preview", label: "Preview", path: "preview", element: <PS_Preview /> },
       { id: "tabbar", label: "TabBar", path: "tabbar", element: <PS_Tabbar /> },
+    ],
+  },
+  {
+    id: "pivot",
+    label: "Pivot",
+    icon: <FiNavigation />,
+    base: "/components/pivot",
+    pages: [
+      { id: "basics", label: "Basics", path: "basics", element: <PV_Basics /> },
+      { id: "tabs", label: "Tab Navigation", path: "tabs", element: <PV_Tabs /> },
+      { id: "sidebar", label: "Sidebar Navigation", path: "sidebar", element: <PV_Sidebar /> },
+      { id: "transitions", label: "Transitions", path: "transitions", element: <PV_Transitions /> },
     ],
   },
 ];

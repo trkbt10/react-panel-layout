@@ -9,6 +9,7 @@ import { usePanelState } from "../../panels/state/StateContext";
 import { useTree } from "../../panels/state/tree/Context";
 import { ResizeHandle } from "../../../components/resizer/ResizeHandle";
 import { SPLIT_HANDLE_THICKNESS } from "../../../constants/styles";
+import { useIsomorphicLayoutEffect } from "../../../hooks/useIsomorphicLayoutEffect";
 
 type Rect = { x: number; y: number; w: number; h: number };
 
@@ -50,7 +51,7 @@ export const PanelSplitHandles: React.FC<PanelSplitHandlesProps> = ({ containerR
 
   // Measure container rect after layout to avoid reading stale geometry during render
   const [containerRect, setContainerRect] = React.useState<Pick<DOMRect, "left" | "top" | "width" | "height"> | null>(null);
-  React.useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) {
       return;

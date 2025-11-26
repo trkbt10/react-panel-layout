@@ -85,6 +85,36 @@ export type FloatingWindowConfig = {
   popup?: PopupWindowOptions;
 };
 
+// Pivot item definition for content switching
+export type PivotBehaviorItem = {
+  /** Unique identifier for this content item */
+  id: string;
+  /** Human-readable label (optional) */
+  label?: string;
+  /** The actual content to render when this item is active */
+  content: React.ReactNode;
+  /** Whether this item can be selected */
+  disabled?: boolean;
+};
+
+// Pivot behavior configuration for content switching
+export type PivotBehavior = {
+  /** Array of content items to switch between */
+  items: PivotBehaviorItem[];
+  /** Currently active item ID (controlled mode) */
+  activeId?: string;
+  /** Default active item ID (uncontrolled mode) */
+  defaultActiveId?: string;
+  /** Callback when active item changes */
+  onActiveChange?: (id: string) => void;
+  /**
+   * Transition mode for content switching.
+   * - "css" (default) uses CSS transitions via design tokens.
+   * - "none" disables transitions (uses React.Activity for memory optimization).
+   */
+  transitionMode?: "css" | "none";
+};
+
 // Drawer behavior configuration for mobile-friendly slide-in panels
 export type DrawerBehavior = {
   /** Optional controlled state */
@@ -175,6 +205,7 @@ export type LayerDefinition = {
   // Behaviors
   drawer?: DrawerBehavior;
   floating?: FloatingWindowConfig;
+  pivot?: PivotBehavior;
 
   // Styling
   style?: React.CSSProperties;

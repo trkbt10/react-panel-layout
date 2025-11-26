@@ -57,9 +57,32 @@ export type PanelProps =
       drawer: DrawerBehavior;
       position?: WindowPosition;
       backdropStyle?: React.CSSProperties;
+    })
+  | (Omit<PanelCommonProps, "children"> & {
+      type: "pivot";
+      area: string;
+      /** Currently active item ID (controlled mode) */
+      activeId?: string;
+      /** Default active item ID (uncontrolled mode) */
+      defaultActiveId?: string;
+      /** Callback when active item changes */
+      onActiveChange?: (id: string) => void;
+      children?: React.ReactNode;
     });
 
 export const Panel: React.FC<PanelProps> = () => null;
+
+/**
+ * PivotItem declaration for use inside <Panel type="pivot">
+ */
+export type PivotItemDeclProps = {
+  id: string;
+  label?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
+};
+
+export const PivotItem: React.FC<PivotItemDeclProps> = () => null;
 
 const isElementOf = <P,>(element: unknown, component: React.FC<P>): element is React.ReactElement<P> => {
   if (!React.isValidElement<P>(element)) {
@@ -138,6 +161,33 @@ export const buildRoutesFromChildren = (children: React.ReactNode): PanelRoute[]
           style: props.style,
           drawer: props.drawer,
           backdropStyle: props.backdropStyle,
+        });
+        return;
+      }
+      if (props.type === "pivot") {
+        if (!props.area) {
+          throw new Error(`<Panel id="${props.id}"> requires an explicit 'area' prop when type="pivot".`);
+        }
+        const pivotItems = collectPivotItems(props.children);
+        if (pivotItems.length === 0) {
+          throw new Error(`<Panel id="${props.id}"> requires at least one <PivotItem> child when type="pivot".`);
+        }
+        routes.push({
+          id: props.id,
+          area: props.area,
+          element: null,
+          visible: props.visible,
+          zIndex: props.zIndex,
+          width: props.width,
+          height: props.height,
+          pointerEvents: props.pointerEvents,
+          style: props.style,
+          pivot: {
+            items: pivotItems,
+            activeId: props.activeId,
+            defaultActiveId: props.defaultActiveId,
+            onActiveChange: props.onActiveChange,
+          },
         });
         return;
       }
@@ -300,6 +350,47 @@ const findFirst = <P,>(children: React.ReactNode, marker: React.FC<P>): React.Re
     return null;
   };
   return visit(children);
+};
+
+type CollectedPivotItem = {
+  id: string;
+  label?: string;
+  content: React.ReactNode;
+  disabled?: boolean;
+};
+
+const collectPivotItems = (children: React.ReactNode): CollectedPivotItem[] => {
+  const items: CollectedPivotItem[] = [];
+  const visit = (node: React.ReactNode): void => {
+    if (node === null || node === undefined || typeof node === "boolean") {
+      return;
+    }
+    if (Array.isArray(node)) {
+      node.forEach(visit);
+      return;
+    }
+    if (isElementOf(node, PivotItem)) {
+      const props = node.props as PivotItemDeclProps;
+      if (!props.id) {
+        throw new Error("<PivotItem> requires an 'id' prop.");
+      }
+      items.push({
+        id: props.id,
+        label: props.label,
+        content: props.children ?? null,
+        disabled: props.disabled,
+      });
+      return;
+    }
+    if (React.isValidElement(node)) {
+      if (node.type === React.Fragment) {
+        const el = node as React.ReactElement<{ children?: React.ReactNode }>;
+        visit(el.props.children);
+      }
+    }
+  };
+  visit(children);
+  return items;
 };
 
 export const buildConfigFromChildren = (children: React.ReactNode): PanelLayoutConfig | null => {

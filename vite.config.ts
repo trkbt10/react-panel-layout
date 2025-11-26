@@ -34,6 +34,7 @@ export default defineConfig({
         index: resolve(__dirname, "src/index.tsx"),
         config: resolve(__dirname, "src/config/index.tsx"),
         floating: resolve(__dirname, "src/floating/index.ts"),
+        pivot: resolve(__dirname, "src/pivot/index.ts"),
       },
     },
     rollupOptions: {

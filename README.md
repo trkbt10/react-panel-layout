@@ -300,3 +300,113 @@ const layers: LayerDefinition[] = [
 
 <GridLayout config={config} layers={layers} />;
 ```
+
+---
+
+## Pivot – Headless Content Switching
+
+`usePivot` is a headless hook for building tabbed interfaces, content switchers, and navigation patterns. It handles state management and provides an `Outlet` component for rendering content with CSS transitions.
+
+### Quick Start
+
+```tsx
+import { usePivot } from "react-panel-layout/pivot";
+
+const items = [
+  { id: "home", label: "Home", content: <HomePage /> },
+  { id: "settings", label: "Settings", content: <SettingsPage /> },
+];
+
+function MyTabs() {
+  const { activeId, getItemProps, Outlet } = usePivot({
+    items,
+    defaultActiveId: "home",
+  });
+
+  return (
+    <div>
+      <nav>
+        {items.map((item) => (
+          <button key={item.id} {...getItemProps(item.id)}>
+            {item.label}
+          </button>
+        ))}
+      </nav>
+      <Outlet />
+    </div>
+  );
+}
+```
+
+### Transition Modes
+
+```tsx
+const { Outlet } = usePivot({
+  items,
+  transitionMode: "css",  // "css" (default) | "none"
+});
+```
+
+- `"css"` – Smooth opacity transitions via CSS design tokens (default)
+- `"none"` – Instant switch, uses React.Activity for memory optimization
+
+### Design Tokens
+
+Customize animations via CSS custom properties:
+
+```css
+/* Define enter/leave keyframes */
+@keyframes pivotEnter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pivotLeave {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Reference via design tokens */
+:root {
+  --rpl-pivot-animation-enter: pivotEnter 150ms ease-out forwards;
+  --rpl-pivot-animation-leave: pivotLeave 150ms ease-out forwards;
+}
+```
+
+Example: Slide-up animation:
+```css
+@keyframes pivotSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pivotSlideOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+:root {
+  --rpl-pivot-animation-enter: pivotSlideIn 150ms ease-out forwards;
+  --rpl-pivot-animation-leave: pivotSlideOut 150ms ease-out forwards;
+}
+```
+
+### UsePivotOptions
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `items` | `PivotItem[]` | Array of content items |
+| `activeId` | `string` | Controlled active item ID |
+| `defaultActiveId` | `string` | Default active item (uncontrolled) |
+| `onActiveChange` | `(id) => void` | Callback when active item changes |
+| `transitionMode` | `"css" \| "none"` | Enable/disable CSS transitions |
+
+### UsePivotResult
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `activeId` | `string` | Current active item ID |
+| `setActiveId` | `(id) => void` | Change active item |
+| `isActive` | `(id) => boolean` | Check if item is active |
+| `getItemProps` | `(id) => props` | Get props for navigation elements |
+| `Outlet` | `React.FC` | Component that renders active content |

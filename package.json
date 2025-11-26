@@ -30,6 +30,11 @@
       "import": "./dist/floating.js",
       "require": "./dist/floating.cjs"
     },
+    "./pivot": {
+      "types": "./dist/pivot/index.d.ts",
+      "import": "./dist/pivot.js",
+      "require": "./dist/pivot.cjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [

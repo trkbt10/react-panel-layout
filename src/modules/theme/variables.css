@@ -119,4 +119,17 @@
 
   --rpl-size-horizontal-divider-width: 4px;
   --rpl-space-horizontal-divider-hit-area-offset: 4px;
+
+  /* ========== Pivot ========== */
+
+  /* Enter animation: applied when content becomes active.
+   * User defines @keyframes and references here.
+   * Example: --rpl-pivot-animation-enter: pivotFadeIn 150ms ease-out forwards;
+   */
+  --rpl-pivot-animation-enter: none;
+
+  /* Leave animation: applied when content becomes inactive.
+   * Example: --rpl-pivot-animation-leave: pivotFadeOut 150ms ease-out forwards;
+   */
+  --rpl-pivot-animation-leave: none;
 }

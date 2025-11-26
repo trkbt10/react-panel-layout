@@ -12,6 +12,7 @@ import type {
   LayerPositionMode,
   PanelLayoutConfig,
   PanelLayoutProps,
+  PivotBehavior,
   WindowPosition,
 } from "../types";
 import { GridLayout } from "../components/grid/GridLayout";
@@ -50,6 +51,8 @@ export type PanelRoute = {
   drawer?: DrawerBehavior;
   /** Floating window configuration. */
   floating?: FloatingWindowConfig;
+  /** Pivot behavior for content switching. */
+  pivot?: PivotBehavior;
 
   /**
    * Optional child declarations; purely a grouping convenience.
@@ -81,6 +84,7 @@ const toLayer = (route: PanelRoute): LayerDefinition => {
     style: route.style,
     drawer: route.drawer,
     floating: route.floating,
+    pivot: route.pivot,
     backdropStyle: route.backdropStyle,
   } satisfies LayerDefinition;
 };
