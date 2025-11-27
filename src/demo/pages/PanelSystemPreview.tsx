@@ -15,11 +15,26 @@ import {
 import type { TabBarRenderProps } from "../../modules/panels/state/types";
 import styles from "./PanelSystemPreview.module.css";
 
+const CounterContent: React.FC<{ id: string; title: string }> = ({ id, title }) => {
+  const [count, setCount] = React.useState(0);
+  return (
+    <div className={styles.tabContent}>
+      <div>{title} content (id: {id})</div>
+      <div style={{ marginTop: 12 }}>
+        <span>count: {count}</span>
+        <button type="button" onClick={() => setCount((c) => c + 1)} style={{ marginLeft: 8 }}>
+          +1
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const makeTabs = (): TabDefinition[] => {
   const mk = (id: string, title: string): TabDefinition => ({
     id,
     title,
-    render: () => React.createElement("div", { className: styles.tabContent }, `${title} content`),
+    render: (panelId) => <CounterContent key={panelId} id={panelId} title={title} />,
   });
   return [mk("welcome", "Welcome"), mk("explorer", "Explorer"), mk("preview", "Preview")];
 };

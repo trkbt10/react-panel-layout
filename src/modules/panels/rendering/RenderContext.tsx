@@ -13,6 +13,7 @@ export type PanelRenderContextValue = {
   onStartTabDrag: (tabId: PanelId, groupId: GroupId, e: React.PointerEvent) => void;
   onStartContentDrag: (groupId: GroupId, e: React.PointerEvent<HTMLDivElement>) => void;
   doubleClickToAdd?: boolean;
+  registerContentContainer: (groupId: GroupId, element: HTMLElement | null) => void;
 };
 
 const PanelRenderContext = React.createContext<PanelRenderContextValue | null>(null);

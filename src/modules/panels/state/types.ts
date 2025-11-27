@@ -41,8 +41,8 @@ export type PanelSplitLimits = number | RowsColsSplitLimits | LegacySplitLimits;
 export type TabDefinition = {
   id: PanelId;
   title: string;
-  /** Render function to avoid remount on move */
-  render: () => React.ReactNode;
+  /** Render function receives panel id to enable proper keying */
+  render: (id: PanelId) => React.ReactNode;
 };
 
 export type GroupModel = {

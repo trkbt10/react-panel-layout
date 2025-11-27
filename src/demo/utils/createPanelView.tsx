@@ -17,7 +17,7 @@ export const createPanelView = (
   const TabBarComp = TabBarImpl ?? DefaultTabBar;
   const PanelGroupComp: React.ComponentType<PanelGroupRenderProps> = PanelGroupImpl ?? ((p) => <PanelGroupView {...p} />);
   const View: PanelViewComponent = ({ groupId }) => {
-    const { getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartContentDrag, onStartTabDrag, doubleClickToAdd } = usePanelRenderContext();
+    const { getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, doubleClickToAdd, registerContentContainer } = usePanelRenderContext();
     const { setGroupEl, setTabbarEl, setContentEl } = useDomRegistry();
 
     const group = getGroup(groupId);
@@ -26,7 +26,10 @@ export const createPanelView = (
     }
     const content = getGroupContent(groupId);
     const groupRef = React.useCallback((el: HTMLDivElement | null) => setGroupEl(groupId, el), [groupId, setGroupEl]);
-    const contentRef = React.useCallback((el: HTMLDivElement | null) => setContentEl(groupId, el), [groupId, setContentEl]);
+    const contentRef = React.useCallback((el: HTMLDivElement | null) => {
+      setContentEl(groupId, el);
+      registerContentContainer(groupId, el);
+    }, [groupId, setContentEl, registerContentContainer]);
     const tabbarRef = React.useCallback((el: HTMLDivElement | null) => setTabbarEl(groupId, el), [groupId, setTabbarEl]);
 
     return (
@@ -46,7 +49,6 @@ export const createPanelView = (
         content={content}
         groupRef={groupRef}
         contentRef={contentRef}
-        onContentPointerDown={(e) => onStartContentDrag(groupId, e)}
       />
     );
   };

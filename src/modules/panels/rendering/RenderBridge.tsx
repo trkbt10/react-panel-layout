@@ -5,14 +5,22 @@ import * as React from "react";
 import { usePanelInteractions } from "../interactions/InteractionsContext";
 import { PanelRenderProvider } from "./RenderContext";
 import { usePanelState } from "../state/StateContext";
+import { ContentRegistryProvider, useContentRegistry } from "./ContentRegistry";
+import type { PanelId, GroupId } from "../state/types";
 
-export const RenderBridge: React.FC<React.PropsWithChildren<{ emptyContentComponent?: React.ComponentType; doubleClickToAdd?: boolean }>> = ({
+type PanelPlacement = {
+  groupId: GroupId;
+  isActive: boolean;
+};
+
+const RenderBridgeInner: React.FC<React.PropsWithChildren<{ emptyContentComponent?: React.ComponentType; doubleClickToAdd?: boolean }>> = ({
   children,
   emptyContentComponent,
   doubleClickToAdd,
 }) => {
   const interactions = usePanelInteractions();
   const { state, actions } = usePanelState();
+  const { registerContentContainer } = useContentRegistry();
 
   const DefaultEmpty: React.FC = React.useCallback(() => {
     return React.createElement("div", { style: { color: "#888", fontSize: 12, padding: 12 } }, "No tabs");
@@ -34,20 +42,13 @@ export const RenderBridge: React.FC<React.PropsWithChildren<{ emptyContentCompon
   const getGroupContent = React.useCallback(
     (id: string) => {
       const group = state.groups[id];
-      if (!group) {
+      if (!group || group.tabIds.length === 0) {
         return <Empty />;
       }
-      const activeTabId = group.activeTabId;
-      if (!activeTabId) {
-        return <Empty />;
-      }
-      const tab = state.panels[activeTabId];
-      if (!tab) {
-        return <Empty />;
-      }
-      return tab.render();
+      // Content is rendered via Portal from ContentRegistry
+      return null;
     },
-    [state.groups, state.panels, Empty],
+    [state.groups, Empty],
   );
 
   const onClickTab = React.useCallback((gid: string, tabId: string) => {
@@ -76,9 +77,39 @@ export const RenderBridge: React.FC<React.PropsWithChildren<{ emptyContentCompon
   }, [state.groups, interactions]);
 
   const value = React.useMemo(
-    () => ({ getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag, doubleClickToAdd }),
-    [getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag, doubleClickToAdd],
+    () => ({ getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag, doubleClickToAdd, registerContentContainer }),
+    [getGroup, getGroupContent, onClickTab, onAddTab, onCloseTab, onStartTabDrag, onStartContentDrag, doubleClickToAdd, registerContentContainer],
   );
 
   return <PanelRenderProvider value={value}>{children}</PanelRenderProvider>;
+};
+
+export const RenderBridge: React.FC<React.PropsWithChildren<{ emptyContentComponent?: React.ComponentType; doubleClickToAdd?: boolean }>> = ({
+  children,
+  emptyContentComponent,
+  doubleClickToAdd,
+}) => {
+  const { state } = usePanelState();
+
+  // Compute placements: which group each panel belongs to and if it's active
+  const placements = React.useMemo(() => {
+    const result: Record<PanelId, PanelPlacement> = {};
+    for (const [groupId, group] of Object.entries(state.groups)) {
+      for (const tabId of group.tabIds) {
+        result[tabId] = {
+          groupId,
+          isActive: tabId === group.activeTabId,
+        };
+      }
+    }
+    return result;
+  }, [state.groups]);
+
+  return (
+    <ContentRegistryProvider panels={state.panels} placements={placements}>
+      <RenderBridgeInner emptyContentComponent={emptyContentComponent} doubleClickToAdd={doubleClickToAdd}>
+        {children}
+      </RenderBridgeInner>
+    </ContentRegistryProvider>
+  );
 };
