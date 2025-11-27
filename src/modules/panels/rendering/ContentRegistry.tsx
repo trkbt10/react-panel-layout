@@ -3,10 +3,11 @@
  * Manages component lifecycle to preserve state across tab switches and panel moves.
  *
  * Architecture:
- * - Each panel has a stable wrapper element created outside React
- * - Content is portaled into the wrapper
- * - The wrapper is moved between containers using DOM manipulation
- * - React manages content lifecycle, DOM manages wrapper position
+ * - Panel contents are rendered once via React and cached
+ * - Each panel has a stable wrapper element managed outside React's tree
+ * - The wrapper is moved between containers using DOM APIs
+ * - This hybrid approach is necessary because React portals remount on container change
+ * - React.Activity controls visibility without unmounting
  */
 import * as React from "react";
 import { createPortal } from "react-dom";
@@ -32,43 +33,44 @@ export const useContentRegistry = (): ContentRegistryContextValue => {
 };
 
 /**
- * Creates and manages a wrapper element for a panel's content.
- * The wrapper is moved between containers using DOM manipulation.
+ * Creates a stable wrapper element for panel content.
+ * The wrapper is created once and reused across the component's lifetime.
+ *
+ * Note: This uses DOM API to create an element outside React's tree.
+ * This is necessary because React portals remount when container changes.
+ */
+const createPanelWrapper = (panelId: PanelId): HTMLDivElement => {
+  const wrapper = document.createElement("div");
+  wrapper.setAttribute("data-panel-wrapper", panelId);
+  wrapper.style.display = "contents";
+  return wrapper;
+};
+
+/**
+ * Manages wrapper element lifecycle and positioning.
+ * Uses DOM APIs to move the wrapper between containers without React remount.
  */
 const usePanelWrapper = (
   panelId: PanelId,
   containerElement: HTMLElement | null,
   isActive: boolean,
-): HTMLDivElement | null => {
-  const wrapperRef = React.useRef<HTMLDivElement | null>(null);
+): HTMLDivElement => {
+  // Create wrapper element once using lazy initialization
+  const [wrapper] = React.useState(() => createPanelWrapper(panelId));
 
-  // Create wrapper element once
-  if (!wrapperRef.current) {
-    const wrapper = document.createElement("div");
-    wrapper.setAttribute("data-panel-wrapper", panelId);
-    wrapper.style.display = "contents";
-    wrapperRef.current = wrapper;
-  }
-
-  const wrapper = wrapperRef.current;
-
-  // Move wrapper to container and update visibility
+  // Move wrapper to container and manage visibility
   React.useLayoutEffect(() => {
-    if (!wrapper) return;
-
-    // Update visibility
+    // Update visibility via CSS
     wrapper.style.display = isActive ? "contents" : "none";
 
-    // Move to container if needed
+    // Move to target container if different from current parent
     if (containerElement && wrapper.parentElement !== containerElement) {
       containerElement.appendChild(wrapper);
     }
 
+    // Cleanup: remove wrapper from DOM when component unmounts
     return () => {
-      // Only remove if wrapper is in the DOM
-      if (wrapper.parentElement) {
-        wrapper.parentElement.removeChild(wrapper);
-      }
+      wrapper.parentElement?.removeChild(wrapper);
     };
   }, [wrapper, containerElement, isActive]);
 
@@ -77,7 +79,7 @@ const usePanelWrapper = (
 
 /**
  * Host component for a single panel's content.
- * Uses a portal to render content into a movable wrapper element.
+ * Uses createPortal to render React content into a stable wrapper element.
  */
 type PanelContentHostProps = {
   panelId: PanelId;
@@ -91,10 +93,7 @@ const PanelContentHost: React.FC<PanelContentHostProps> = React.memo(
     const isActive = placement?.isActive ?? false;
     const wrapper = usePanelWrapper(panelId, containerElement, isActive);
 
-    if (!wrapper) {
-      return null;
-    }
-
+    // Use React portal to render content into the stable wrapper
     return createPortal(
       <React.Activity mode={isActive ? "visible" : "hidden"}>
         {content}
@@ -120,7 +119,7 @@ export const ContentRegistryProvider: React.FC<ContentRegistryProviderProps> = (
   placements,
 }) => {
   const [containers, setContainers] = React.useState<Map<GroupId, HTMLElement>>(new Map());
-  // Store rendered content per panel to preserve across moves
+  // Store rendered content per panel to preserve React element identity
   const contentCacheRef = React.useRef<Map<PanelId, React.ReactNode>>(new Map());
 
   const registerContentContainer = React.useCallback((groupId: GroupId, element: HTMLElement | null): void => {
@@ -140,15 +139,19 @@ export const ContentRegistryProvider: React.FC<ContentRegistryProviderProps> = (
     [registerContentContainer],
   );
 
-  // Get or create cached content for a panel
-  const getOrCreateContent = (panelId: PanelId, tab: TabDefinition): React.ReactNode => {
-    let content = contentCacheRef.current.get(panelId);
-    if (!content) {
-      content = tab.render(tab.id);
-      contentCacheRef.current.set(panelId, content);
+  /**
+   * Gets cached content or creates and caches new content.
+   * Content is created once per panel and reused to preserve React element identity.
+   */
+  const getOrCreateContent = React.useCallback((panelId: PanelId, tab: TabDefinition): React.ReactNode => {
+    const cached = contentCacheRef.current.get(panelId);
+    if (cached) {
+      return cached;
     }
-    return content;
-  };
+    const newContent = tab.render(tab.id);
+    contentCacheRef.current.set(panelId, newContent);
+    return newContent;
+  }, []);
 
   const panelIds = Object.keys(panels);
 

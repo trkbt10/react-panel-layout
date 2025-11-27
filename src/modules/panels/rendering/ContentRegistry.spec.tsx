@@ -57,16 +57,7 @@ describe("ContentRegistry", () => {
   });
 
   beforeEach(() => {
-    // Mock ResizeObserver
-    (globalThis as any).ResizeObserver = class MockResizeObserver {
-      callback: ResizeObserverCallback;
-      constructor(callback: ResizeObserverCallback) {
-        this.callback = callback;
-      }
-      observe(): void {}
-      unobserve(): void {}
-      disconnect(): void {}
-    };
+    // Mock ResizeObserver (polyfill provided in vitest.setup.ts)
 
     // Mock pointer capture methods
     Element.prototype.setPointerCapture = vi.fn();

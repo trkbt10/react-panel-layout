@@ -18,3 +18,14 @@ if (typeof (globalThis as any).IntersectionObserver === "undefined") {
   }
   ;(globalThis as any).IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
 }
+
+// Polyfill ResizeObserver for jsdom environment
+if (typeof (globalThis as any).ResizeObserver === "undefined") {
+  class MockResizeObserver {
+    constructor(_callback: ResizeObserverCallback) {}
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  }
+  ;(globalThis as any).ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+}
