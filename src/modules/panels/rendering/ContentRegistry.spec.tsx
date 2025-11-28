@@ -220,4 +220,86 @@ describe("ContentRegistry", () => {
     // panel-1's counter should still be 3
     expect(screen.getByTestId("count-panel-1").textContent).toBe("3");
   });
+
+  it("should handle multiple panels in same group without wrapper conflicts", () => {
+    const panels = {
+      "panel-1": createPanel("panel-1"),
+      "panel-2": createPanel("panel-2"),
+      "panel-3": createPanel("panel-3"),
+    };
+
+    const state: TestState = {
+      panels,
+      placements: {
+        "panel-1": { groupId: "group-1", isActive: true },
+        "panel-2": { groupId: "group-1", isActive: false },
+        "panel-3": { groupId: "group-1", isActive: false },
+      },
+      groupIds: ["group-1"],
+    };
+
+    render(<TestHarness state={state} />);
+
+    const container = screen.getByTestId("container-group-1");
+
+    // All panel wrappers should be inside the container
+    const wrappers = container.querySelectorAll("[data-panel-wrapper]");
+    expect(wrappers.length).toBe(3);
+
+    // Each wrapper should have unique panel id
+    const wrapperIds = Array.from(wrappers).map((w) => w.getAttribute("data-panel-wrapper"));
+    expect(wrapperIds).toContain("panel-1");
+    expect(wrapperIds).toContain("panel-2");
+    expect(wrapperIds).toContain("panel-3");
+
+    // Active panel content should be visible
+    expect(screen.getByTestId("content-panel-1")).toBeVisible();
+  });
+
+  it("should not have wrapper nesting issues when panels move between groups", () => {
+    const panels = {
+      "panel-1": createPanel("panel-1"),
+      "panel-2": createPanel("panel-2"),
+    };
+
+    const initialState: TestState = {
+      panels,
+      placements: {
+        "panel-1": { groupId: "group-1", isActive: true },
+        "panel-2": { groupId: "group-1", isActive: false },
+      },
+      groupIds: ["group-1", "group-2"],
+    };
+
+    const { rerender } = render(<TestHarness state={initialState} />);
+
+    // Initially both panels in group-1
+    const container1 = screen.getByTestId("container-group-1");
+    expect(container1.querySelectorAll("[data-panel-wrapper]").length).toBe(2);
+
+    // Move panel-2 to group-2
+    const movedState: TestState = {
+      panels,
+      placements: {
+        "panel-1": { groupId: "group-1", isActive: true },
+        "panel-2": { groupId: "group-2", isActive: true },
+      },
+      groupIds: ["group-1", "group-2"],
+    };
+    rerender(<TestHarness state={movedState} />);
+
+    // Now each group should have exactly one wrapper
+    const container1After = screen.getByTestId("container-group-1");
+    const container2 = screen.getByTestId("container-group-2");
+
+    expect(container1After.querySelectorAll("[data-panel-wrapper]").length).toBe(1);
+    expect(container2.querySelectorAll("[data-panel-wrapper]").length).toBe(1);
+
+    // Wrappers should not be nested inside each other
+    const allWrappers = document.querySelectorAll("[data-panel-wrapper]");
+    allWrappers.forEach((wrapper) => {
+      const nestedWrappers = wrapper.querySelectorAll("[data-panel-wrapper]");
+      expect(nestedWrappers.length).toBe(0);
+    });
+  });
 });
