@@ -36,7 +36,6 @@ function Home() {
   return (
     <div
       style={{
-        minHeight: "100%",
         background: "var(--rpl-demo-gradient-hero)",
         padding: `${pagePaddingY} ${pagePaddingX}`,
         fontFamily: "var(--rpl-demo-font-family)",

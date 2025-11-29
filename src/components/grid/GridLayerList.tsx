@@ -53,17 +53,12 @@ const LayerResizeHandles = React.memo<{
 LayerResizeHandles.displayName = "LayerResizeHandles";
 
 /**
- * Determines the overflow style for a layer based on scrollable flag and root level.
- * - Root level + scrollable: visible (delegate to browser scroll)
- * - Nested + scrollable: auto (container scroll)
+ * Determines the overflow style for a layer based on scrollable flag.
+ * - scrollable: auto (enable scrolling within container)
  * - Not scrollable: hidden (prevent overflow)
  */
-const resolveOverflowStyle = (scrollable: boolean | undefined, isRootLevel: boolean): React.CSSProperties["overflow"] => {
-  if (!scrollable) {
-    return "hidden";
-  }
-  // At root level, delegate to browser's native scroll
-  return isRootLevel ? "visible" : "auto";
+const resolveOverflowStyle = (scrollable: boolean | undefined): React.CSSProperties["overflow"] => {
+  return scrollable ? "auto" : "hidden";
 };
 
 /**
@@ -73,7 +68,7 @@ const EmbeddedLayer = React.memo<{
   layer: LayerDefinition;
   handleLayerPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
 }>(({ layer, handleLayerPointerDown }) => {
-  const { getLayerRenderState, isRootLevel } = useGridLayoutContext();
+  const { getLayerRenderState } = useGridLayoutContext();
   const { style, isResizable, isResizing, onResizeHandlePointerDown } = getLayerRenderState(layer);
 
   const gridPlacementStyle = React.useMemo<React.CSSProperties>(() => {
@@ -92,8 +87,7 @@ const EmbeddedLayer = React.memo<{
 
   const combinedStyle = React.useMemo<React.CSSProperties>(() => {
     // min-width/height: 0 allows grid items to shrink below content size
-    // overflow behavior depends on scrollable flag and root level detection
-    const overflow = resolveOverflowStyle(layer.scrollable, isRootLevel);
+    const overflow = resolveOverflowStyle(layer.scrollable);
     const baseStyle: React.CSSProperties = {
       ...style,
       ...gridPlacementStyle,
@@ -102,7 +96,7 @@ const EmbeddedLayer = React.memo<{
       overflow,
     };
     return isResizable ? { ...baseStyle, position: "relative" } : baseStyle;
-  }, [style, gridPlacementStyle, isResizable, layer.scrollable, isRootLevel]);
+  }, [style, gridPlacementStyle, isResizable, layer.scrollable]);
 
   const handleClose = React.useCallback(() => {
     layer.floating?.onClose?.();
