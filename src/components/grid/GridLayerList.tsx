@@ -62,12 +62,22 @@ const LayerResizeHandles = React.memo<{
 LayerResizeHandles.displayName = "LayerResizeHandles";
 
 /**
- * Determines the overflow style for a layer based on scrollable flag.
+ * Determines the overflow style for a layer based on scrollable flag and floating status.
  * - scrollable: auto (enable scrolling within container)
- * - Not scrollable: hidden (prevent overflow)
+ * - floating: visible (allow box-shadow to render outside bounds)
+ * - Not scrollable and not floating: hidden (prevent overflow)
  */
-const resolveOverflowStyle = (scrollable: boolean | undefined): React.CSSProperties["overflow"] => {
-  return scrollable ? "auto" : "hidden";
+const resolveOverflowStyle = (
+  scrollable: boolean | undefined,
+  isFloating: boolean,
+): React.CSSProperties["overflow"] => {
+  if (scrollable) {
+    return "auto";
+  }
+  if (isFloating) {
+    return "visible";
+  }
+  return "hidden";
 };
 
 /**
@@ -96,7 +106,8 @@ const EmbeddedLayer = React.memo<{
 
   const combinedStyle = React.useMemo<React.CSSProperties>(() => {
     // min-width/height: 0 allows grid items to shrink below content size
-    const overflow = resolveOverflowStyle(layer.scrollable);
+    const isFloating = Boolean(layer.floating);
+    const overflow = resolveOverflowStyle(layer.scrollable, isFloating);
     const baseStyle: React.CSSProperties = {
       ...style,
       ...gridPlacementStyle,
@@ -105,7 +116,7 @@ const EmbeddedLayer = React.memo<{
       overflow,
     };
     return isResizable ? { ...baseStyle, position: "relative" } : baseStyle;
-  }, [style, gridPlacementStyle, isResizable, layer.scrollable]);
+  }, [style, gridPlacementStyle, isResizable, layer.scrollable, layer.floating]);
 
   const handleClose = React.useCallback(() => {
     layer.floating?.onClose?.();
