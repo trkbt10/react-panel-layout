@@ -26,30 +26,12 @@
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
-.dots {
-  display: flex;
-  gap: 6px;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.dotRed {
-  background: #ff5f57;
-}
-
-.dotYellow {
-  background: #febc2e;
-}
-
-.dotGreen {
-  background: #28c840;
+.codeIcon {
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
 }
 
 .title {
