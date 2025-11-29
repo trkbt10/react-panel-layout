@@ -2,8 +2,8 @@
  * @file Drawer - Animations comparison page
  */
 import * as React from "react";
-import { DrawerAnimations, code } from "../DrawerAnimations";
-import { SingleSamplePage } from "../../components";
+import { DrawerAnimations, code } from "../components/DrawerAnimations";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

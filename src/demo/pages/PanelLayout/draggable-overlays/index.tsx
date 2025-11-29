@@ -2,8 +2,8 @@
  * @file PanelLayout - Draggable Overlays page
  */
 import * as React from "react";
-import { DraggableOverlays, code as draggableOverlaysCode } from "../DraggableOverlays";
-import { SingleSamplePage } from "../../components";
+import { DraggableOverlays, code as draggableOverlaysCode } from "../components/DraggableOverlays";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

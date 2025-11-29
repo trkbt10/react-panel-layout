@@ -6,7 +6,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter, Routes, Route, Outlet, Link } from "react-router";
 import { Layout } from "./Layout";
-import { PanelLayoutDemo } from "./PanelLayoutDemo";
+import { PanelLayoutDemo } from "./pages/PanelLayout/PanelLayoutDemo";
 import { demoCategories } from "./routes";
 import * as React from "react";
 import { useMedia } from "./hooks/useMedia";

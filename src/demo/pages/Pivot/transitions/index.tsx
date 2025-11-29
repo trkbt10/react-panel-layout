@@ -2,8 +2,8 @@
  * @file Pivot - Transitions page
  */
 import * as React from "react";
-import { PivotTransitions, code } from "../PivotTransitions";
-import { SingleSamplePage } from "../../components";
+import { PivotTransitions, code } from "../components/PivotTransitions";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

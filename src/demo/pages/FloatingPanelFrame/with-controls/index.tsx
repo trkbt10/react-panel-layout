@@ -2,8 +2,8 @@
  * @file FloatingPanelFrame - With Controls sample page
  */
 import * as React from "react";
-import { PanelWithControls, code as panelWithControlsCode } from "../PanelWithControls";
-import { SingleSamplePage } from "../../components";
+import { PanelWithControls, code as panelWithControlsCode } from "../components/PanelWithControls";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   const [open, setOpen] = React.useState(true);

@@ -2,8 +2,8 @@
  * @file FloatingPanelFrame - Basic sample page (single sample)
  */
 import * as React from "react";
-import { BasicPanel, code as basicPanelCode } from "../BasicPanel";
-import { SingleSamplePage } from "../../components";
+import { BasicPanel, code as basicPanelCode } from "../components/BasicPanel";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

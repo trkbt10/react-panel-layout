@@ -2,8 +2,8 @@
  * @file PanelSystem - Preview page
  */
 import * as React from "react";
-import { PanelSystemPreview } from "../../PanelSystemPreview";
-import { DemoPage } from "../../components";
+import { PanelSystemPreview } from "../PanelSystemPreview";
+import { DemoPage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

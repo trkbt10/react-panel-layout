@@ -4,12 +4,12 @@
 import * as React from "react";
 import { Section, Story, StoryActionButton } from "../../components/Story";
 import { CodePreview } from "../../components/CodePreview";
-import { BasicPanel, code as basicPanelCode } from "./BasicPanel";
-import { PanelWithMeta, code as panelWithMetaCode } from "./PanelWithMeta";
-import { PanelWithControls, code as panelWithControlsCode } from "./PanelWithControls";
-import { ComplexPanel, code as complexPanelCode } from "./ComplexPanel";
-import { ScrollablePanel, code as scrollablePanelCode } from "./ScrollablePanel";
-import { DemoPage } from "../components";
+import { BasicPanel, code as basicPanelCode } from "./components/BasicPanel";
+import { PanelWithMeta, code as panelWithMetaCode } from "./components/PanelWithMeta";
+import { PanelWithControls, code as panelWithControlsCode } from "./components/PanelWithControls";
+import { ComplexPanel, code as complexPanelCode } from "./components/ComplexPanel";
+import { ScrollablePanel, code as scrollablePanelCode } from "./components/ScrollablePanel";
+import { DemoPage } from "../../components/layout";
 
 export const FloatingPanelFramePreview: React.FC = () => {
   const [showPanel1, setShowPanel1] = React.useState(true);

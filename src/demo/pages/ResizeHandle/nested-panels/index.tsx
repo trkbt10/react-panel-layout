@@ -2,8 +2,8 @@
  * @file ResizeHandle - Nested panels page
  */
 import * as React from "react";
-import { NestedPanelsDemo, code as nestedPanelsCode } from "../NestedPanelsDemo";
-import { SingleSamplePage } from "../../components";
+import { NestedPanelsDemo, code as nestedPanelsCode } from "../components/NestedPanelsDemo";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

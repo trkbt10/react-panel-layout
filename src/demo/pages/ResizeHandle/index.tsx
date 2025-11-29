@@ -4,11 +4,11 @@
 import * as React from "react";
 import { Section, Story } from "../../components/Story";
 import { CodePreview } from "../../components/CodePreview";
-import { VerticalResizeDemo, code as verticalCode } from "./VerticalResizeDemo";
-import { HorizontalResizeDemo, code as horizontalCode } from "./HorizontalResizeDemo";
-import { BothDirectionsDemo, code as bothDirectionsCode } from "./BothDirectionsDemo";
-import { NestedPanelsDemo, code as nestedPanelsCode } from "./NestedPanelsDemo";
-import { DemoPage } from "../components";
+import { VerticalResizeDemo, code as verticalCode } from "./components/VerticalResizeDemo";
+import { HorizontalResizeDemo, code as horizontalCode } from "./components/HorizontalResizeDemo";
+import { BothDirectionsDemo, code as bothDirectionsCode } from "./components/BothDirectionsDemo";
+import { NestedPanelsDemo, code as nestedPanelsCode } from "./components/NestedPanelsDemo";
+import { DemoPage } from "../../components/layout";
 import styles from "./index.module.css";
 
 export const ResizeHandlePreview: React.FC = () => {

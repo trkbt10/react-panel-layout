@@ -2,8 +2,8 @@
  * @file Responsive Layout - Adaptive workspace page
  */
 import * as React from "react";
-import { ResponsiveWorkspace, code } from "../ResponsiveWorkspace";
-import { SingleSamplePage } from "../../components";
+import { ResponsiveWorkspace, code } from "../components/ResponsiveWorkspace";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

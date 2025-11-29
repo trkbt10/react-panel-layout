@@ -2,8 +2,8 @@
  * @file PanelLayout - Dashboard Layout page
  */
 import * as React from "react";
-import { DashboardLayout, code as dashboardLayoutCode } from "../DashboardLayout";
-import { SingleSamplePage } from "../../components";
+import { DashboardLayout, code as dashboardLayoutCode } from "../components/DashboardLayout";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

@@ -2,8 +2,8 @@
  * @file ResizeHandle - Both directions page
  */
 import * as React from "react";
-import { BothDirectionsDemo, code as bothCode } from "../BothDirectionsDemo";
-import { SingleSamplePage } from "../../components";
+import { BothDirectionsDemo, code as bothCode } from "../components/BothDirectionsDemo";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

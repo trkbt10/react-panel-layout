@@ -2,8 +2,8 @@
  * @file Pivot - Basics page
  */
 import * as React from "react";
-import { PivotBasics, code } from "../PivotBasics";
-import { SingleSamplePage } from "../../components";
+import { PivotBasics, code } from "../components/PivotBasics";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

@@ -2,8 +2,8 @@
  * @file Drawer - Menu layout page
  */
 import * as React from "react";
-import { DrawerMenuLayout, code } from "../DrawerMenuLayout";
-import { SingleSamplePage } from "../../components";
+import { DrawerMenuLayout, code } from "../components/DrawerMenuLayout";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

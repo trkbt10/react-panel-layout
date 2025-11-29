@@ -2,8 +2,8 @@
  * @file PanelLayout - Simple Grid page
  */
 import * as React from "react";
-import { SimpleGrid, code as simpleGridCode } from "../SimpleGrid";
-import { SingleSamplePage } from "../../components";
+import { SimpleGrid, code as simpleGridCode } from "../components/SimpleGrid";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

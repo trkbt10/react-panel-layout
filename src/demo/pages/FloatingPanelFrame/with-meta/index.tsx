@@ -2,8 +2,8 @@
  * @file FloatingPanelFrame - With Meta sample page
  */
 import * as React from "react";
-import { PanelWithMeta, code as panelWithMetaCode } from "../PanelWithMeta";
-import { SingleSamplePage } from "../../components";
+import { PanelWithMeta, code as panelWithMetaCode } from "../components/PanelWithMeta";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

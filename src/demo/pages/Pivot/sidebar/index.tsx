@@ -2,8 +2,8 @@
  * @file Pivot - Sidebar page
  */
 import * as React from "react";
-import { PivotSidebar, code } from "../PivotSidebar";
-import { SingleSamplePage } from "../../components";
+import { PivotSidebar, code } from "../components/PivotSidebar";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

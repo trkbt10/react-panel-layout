@@ -5,7 +5,7 @@ import * as React from "react";
 import type { GroupModel, GroupId, PanelId, TabBarRenderProps } from "../../../../modules/panels/state/types";
 import { InteractionsProvider } from "../../../../modules/panels/interactions/InteractionsContext";
 import { DomRegistryProvider } from "../../../../modules/panels/dom/DomRegistry";
-import { DemoPage } from "../../components";
+import { DemoPage } from "../../../components/layout";
 import { ChromeTabBar, VSCodeTabBar, GitHubTabBar } from "../../../components/tab-styles";
 import {
   DemoTabbarConfigProvider,

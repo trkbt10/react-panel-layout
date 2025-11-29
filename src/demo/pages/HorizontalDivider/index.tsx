@@ -4,10 +4,10 @@
 import * as React from "react";
 import { Section, Story } from "../../components/Story";
 import { CodePreview } from "../../components/CodePreview";
-import { SimpleResizablePanels, code as simpleCode } from "./SimpleResizablePanels";
-import { PanelsWithRichContent, code as richContentCode } from "./PanelsWithRichContent";
-import { ThreePanelLayout, code as threePanelCode } from "./ThreePanelLayout";
-import { DemoPage } from "../components";
+import { SimpleResizablePanels, code as simpleCode } from "./components/SimpleResizablePanels";
+import { PanelsWithRichContent, code as richContentCode } from "./components/PanelsWithRichContent";
+import { ThreePanelLayout, code as threePanelCode } from "./components/ThreePanelLayout";
+import { DemoPage } from "../../components/layout";
 import styles from "./index.module.css";
 
 export const HorizontalDividerPreview: React.FC = () => {

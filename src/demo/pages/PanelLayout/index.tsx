@@ -4,13 +4,13 @@
 import * as React from "react";
 import { Section, Story } from "../../components/Story";
 import { CodePreview } from "../../components/CodePreview";
-import { IDELayout, code as ideLayoutCode } from "./IDELayout";
-import { SimpleGrid, code as simpleGridCode } from "./SimpleGrid";
-import { DashboardLayout, code as dashboardLayoutCode } from "./DashboardLayout";
-import { DraggableOverlays, code as draggableOverlaysCode } from "./DraggableOverlays";
-import { DrawerMenuLayout, code as drawerMenuCode } from "../Drawer/DrawerMenuLayout";
-import { DrawerBasics, code as drawerBasicsCode } from "../Drawer/DrawerBasics";
-import { DemoPage } from "../components";
+import { IDELayout, code as ideLayoutCode } from "./components/IDELayout";
+import { SimpleGrid, code as simpleGridCode } from "./components/SimpleGrid";
+import { DashboardLayout, code as dashboardLayoutCode } from "./components/DashboardLayout";
+import { DraggableOverlays, code as draggableOverlaysCode } from "./components/DraggableOverlays";
+import { DrawerMenuLayout, code as drawerMenuCode } from "../Drawer/components/DrawerMenuLayout";
+import { DrawerBasics, code as drawerBasicsCode } from "../Drawer/components/DrawerBasics";
+import { DemoPage } from "../../components/layout";
 
 export const PanelLayoutPreview: React.FC = () => {
   return (

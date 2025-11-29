@@ -2,8 +2,8 @@
  * @file FloatingPanelFrame - Scrollable sample page
  */
 import * as React from "react";
-import { ScrollablePanel, code as scrollablePanelCode } from "../ScrollablePanel";
-import { SingleSamplePage } from "../../components";
+import { ScrollablePanel, code as scrollablePanelCode } from "../components/ScrollablePanel";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   const [open, setOpen] = React.useState(true);

@@ -2,8 +2,8 @@
  * @file FloatingPanelFrame - Complex sample page
  */
 import * as React from "react";
-import { ComplexPanel, code as complexPanelCode } from "../ComplexPanel";
-import { SingleSamplePage } from "../../components";
+import { ComplexPanel, code as complexPanelCode } from "../components/ComplexPanel";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   const [open, setOpen] = React.useState(true);

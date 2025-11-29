@@ -30,7 +30,7 @@ import DR_Animations from "./pages/Drawer/animations";
 
 import PS_Preview from "./pages/PanelSystem/preview";
 import PS_Tabbar from "./pages/PanelSystem/tabbar";
-import { ResizableFloatingPanelsPreview } from "./pages/ResizableFloatingPanelsPreview";
+import { ResizableFloatingPanelsPreview } from "./pages/FloatingPanelFrame/ResizableFloatingPanelsPreview";
 import RL_AdaptiveWorkspace from "./pages/ResponsiveLayout/adaptive-workspace";
 
 import PV_Basics from "./pages/Pivot/basics";

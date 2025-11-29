@@ -2,8 +2,8 @@
  * @file HorizontalDivider - Three Panel Layout page
  */
 import * as React from "react";
-import { ThreePanelLayout, code as threePanelCode } from "../ThreePanelLayout";
-import { SingleSamplePage } from "../../components";
+import { ThreePanelLayout, code as threePanelCode } from "../components/ThreePanelLayout";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

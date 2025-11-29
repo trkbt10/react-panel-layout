@@ -2,8 +2,8 @@
  * @file Pivot - Tabs page
  */
 import * as React from "react";
-import { PivotTabs, code } from "../PivotTabs";
-import { SingleSamplePage } from "../../components";
+import { PivotTabs, code } from "../components/PivotTabs";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

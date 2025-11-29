@@ -2,8 +2,8 @@
  * @file ResizeHandle - Vertical resize page
  */
 import * as React from "react";
-import { VerticalResizeDemo, code as verticalCode } from "../VerticalResizeDemo";
-import { SingleSamplePage } from "../../components";
+import { VerticalResizeDemo, code as verticalCode } from "../components/VerticalResizeDemo";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (

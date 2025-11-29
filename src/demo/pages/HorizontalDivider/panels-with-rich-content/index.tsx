@@ -2,8 +2,8 @@
  * @file HorizontalDivider - Panels with Rich Content page
  */
 import * as React from "react";
-import { PanelsWithRichContent, code as richContentCode } from "../PanelsWithRichContent";
-import { SingleSamplePage } from "../../components";
+import { PanelsWithRichContent, code as richContentCode } from "../components/PanelsWithRichContent";
+import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (
