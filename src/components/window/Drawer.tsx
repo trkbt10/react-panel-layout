@@ -177,26 +177,34 @@ export const Drawer: React.FC<DrawerProps> = ({
     transitionEasing,
   } = config;
 
-  const resolvePlacement = React.useCallback((pos?: WindowPosition): "left" | "right" | "top" | "bottom" => {
-    if (!pos) {
+  const resolvePlacement = React.useCallback(
+    (anchor?: DrawerBehavior["anchor"], pos?: WindowPosition): "left" | "right" | "top" | "bottom" => {
+      // Prefer explicit anchor from config
+      if (anchor) {
+        return anchor;
+      }
+      // Fall back to inferring from position
+      if (!pos) {
+        return "right";
+      }
+      if (pos.left !== undefined) {
+        return "left";
+      }
+      if (pos.right !== undefined) {
+        return "right";
+      }
+      if (pos.top !== undefined) {
+        return "top";
+      }
+      if (pos.bottom !== undefined) {
+        return "bottom";
+      }
       return "right";
-    }
-    if (pos.left !== undefined) {
-      return "left";
-    }
-    if (pos.right !== undefined) {
-      return "right";
-    }
-    if (pos.top !== undefined) {
-      return "top";
-    }
-    if (pos.bottom !== undefined) {
-      return "bottom";
-    }
-    return "right";
-  }, []);
+    },
+    [],
+  );
 
-  const placement = resolvePlacement(position);
+  const placement = resolvePlacement(config.anchor, position);
 
   const openTransforms: Record<string, string> = {
     left: "translateX(0)",

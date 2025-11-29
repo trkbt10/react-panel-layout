@@ -188,6 +188,12 @@ export type DrawerBehavior = {
   /** Whether clicking backdrop dismisses the drawer */
   dismissible?: boolean;
   /**
+   * Anchor edge for the drawer.
+   * - "left", "right", "top", "bottom"
+   * - When not specified, inferred from position prop
+   */
+  anchor?: "left" | "right" | "top" | "bottom";
+  /**
    * Transition mode for drawer visibility.
    * - "css" (default) uses CSS transform transitions.
    * - "none" disables transitions.
