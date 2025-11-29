@@ -38,7 +38,10 @@ import PV_Tabs from "./pages/Pivot/tabs";
 import PV_Sidebar from "./pages/Pivot/sidebar";
 import PV_Transitions from "./pages/Pivot/transitions";
 
-import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone, FiSidebar, FiNavigation } from "react-icons/fi";
+import SH_Basics from "./pages/StickyHeader/basics";
+import SH_NestedScroll from "./pages/StickyHeader/nested-scroll";
+
+import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone, FiSidebar, FiNavigation, FiImage } from "react-icons/fi";
 
 export type DemoPage = {
   id: string;
@@ -158,6 +161,16 @@ export const demoCategories: DemoCategory[] = [
       { id: "tabs", label: "Tab Navigation", path: "tabs", element: <PV_Tabs /> },
       { id: "sidebar", label: "Sidebar Navigation", path: "sidebar", element: <PV_Sidebar /> },
       { id: "transitions", label: "Transitions", path: "transitions", element: <PV_Transitions /> },
+    ],
+  },
+  {
+    id: "sticky-header",
+    label: "StickyHeader",
+    icon: <FiImage />,
+    base: "/components/sticky-header",
+    pages: [
+      { id: "basics", label: "Basics", path: "basics", element: <SH_Basics /> },
+      { id: "nested-scroll", label: "Nested Scroll", path: "nested-scroll", element: <SH_NestedScroll /> },
     ],
   },
 ];
