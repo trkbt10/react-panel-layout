@@ -132,25 +132,3 @@ export const PivotTransitions: React.FC = () => {
     </div>
   );
 };
-
-export const code = `import { usePivot } from "react-panel-layout/pivot";
-
-// CSS animations (default) - customize via design tokens
-const { Outlet } = usePivot({
-  items,
-  transitionMode: "css", // default
-});
-
-// No animations - instant switch
-const { Outlet: Outlet2 } = usePivot({
-  items,
-  transitionMode: "none",
-});
-
-// Customize via CSS keyframes and custom properties:
-// @keyframes pivotEnter { from { opacity: 0; } to { opacity: 1; } }
-// @keyframes pivotLeave { from { opacity: 1; } to { opacity: 0; } }
-// :root {
-//   --rpl-pivot-animation-enter: pivotEnter 150ms ease-out forwards;
-//   --rpl-pivot-animation-leave: pivotLeave 150ms ease-out forwards;
-// }`;

@@ -4,9 +4,12 @@
 import * as React from "react";
 import { Section, Story } from "../../components/Story";
 import { CodePreview } from "../../components/CodePreview";
-import { SimpleResizablePanels, code as simpleCode } from "./components/SimpleResizablePanels";
-import { PanelsWithRichContent, code as richContentCode } from "./components/PanelsWithRichContent";
-import { ThreePanelLayout, code as threePanelCode } from "./components/ThreePanelLayout";
+import { SimpleResizablePanels } from "./components/SimpleResizablePanels";
+import SimpleResizablePanelsSource from "./components/SimpleResizablePanels.tsx?raw";
+import { PanelsWithRichContent } from "./components/PanelsWithRichContent";
+import PanelsWithRichContentSource from "./components/PanelsWithRichContent.tsx?raw";
+import { ThreePanelLayout } from "./components/ThreePanelLayout";
+import ThreePanelLayoutSource from "./components/ThreePanelLayout.tsx?raw";
 import { DemoPage } from "../../components/layout";
 import styles from "./index.module.css";
 
@@ -20,7 +23,7 @@ export const HorizontalDividerPreview: React.FC = () => {
         >
           <SimpleResizablePanels />
         </Story>
-        <CodePreview code={simpleCode} title="Simple Resizable Panels Code" />
+        <CodePreview code={SimpleResizablePanelsSource} title="SimpleResizablePanels.tsx" />
       </Section>
 
       <Section title="With Content">
@@ -30,7 +33,7 @@ export const HorizontalDividerPreview: React.FC = () => {
         >
           <PanelsWithRichContent />
         </Story>
-        <CodePreview code={richContentCode} title="Panels with Rich Content Code" />
+        <CodePreview code={PanelsWithRichContentSource} title="PanelsWithRichContent.tsx" />
       </Section>
 
       <Section title="Three-Panel Layout">
@@ -40,7 +43,7 @@ export const HorizontalDividerPreview: React.FC = () => {
         >
           <ThreePanelLayout />
         </Story>
-        <CodePreview code={threePanelCode} title="Three-Panel Layout Code" />
+        <CodePreview code={ThreePanelLayoutSource} title="ThreePanelLayout.tsx" />
       </Section>
 
       <Section title="Interactive Demo">

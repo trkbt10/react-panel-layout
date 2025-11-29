@@ -2,12 +2,13 @@
  * @file Pivot - Basics page
  */
 import * as React from "react";
-import { PivotBasics, code } from "../components/PivotBasics";
+import { PivotBasics } from "../components/PivotBasics";
+import PivotBasicsSource from "../components/PivotBasics.tsx?raw";
 import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (
-    <SingleSamplePage title="Pivot / Basics" code={code} codeTitle="usePivot Hook" previewHeight={400}>
+    <SingleSamplePage title="Pivot / Basics" code={PivotBasicsSource} codeTitle="PivotBasics.tsx" previewHeight={400}>
       <PivotBasics />
     </SingleSamplePage>
   );

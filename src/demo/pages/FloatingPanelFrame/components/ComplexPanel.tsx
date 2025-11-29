@@ -80,22 +80,3 @@ export const ComplexPanel: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
     </FloatingPanelContent>
   </FloatingPanelFrame>
 );
-
-export const code = `// Complex panel with profile information
-export const ComplexPanel = ({ onClose }) => (
-  <FloatingPanelFrame style={{ width: "500px" }}>
-    <FloatingPanelHeader>
-      <div style={{ flex: 1 }}>
-        <FloatingPanelTitle>User Profile</FloatingPanelTitle>
-        <FloatingPanelMeta>ID: 12345 • Online</FloatingPanelMeta>
-      </div>
-      <FloatingPanelControls>
-        <button>Edit</button>
-        <button onClick={onClose}>×</button>
-      </FloatingPanelControls>
-    </FloatingPanelHeader>
-    <FloatingPanelContent>
-      {/* Profile content with avatar, bio, stats */}
-    </FloatingPanelContent>
-  </FloatingPanelFrame>
-);`;

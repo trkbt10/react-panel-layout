@@ -2,7 +2,8 @@
  * @file FloatingPanelFrame - With Controls sample page
  */
 import * as React from "react";
-import { PanelWithControls, code as panelWithControlsCode } from "../components/PanelWithControls";
+import { PanelWithControls } from "../components/PanelWithControls";
+import PanelWithControlsSource from "../components/PanelWithControls.tsx?raw";
 import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
@@ -18,8 +19,8 @@ const Page: React.FC = () => {
   return (
     <SingleSamplePage
       title="FloatingPanelFrame / With Controls"
-      code={panelWithControlsCode}
-      codeTitle="Panel with Controls Code"
+      code={PanelWithControlsSource}
+      codeTitle="PanelWithControls.tsx"
     >
       {renderBody()}
     </SingleSamplePage>

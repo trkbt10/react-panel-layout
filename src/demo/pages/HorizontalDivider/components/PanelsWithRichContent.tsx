@@ -54,31 +54,3 @@ export const PanelsWithRichContent: React.FC = () => {
     </div>
   );
 };
-
-export const code = `import * as React from "react";
-import { HorizontalDivider } from "./components/panels/HorizontalDivider";
-
-export const PanelsWithRichContent = () => {
-  const [leftWidth, setLeftWidth] = React.useState(300);
-
-  const handleResize = React.useCallback((deltaX: number) => {
-    setLeftWidth((prev) => Math.max(150, Math.min(500, prev + deltaX)));
-  }, []);
-
-  return (
-    <div style={{ display: "flex", height: "400px" }}>
-      <div style={{ width: \`\${leftWidth}px\`, overflow: "auto" }}>
-        <h4>Sidebar</h4>
-        <nav>
-          <a href="#">Dashboard</a>
-          <a href="#">Projects</a>
-        </nav>
-      </div>
-      <HorizontalDivider onResize={handleResize} />
-      <div style={{ flex: 1, overflow: "auto" }}>
-        <h4>Main Content</h4>
-        <p>Primary content area...</p>
-      </div>
-    </div>
-  );
-};`;

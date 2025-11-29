@@ -2,12 +2,13 @@
  * @file Pivot - Tabs page
  */
 import * as React from "react";
-import { PivotTabs, code } from "../components/PivotTabs";
+import { PivotTabs } from "../components/PivotTabs";
+import PivotTabsSource from "../components/PivotTabs.tsx?raw";
 import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (
-    <SingleSamplePage title="Pivot / Tab Navigation" code={code} codeTitle="Tab Navigation" previewHeight={400}>
+    <SingleSamplePage title="Pivot / Tab Navigation" code={PivotTabsSource} codeTitle="PivotTabs.tsx" previewHeight={400}>
       <PivotTabs />
     </SingleSamplePage>
   );

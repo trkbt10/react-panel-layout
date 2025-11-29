@@ -39,33 +39,3 @@ export const BothDirectionsDemo: React.FC = () => {
     </div>
   );
 };
-
-export const code = `import * as React from "react";
-import { ResizeHandle } from "./components/panels/ResizeHandle";
-
-export const BothDirectionsDemo = () => {
-  const [boxWidth, setBoxWidth] = React.useState(400);
-  const [boxHeight, setBoxHeight] = React.useState(300);
-
-  const handleVerticalResize = React.useCallback((delta: number) => {
-    setBoxWidth((prev) => Math.max(200, Math.min(800, prev - delta)));
-  }, []);
-
-  const handleHorizontalResize = React.useCallback((delta: number) => {
-    setBoxHeight((prev) => Math.max(150, Math.min(600, prev - delta)));
-  }, []);
-
-  return (
-    <div style={{ position: "relative", display: "inline-block" }}>
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "6px", zIndex: 10 }}>
-        <ResizeHandle direction="vertical" onResize={handleVerticalResize} />
-      </div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: "6px", zIndex: 10 }}>
-        <ResizeHandle direction="horizontal" onResize={handleHorizontalResize} />
-      </div>
-      <div style={{ width: \`\${boxWidth}px\`, height: \`\${boxHeight}px\` }}>
-        Resizable Box
-      </div>
-    </div>
-  );
-};`;

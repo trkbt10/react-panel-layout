@@ -2,7 +2,8 @@
  * @file FloatingPanelFrame - Scrollable sample page
  */
 import * as React from "react";
-import { ScrollablePanel, code as scrollablePanelCode } from "../components/ScrollablePanel";
+import { ScrollablePanel } from "../components/ScrollablePanel";
+import ScrollablePanelSource from "../components/ScrollablePanel.tsx?raw";
 import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
@@ -18,8 +19,8 @@ const Page: React.FC = () => {
   return (
     <SingleSamplePage
       title="FloatingPanelFrame / Scrollable"
-      code={scrollablePanelCode}
-      codeTitle="Scrollable Panel Code"
+      code={ScrollablePanelSource}
+      codeTitle="ScrollablePanel.tsx"
     >
       {renderBody()}
     </SingleSamplePage>

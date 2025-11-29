@@ -31,31 +31,3 @@ export const VerticalResizeDemo: React.FC = () => {
     </div>
   );
 };
-
-export const code = `import * as React from "react";
-import { ResizeHandle } from "./components/panels/ResizeHandle";
-
-export const VerticalResizeDemo = () => {
-  const [panelWidth, setPanelWidth] = React.useState(300);
-
-  const handleResize = React.useCallback((delta: number) => {
-    setPanelWidth((prev) => Math.max(150, Math.min(600, prev - delta)));
-  }, []);
-
-  return (
-    <div style={{ display: "flex", height: "300px" }}>
-      <div style={{ position: "relative", display: "flex" }}>
-        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "6px", zIndex: 10 }}>
-          <ResizeHandle direction="vertical" onResize={handleResize} />
-        </div>
-        <div style={{ width: \`\${panelWidth}px\`, background: "#667eea", color: "white", padding: "1rem 1rem 1rem 1.5rem" }}>
-          <h4>Resizable Panel</h4>
-          <p>Width: {panelWidth}px</p>
-        </div>
-      </div>
-      <div style={{ flex: 1, background: "#f5f5f5", padding: "1rem" }}>
-        <h4>Fixed Content</h4>
-      </div>
-    </div>
-  );
-};`;

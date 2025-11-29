@@ -2,15 +2,16 @@
  * @file PanelLayout - IDE Layout page
  */
 import * as React from "react";
-import { IDELayout, code as ideLayoutCode } from "../components/IDELayout";
+import { IDELayout } from "../components/IDELayout";
+import IDELayoutSource from "../components/IDELayout.tsx?raw";
 import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (
     <SingleSamplePage
       title="PanelLayout / IDE Layout"
-      code={ideLayoutCode}
-      codeTitle="IDE Layout Code"
+      code={IDELayoutSource}
+      codeTitle="IDELayout.tsx"
       previewHeight={600}
     >
       <IDELayout />

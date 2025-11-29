@@ -4,11 +4,16 @@
 import * as React from "react";
 import { Section, Story, StoryActionButton } from "../../components/Story";
 import { CodePreview } from "../../components/CodePreview";
-import { BasicPanel, code as basicPanelCode } from "./components/BasicPanel";
-import { PanelWithMeta, code as panelWithMetaCode } from "./components/PanelWithMeta";
-import { PanelWithControls, code as panelWithControlsCode } from "./components/PanelWithControls";
-import { ComplexPanel, code as complexPanelCode } from "./components/ComplexPanel";
-import { ScrollablePanel, code as scrollablePanelCode } from "./components/ScrollablePanel";
+import { BasicPanel } from "./components/BasicPanel";
+import BasicPanelSource from "./components/BasicPanel.tsx?raw";
+import { PanelWithMeta } from "./components/PanelWithMeta";
+import PanelWithMetaSource from "./components/PanelWithMeta.tsx?raw";
+import { PanelWithControls } from "./components/PanelWithControls";
+import PanelWithControlsSource from "./components/PanelWithControls.tsx?raw";
+import { ComplexPanel } from "./components/ComplexPanel";
+import ComplexPanelSource from "./components/ComplexPanel.tsx?raw";
+import { ScrollablePanel } from "./components/ScrollablePanel";
+import ScrollablePanelSource from "./components/ScrollablePanel.tsx?raw";
 import { DemoPage } from "../../components/layout";
 
 export const FloatingPanelFramePreview: React.FC = () => {
@@ -25,7 +30,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           <BasicPanel />
         </Story>
-        <CodePreview code={basicPanelCode} title="Basic Panel Code" />
+        <CodePreview code={BasicPanelSource} title="BasicPanel.tsx" />
       </Section>
 
       <Section title="Panel with Meta Information">
@@ -35,7 +40,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           <PanelWithMeta />
         </Story>
-        <CodePreview code={panelWithMetaCode} title="Panel with Meta Code" />
+        <CodePreview code={PanelWithMetaSource} title="PanelWithMeta.tsx" />
       </Section>
 
       <Section title="Panel with Controls">
@@ -46,7 +51,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           {showPanel1 ? <PanelWithControls onClose={() => setShowPanel1(false)} /> : <p>Panel closed</p>}
         </Story>
-        <CodePreview code={panelWithControlsCode} title="Panel with Controls Code" />
+        <CodePreview code={PanelWithControlsSource} title="PanelWithControls.tsx" />
       </Section>
 
       <Section title="Complex Panel">
@@ -57,7 +62,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           {showPanel2 ? <ComplexPanel onClose={() => setShowPanel2(false)} /> : <p>Panel closed</p>}
         </Story>
-        <CodePreview code={complexPanelCode} title="Complex Panel Code" />
+        <CodePreview code={ComplexPanelSource} title="ComplexPanel.tsx" />
       </Section>
 
       <Section title="Scrollable Content">
@@ -68,7 +73,7 @@ export const FloatingPanelFramePreview: React.FC = () => {
         >
           {showPanel3 ? <ScrollablePanel onClose={() => setShowPanel3(false)} /> : <p>Panel closed</p>}
         </Story>
-        <CodePreview code={scrollablePanelCode} title="Scrollable Panel Code" />
+        <CodePreview code={ScrollablePanelSource} title="ScrollablePanel.tsx" />
       </Section>
     </DemoPage>
   );

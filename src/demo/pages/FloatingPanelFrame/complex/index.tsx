@@ -2,7 +2,8 @@
  * @file FloatingPanelFrame - Complex sample page
  */
 import * as React from "react";
-import { ComplexPanel, code as complexPanelCode } from "../components/ComplexPanel";
+import { ComplexPanel } from "../components/ComplexPanel";
+import ComplexPanelSource from "../components/ComplexPanel.tsx?raw";
 import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
@@ -16,7 +17,7 @@ const Page: React.FC = () => {
   };
 
   return (
-    <SingleSamplePage title="FloatingPanelFrame / Complex" code={complexPanelCode} codeTitle="Complex Panel Code">
+    <SingleSamplePage title="FloatingPanelFrame / Complex" code={ComplexPanelSource} codeTitle="ComplexPanel.tsx">
       {renderBody()}
     </SingleSamplePage>
   );

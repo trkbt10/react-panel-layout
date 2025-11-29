@@ -54,28 +54,3 @@ export const PanelWithControls: React.FC<{ onClose?: () => void }> = ({ onClose 
     </FloatingPanelContent>
   </FloatingPanelFrame>
 );
-
-export const code = `import {
-  FloatingPanelFrame,
-  FloatingPanelHeader,
-  FloatingPanelTitle,
-  FloatingPanelControls,
-  FloatingPanelContent,
-} from "./components/panels/FloatingPanelFrame";
-
-export const PanelWithControls = ({ onClose }) => (
-  <FloatingPanelFrame style={{ width: "400px" }}>
-    <FloatingPanelHeader>
-      <FloatingPanelTitle>Notifications</FloatingPanelTitle>
-      <FloatingPanelControls>
-        <button onClick={onClose}>×</button>
-      </FloatingPanelControls>
-    </FloatingPanelHeader>
-    <FloatingPanelContent>
-      <div className="notifications">
-        <div className="notification">New message from John</div>
-        <div className="notification">Task completed</div>
-      </div>
-    </FloatingPanelContent>
-  </FloatingPanelFrame>
-);`;

@@ -28,26 +28,3 @@ export const ThreePanelLayout: React.FC = () => {
     </div>
   );
 };
-
-export const code = `import * as React from "react";
-import { HorizontalDivider } from "./components/panels/HorizontalDivider";
-
-export const ThreePanelLayout = () => {
-  const [leftWidth, setLeftWidth] = React.useState(250);
-
-  const handleResize = React.useCallback((deltaX: number) => {
-    setLeftWidth((prev) => Math.max(100, Math.min(600, prev + deltaX)));
-  }, []);
-
-  return (
-    <div style={{ display: "flex", height: "350px" }}>
-      <div style={{ width: \`\${leftWidth}px\` }}>
-        <h4>Left Panel</h4>
-      </div>
-      <HorizontalDivider onResize={handleResize} />
-      <div style={{ flex: 1 }}>
-        <h4>Center Panel</h4>
-      </div>
-    </div>
-  );
-};`;

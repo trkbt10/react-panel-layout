@@ -22,21 +22,3 @@ export const BasicPanel = () => (
     </FloatingPanelFrame>
   </div>
 );
-
-export const code = `import {
-  FloatingPanelFrame,
-  FloatingPanelHeader,
-  FloatingPanelTitle,
-  FloatingPanelContent,
-} from "./components/panels/FloatingPanelFrame";
-
-export const BasicPanel = () => (
-  <FloatingPanelFrame style={{ width: "400px" }}>
-    <FloatingPanelHeader>
-      <FloatingPanelTitle>Panel Title</FloatingPanelTitle>
-    </FloatingPanelHeader>
-    <FloatingPanelContent>
-      <p>This is the panel content.</p>
-    </FloatingPanelContent>
-  </FloatingPanelFrame>
-);`;

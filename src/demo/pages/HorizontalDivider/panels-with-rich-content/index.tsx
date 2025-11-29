@@ -2,15 +2,16 @@
  * @file HorizontalDivider - Panels with Rich Content page
  */
 import * as React from "react";
-import { PanelsWithRichContent, code as richContentCode } from "../components/PanelsWithRichContent";
+import { PanelsWithRichContent } from "../components/PanelsWithRichContent";
+import PanelsWithRichContentSource from "../components/PanelsWithRichContent.tsx?raw";
 import { SingleSamplePage } from "../../../components/layout";
 
 const Page: React.FC = () => {
   return (
     <SingleSamplePage
       title="HorizontalDivider / Panels with Rich Content"
-      code={richContentCode}
-      codeTitle="Panels with Rich Content Code"
+      code={PanelsWithRichContentSource}
+      codeTitle="PanelsWithRichContent.tsx"
     >
       <PanelsWithRichContent />
     </SingleSamplePage>

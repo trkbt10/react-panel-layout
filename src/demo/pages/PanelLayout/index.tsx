@@ -4,12 +4,18 @@
 import * as React from "react";
 import { Section, Story } from "../../components/Story";
 import { CodePreview } from "../../components/CodePreview";
-import { IDELayout, code as ideLayoutCode } from "./components/IDELayout";
-import { SimpleGrid, code as simpleGridCode } from "./components/SimpleGrid";
-import { DashboardLayout, code as dashboardLayoutCode } from "./components/DashboardLayout";
-import { DraggableOverlays, code as draggableOverlaysCode } from "./components/DraggableOverlays";
-import { DrawerMenuLayout, code as drawerMenuCode } from "../Drawer/components/DrawerMenuLayout";
-import { DrawerBasics, code as drawerBasicsCode } from "../Drawer/components/DrawerBasics";
+import { IDELayout } from "./components/IDELayout";
+import IDELayoutSource from "./components/IDELayout.tsx?raw";
+import { SimpleGrid } from "./components/SimpleGrid";
+import SimpleGridSource from "./components/SimpleGrid.tsx?raw";
+import { DashboardLayout } from "./components/DashboardLayout";
+import DashboardLayoutSource from "./components/DashboardLayout.tsx?raw";
+import { DraggableOverlays } from "./components/DraggableOverlays";
+import DraggableOverlaysSource from "./components/DraggableOverlays.tsx?raw";
+import { DrawerMenuLayout } from "../Drawer/components/DrawerMenuLayout";
+import DrawerMenuLayoutSource from "../Drawer/components/DrawerMenuLayout.tsx?raw";
+import { DrawerBasics } from "../Drawer/components/DrawerBasics";
+import DrawerBasicsSource from "../Drawer/components/DrawerBasics.tsx?raw";
 import { DemoPage } from "../../components/layout";
 
 export const PanelLayoutPreview: React.FC = () => {
@@ -21,7 +27,7 @@ export const PanelLayoutPreview: React.FC = () => {
             <SimpleGrid />
           </div>
         </Story>
-        <CodePreview code={simpleGridCode} title="Simple Grid Code" />
+        <CodePreview code={SimpleGridSource} title="SimpleGrid.tsx" />
       </Section>
 
       <Section title="IDE-Style Layout">
@@ -33,7 +39,7 @@ export const PanelLayoutPreview: React.FC = () => {
             <IDELayout />
           </div>
         </Story>
-        <CodePreview code={ideLayoutCode} title="IDE Layout Code" />
+        <CodePreview code={IDELayoutSource} title="IDELayout.tsx" />
       </Section>
 
       <Section title="Dashboard Layout">
@@ -45,7 +51,7 @@ export const PanelLayoutPreview: React.FC = () => {
             <DashboardLayout />
           </div>
         </Story>
-        <CodePreview code={dashboardLayoutCode} title="Dashboard Layout Code" />
+        <CodePreview code={DashboardLayoutSource} title="DashboardLayout.tsx" />
       </Section>
 
       <Section title="Drawer Basics">
@@ -57,7 +63,7 @@ export const PanelLayoutPreview: React.FC = () => {
             <DrawerBasics />
           </div>
         </Story>
-        <CodePreview code={drawerBasicsCode} title="Drawer Basics Code" />
+        <CodePreview code={DrawerBasicsSource} title="DrawerBasics.tsx" />
       </Section>
 
       <Section title="Drawer Menu Layout">
@@ -69,7 +75,7 @@ export const PanelLayoutPreview: React.FC = () => {
             <DrawerMenuLayout />
           </div>
         </Story>
-        <CodePreview code={drawerMenuCode} title="Drawer Menu Code" />
+        <CodePreview code={DrawerMenuLayoutSource} title="DrawerMenuLayout.tsx" />
       </Section>
 
       <Section title="Draggable Overlays">
@@ -81,7 +87,7 @@ export const PanelLayoutPreview: React.FC = () => {
             <DraggableOverlays />
           </div>
         </Story>
-        <CodePreview code={draggableOverlaysCode} title="Draggable Overlays Code" />
+        <CodePreview code={DraggableOverlaysSource} title="DraggableOverlays.tsx" />
       </Section>
     </DemoPage>
   );
