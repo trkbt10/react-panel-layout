@@ -64,23 +64,25 @@ const applyConstraints = (size: number, minSize?: number, maxSize?: number): num
   return withMaxConstraint;
 };
 
-const calculateNewTrackSize = (currentSize: number, delta: number, track: GridTrack): number => {
-  const newSize = currentSize + delta;
-  return applyConstraints(newSize, track.minSize, track.maxSize);
-};
-
-const createTrackSizeUpdater = (
+/**
+ * Measures actual rendered track sizes from computed style.
+ * Returns pixel values parsed from gridTemplateColumns or gridTemplateRows.
+ */
+const measureRenderedTrackSizes = (
+  containerEl: HTMLElement | null,
   direction: TrackDirection,
-  index: number,
-  currentSize: number,
-  delta: number,
-  track: GridTrack,
-) => {
-  const key = createTrackKey(direction, index);
-  return (prev: Record<string, number>): Record<string, number> => {
-    const newSize = calculateNewTrackSize(currentSize, delta, track);
-    return { ...prev, [key]: newSize };
-  };
+): number[] => {
+  if (!containerEl) {
+    return [];
+  }
+  const style = getComputedStyle(containerEl);
+  const template = direction === "col" ? style.gridTemplateColumns : style.gridTemplateRows;
+
+  // Computed style returns resolved pixel values like "370px 500px"
+  return template
+    .split(/\s+/)
+    .map((s) => parseFloat(s))
+    .filter((n) => !Number.isNaN(n));
 };
 
 /**
@@ -263,12 +265,21 @@ const getGapStyle = (gap?: string): React.CSSProperties => {
   return gap !== undefined ? { gap } : {};
 };
 
-const resolveCurrentTrackSize = (
-  trackSizes: Record<string, number>,
-  track: GridTrack,
-  direction: TrackDirection,
-  trackIndex: number,
-): number => {
+type ResolveTrackSizeParams = {
+  trackSizes: Record<string, number>;
+  track: GridTrack;
+  direction: TrackDirection;
+  trackIndex: number;
+  containerRef: React.RefObject<HTMLElement | null> | undefined;
+};
+
+const resolveCurrentTrackSize = ({
+  trackSizes,
+  track,
+  direction,
+  trackIndex,
+  containerRef,
+}: ResolveTrackSizeParams): number => {
   const key = createTrackKey(direction, trackIndex);
   const storedSize = trackSizes[key];
 
@@ -276,11 +287,70 @@ const resolveCurrentTrackSize = (
     return storedSize;
   }
 
+  // Try to measure actual rendered size from DOM
+  const measuredSizes = measureRenderedTrackSizes(containerRef?.current ?? null, direction);
+  const measuredSize = measuredSizes[trackIndex];
+  if (measuredSize !== undefined && measuredSize > 0) {
+    return measuredSize;
+  }
+
+  // Fallback: parse simple px value from track definition
   if (track.size.endsWith("px")) {
     return Number.parseInt(track.size, 10);
   }
 
   return 300;
+};
+
+const calculateOtherTracksMinSpace = (tracks: GridTrack[], excludeIndex: number): number => {
+  return tracks.reduce((sum, t, idx) => {
+    if (idx === excludeIndex) {
+      return sum;
+    }
+    // For fr tracks, assume minimum of 100px; for fixed tracks, use their minSize or parsed size
+    if (t.size.includes("fr")) {
+      return sum + 100;
+    }
+    return sum + (t.minSize ?? 50);
+  }, 0);
+};
+
+type EffectiveMaxSizeParams = {
+  track: GridTrack;
+  tracks: GridTrack[];
+  trackIndex: number;
+  direction: TrackDirection;
+  containerRef: React.RefObject<HTMLElement | null> | undefined;
+  gapSizes: ParsedGap;
+};
+
+const calculateEffectiveMaxSize = ({
+  track,
+  tracks,
+  trackIndex,
+  direction,
+  containerRef,
+  gapSizes,
+}: EffectiveMaxSizeParams): number | undefined => {
+  if (!containerRef?.current) {
+    return track.maxSize;
+  }
+
+  const containerSize =
+    direction === "col" ? containerRef.current.offsetWidth : containerRef.current.offsetHeight;
+
+  const otherTracksMinSpace = calculateOtherTracksMinSpace(tracks, trackIndex);
+
+  const gapCount = tracks.length - 1;
+  const gapSize = direction === "col" ? gapSizes.columnGap : gapSizes.rowGap;
+  const totalGapSpace = gapCount * gapSize;
+
+  const dynamicMax = containerSize - otherTracksMinSpace - totalGapSpace;
+
+  if (track.maxSize !== undefined) {
+    return Math.min(track.maxSize, dynamicMax);
+  }
+  return dynamicMax;
 };
 
 export const useGridTracks = (
@@ -300,18 +370,30 @@ export const useGridTracks = (
   }));
 
   useIsomorphicLayoutEffect(() => {
-    const nextSizes = {
+    const initialSizes = {
       ...extractInitialTrackSizes(config.columns, "col"),
       ...extractInitialTrackSizes(config.rows, "row"),
     };
 
     setTrackSizes((prev) => {
-      const allKeys = new Set([...Object.keys(prev), ...Object.keys(nextSizes)]);
-      const hasChanges = Array.from(allKeys).some((key) => {
-        return prev[key] !== nextSizes[key];
-      });
+      // Only consider tracks that exist in the current config
+      const nextKeys = Object.keys(initialSizes);
 
-      return hasChanges ? nextSizes : prev;
+      // Preserve existing values; use initial values only for new tracks
+      const merged: Record<string, number> = {};
+      for (const key of nextKeys) {
+        merged[key] = prev[key] ?? initialSizes[key];
+      }
+
+      // Check if there are any changes
+      const prevKeys = Object.keys(prev);
+      const keysChangedByLength = prevKeys.length !== nextKeys.length;
+      const keysChangedByMissing = prevKeys.some((key) => !Object.prototype.hasOwnProperty.call(merged, key));
+      const keysChanged = keysChangedByLength ? true : keysChangedByMissing;
+      const valuesChanged = nextKeys.some((key) => prev[key] !== merged[key]);
+
+      const hasChanges = keysChanged ? true : valuesChanged;
+      return hasChanges ? merged : prev;
     });
   }, [config.columns, config.rows]);
 
@@ -348,42 +430,27 @@ export const useGridTracks = (
         return;
       }
 
-      const currentSize = resolveCurrentTrackSize(trackSizes, track, direction, trackIndex);
+      const currentSize = resolveCurrentTrackSize({
+        trackSizes,
+        track,
+        direction,
+        trackIndex,
+        containerRef,
+      });
+      const effectiveMaxSize = calculateEffectiveMaxSize({
+        track,
+        tracks,
+        trackIndex,
+        direction,
+        containerRef,
+        gapSizes,
+      });
 
-      // Calculate dynamic max based on container size
-      let effectiveMaxSize = track.maxSize;
-      if (containerRef?.current) {
-        const containerSize =
-          direction === "col" ? containerRef.current.offsetWidth : containerRef.current.offsetHeight;
-
-        // Calculate minimum space needed for other tracks
-        const otherTracksMinSpace = tracks.reduce((sum, t, idx) => {
-          if (idx === trackIndex) return sum;
-          // For fr tracks, assume minimum of 100px; for fixed tracks, use their minSize or parsed size
-          if (t.size.includes("fr")) {
-            return sum + 100;
-          }
-          return sum + (t.minSize ?? 50);
-        }, 0);
-
-        // Gap space
-        const gapCount = tracks.length - 1;
-        const gapSize = direction === "col" ? gapSizes.columnGap : gapSizes.rowGap;
-        const totalGapSpace = gapCount * gapSize;
-
-        // Dynamic max: container - other tracks - gaps
-        const dynamicMax = containerSize - otherTracksMinSpace - totalGapSpace;
-        effectiveMaxSize =
-          track.maxSize !== undefined ? Math.min(track.maxSize, dynamicMax) : dynamicMax;
-      }
-
-      // Create updater with effective max
       const key = createTrackKey(direction, trackIndex);
       setTrackSizes((prev) => {
         const newSize = currentSize + delta;
-        const withMin = track.minSize !== undefined ? Math.max(newSize, track.minSize) : newSize;
-        const withMax = effectiveMaxSize !== undefined ? Math.min(withMin, effectiveMaxSize) : withMin;
-        return { ...prev, [key]: withMax };
+        const constrained = applyConstraints(newSize, track.minSize, effectiveMaxSize);
+        return { ...prev, [key]: constrained };
       });
     },
     [config.columns, config.rows, trackSizes, containerRef, gapSizes],
