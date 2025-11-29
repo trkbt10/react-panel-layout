@@ -7,6 +7,7 @@ import { useGridLayoutContext } from "../../modules/grid/GridLayoutContext";
 import type { ResizeHandleConfig } from "../../modules/grid/GridLayoutContext";
 import { LayerInstanceProvider } from "../../modules/grid/LayerInstanceContext";
 import { PopupLayerPortal } from "../window/PopupLayerPortal";
+import { FloatingWindow } from "../window/FloatingWindow";
 import { GridLayerResizeHandles } from "./GridLayerResizeHandles";
 import { PivotLayer } from "../pivot/PivotLayer";
 
@@ -15,15 +16,26 @@ type GridLayerListProps = {
 };
 
 /**
- * Renders layer content - either PivotLayer for pivot behavior or the raw component.
+ * Renders layer content with optional FloatingWindow chrome.
+ * Handles both chrome and non-chrome layers.
  */
-const LayerContent = React.memo<{ layer: LayerDefinition }>(({ layer }) => {
-  if (layer.pivot) {
-    return <PivotLayer pivot={layer.pivot} />;
+const LayerContentRenderer = React.memo<{
+  layer: LayerDefinition;
+  onClose: () => void;
+}>(({ layer, onClose }) => {
+  const content = layer.pivot ? <PivotLayer pivot={layer.pivot} /> : <>{layer.component}</>;
+
+  if (!layer.floating?.chrome) {
+    return content;
   }
-  return <>{layer.component}</>;
+
+  return (
+    <FloatingWindow id={layer.id} config={layer.floating} onClose={onClose}>
+      {content}
+    </FloatingWindow>
+  );
 });
-LayerContent.displayName = "LayerContent";
+LayerContentRenderer.displayName = "LayerContentRenderer";
 
 /**
  * Renders resize handles if the layer is resizable.
@@ -65,9 +77,21 @@ const EmbeddedLayer = React.memo<{
   }, [layer.gridArea, layer.gridRow, layer.gridColumn]);
 
   const combinedStyle = React.useMemo<React.CSSProperties>(() => {
-    const baseStyle = { ...style, ...gridPlacementStyle };
+    // min-width/height: 0 allows grid items to shrink below content size
+    // overflow: hidden prevents content from causing layout overflow
+    const baseStyle: React.CSSProperties = {
+      ...style,
+      ...gridPlacementStyle,
+      minWidth: 0,
+      minHeight: 0,
+      overflow: "hidden",
+    };
     return isResizable ? { ...baseStyle, position: "relative" } : baseStyle;
   }, [style, gridPlacementStyle, isResizable]);
+
+  const handleClose = React.useCallback(() => {
+    layer.floating?.onClose?.();
+  }, [layer.floating]);
 
   return (
     <div
@@ -79,7 +103,7 @@ const EmbeddedLayer = React.memo<{
       onPointerDown={handleLayerPointerDown}
     >
       <LayerInstanceProvider layerId={layer.id}>
-        <LayerContent layer={layer} />
+        <LayerContentRenderer layer={layer} onClose={handleClose} />
       </LayerInstanceProvider>
       <LayerResizeHandles layerId={layer.id} isResizable={isResizable} onPointerDown={onResizeHandlePointerDown} />
     </div>

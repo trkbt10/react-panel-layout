@@ -32,7 +32,10 @@ const getTrackSize = (
   const key = createTrackKey(direction, index);
   const currentSize = trackSizes[key];
   if (currentSize !== undefined) {
-    return `${currentSize}px`;
+    // Use minmax() to ensure the track can shrink if container is smaller
+    // This prevents overflow when container width is less than the resized size
+    const minSize = track.minSize ?? 0;
+    return `minmax(${minSize}px, ${currentSize}px)`;
   }
   return track.size;
 };
@@ -283,6 +286,7 @@ const resolveCurrentTrackSize = (
 export const useGridTracks = (
   config: PanelLayoutConfig,
   styleProp?: React.CSSProperties,
+  containerRef?: React.RefObject<HTMLElement | null>,
 ): {
   columnHandles: TrackHandleConfig[];
   rowHandles: TrackHandleConfig[];
@@ -345,9 +349,44 @@ export const useGridTracks = (
       }
 
       const currentSize = resolveCurrentTrackSize(trackSizes, track, direction, trackIndex);
-      setTrackSizes(createTrackSizeUpdater(direction, trackIndex, currentSize, delta, track));
+
+      // Calculate dynamic max based on container size
+      let effectiveMaxSize = track.maxSize;
+      if (containerRef?.current) {
+        const containerSize =
+          direction === "col" ? containerRef.current.offsetWidth : containerRef.current.offsetHeight;
+
+        // Calculate minimum space needed for other tracks
+        const otherTracksMinSpace = tracks.reduce((sum, t, idx) => {
+          if (idx === trackIndex) return sum;
+          // For fr tracks, assume minimum of 100px; for fixed tracks, use their minSize or parsed size
+          if (t.size.includes("fr")) {
+            return sum + 100;
+          }
+          return sum + (t.minSize ?? 50);
+        }, 0);
+
+        // Gap space
+        const gapCount = tracks.length - 1;
+        const gapSize = direction === "col" ? gapSizes.columnGap : gapSizes.rowGap;
+        const totalGapSpace = gapCount * gapSize;
+
+        // Dynamic max: container - other tracks - gaps
+        const dynamicMax = containerSize - otherTracksMinSpace - totalGapSpace;
+        effectiveMaxSize =
+          track.maxSize !== undefined ? Math.min(track.maxSize, dynamicMax) : dynamicMax;
+      }
+
+      // Create updater with effective max
+      const key = createTrackKey(direction, trackIndex);
+      setTrackSizes((prev) => {
+        const newSize = currentSize + delta;
+        const withMin = track.minSize !== undefined ? Math.max(newSize, track.minSize) : newSize;
+        const withMax = effectiveMaxSize !== undefined ? Math.min(withMin, effectiveMaxSize) : withMin;
+        return { ...prev, [key]: withMax };
+      });
     },
-    [config.columns, config.rows, trackSizes],
+    [config.columns, config.rows, trackSizes, containerRef, gapSizes],
   );
 
   return {
