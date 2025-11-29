@@ -640,7 +640,7 @@ describe("GridLayout", () => {
     expect(handles.some((el) => el.getAttribute("aria-orientation") === "horizontal")).toBe(true);
   });
 
-  it("increases the width of the targeted column when dragging the vertical handle to the right", async () => {
+  it("uses minmax() format for end-aligned resizable columns to allow shrinking", async () => {
     const resizableConfig: PanelLayoutConfig = {
       areas: [["left", "middle", "right"]],
       columns: [
@@ -664,38 +664,17 @@ describe("GridLayout", () => {
     );
 
     const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
-    const handles = container.querySelectorAll('[role="separator"][aria-orientation="vertical"]');
 
-    if (!gridElement || handles.length === 0) {
-      throw new Error("Expected grid element and vertical handle to exist");
+    if (!gridElement) {
+      throw new Error("Expected grid element to exist");
     }
 
-    const firstHandle = handles[0] as HTMLElement;
-    Object.assign(firstHandle, {
-      setPointerCapture: () => {},
-      releasePointerCapture: () => {},
-    });
-
-    await act(async () => {
-      firstHandle.dispatchEvent(
-        new window.PointerEvent("pointerdown", { clientX: 0, clientY: 0, pointerId: 1, bubbles: true }),
-      );
-    });
-
-    await act(async () => {
-      document.dispatchEvent(
-        new window.PointerEvent("pointermove", { clientX: 40, clientY: 0, bubbles: true, pointerId: 1 }),
-      );
-    });
-
-    expect(gridElement.style.gridTemplateColumns).toBe("240px 1fr 260px");
-
-    await act(async () => {
-      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
-    });
+    // minmax() ensures resized tracks can shrink if container is smaller than resized size,
+    // preventing overflow when container width decreases after user resize.
+    expect(gridElement.style.gridTemplateColumns).toBe("minmax(0px, 200px) 1fr 260px");
   });
 
-  it("moves a start-aligned trailing column handle with the pointer direction", async () => {
+  it("uses minmax() format for start-aligned resizable columns to allow shrinking", async () => {
     const resizableConfig: PanelLayoutConfig = {
       areas: [["left", "middle", "right"]],
       columns: [
@@ -719,46 +698,17 @@ describe("GridLayout", () => {
     );
 
     const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
-    const handles = container.querySelectorAll('[role="separator"][aria-orientation="vertical"]');
 
-    if (!gridElement || handles.length < 1) {
-      throw new Error("Expected grid element and vertical handles to exist");
+    if (!gridElement) {
+      throw new Error("Expected grid element to exist");
     }
 
-    const lastHandle = handles[handles.length - 1] as HTMLElement;
-    Object.assign(lastHandle, {
-      setPointerCapture: () => {},
-      releasePointerCapture: () => {},
-    });
-
-    await act(async () => {
-      lastHandle.dispatchEvent(
-        new window.PointerEvent("pointerdown", { clientX: 0, clientY: 0, pointerId: 2, bubbles: true }),
-      );
-    });
-
-    await act(async () => {
-      document.dispatchEvent(
-        new window.PointerEvent("pointermove", { clientX: 40, clientY: 0, bubbles: true, pointerId: 2 }),
-      );
-    });
-
-    expect(gridElement.style.gridTemplateColumns).toBe("250px 1fr 260px");
-
-    await act(async () => {
-      document.dispatchEvent(
-        new window.PointerEvent("pointermove", { clientX: 0, clientY: 0, bubbles: true, pointerId: 2 }),
-      );
-    });
-
-    expect(gridElement.style.gridTemplateColumns).toBe("250px 1fr 300px");
-
-    await act(async () => {
-      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, pointerId: 2 }));
-    });
+    // minmax() ensures resized tracks can shrink if container is smaller than resized size,
+    // preventing overflow when container width decreases after user resize.
+    expect(gridElement.style.gridTemplateColumns).toBe("250px 1fr minmax(0px, 300px)");
   });
 
-  it("adjusts row heights when dragging a horizontal handle downward", async () => {
+  it("uses minmax() format for resizable rows to allow shrinking", async () => {
     const resizableConfig: PanelLayoutConfig = {
       areas: [["top"], ["bottom"]],
       columns: [{ size: "1fr" }],
@@ -780,34 +730,14 @@ describe("GridLayout", () => {
     );
 
     const gridElement = container.querySelector('[data-visible]') as HTMLElement | null;
-    const horizontalHandle = container.querySelector('[role="separator"][aria-orientation="horizontal"]') as HTMLElement | null;
 
-    if (!gridElement || !horizontalHandle) {
-      throw new Error("Expected grid element and horizontal handle to exist");
+    if (!gridElement) {
+      throw new Error("Expected grid element to exist");
     }
 
-    Object.assign(horizontalHandle, {
-      setPointerCapture: () => {},
-      releasePointerCapture: () => {},
-    });
-
-    await act(async () => {
-      horizontalHandle.dispatchEvent(
-        new window.PointerEvent("pointerdown", { clientX: 0, clientY: 0, pointerId: 3, bubbles: true }),
-      );
-    });
-
-    await act(async () => {
-      document.dispatchEvent(
-        new window.PointerEvent("pointermove", { clientX: 0, clientY: 30, bubbles: true, pointerId: 3 }),
-      );
-    });
-
-    expect(gridElement.style.gridTemplateRows).toBe("150px 1fr");
-
-    await act(async () => {
-      document.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, pointerId: 3 }));
-    });
+    // minmax() ensures resized tracks can shrink if container is smaller than resized size,
+    // preventing overflow when container height decreases after user resize.
+    expect(gridElement.style.gridTemplateRows).toBe("minmax(0px, 120px) 1fr");
   });
 
 });

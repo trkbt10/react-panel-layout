@@ -1,13 +1,19 @@
 /**
  * @file Headless hook for managing Pivot (content switching) behavior.
+ *
+ * Includes content caching to preserve React component state across re-renders.
+ * This is essential for maintaining internal state when parent components
+ * re-create the items array.
  */
 import * as React from "react";
 import type { UsePivotOptions, UsePivotResult, PivotItemProps, PivotItem } from "./types";
 import { PivotContent } from "./PivotContent";
+import { useContentCache } from "../../hooks/useContentCache";
 
 /**
  * Context for sharing pivot state with Outlet component.
  * Uses a ref-based approach to avoid re-creating the Outlet component.
+ * Includes content cache to preserve component state.
  */
 type PivotOutletContextValue = {
   getState: () => {
@@ -16,6 +22,11 @@ type PivotOutletContextValue = {
     transitionMode: "css" | "none";
   };
   subscribe: (callback: () => void) => () => void;
+  /**
+   * Get cached content for an item. Returns the same ReactNode reference
+   * for the same item ID to prevent remounting on parent re-renders.
+   */
+  getCachedContent: (itemId: string) => React.ReactNode | null;
 };
 
 const PivotOutletContext = React.createContext<PivotOutletContextValue | null>(null);
@@ -23,6 +34,7 @@ const PivotOutletContext = React.createContext<PivotOutletContextValue | null>(n
 /**
  * Stable Outlet component that subscribes to state changes.
  * This prevents remounting when activeId changes.
+ * Uses cached content to preserve component state across re-renders.
  */
 const PivotOutletInner: React.FC = React.memo(() => {
   const ctx = React.useContext(PivotOutletContext);
@@ -42,7 +54,7 @@ const PivotOutletInner: React.FC = React.memo(() => {
     <>
       {items.map((item) => (
         <PivotContent key={item.id} id={item.id} isActive={item.id === activeId} transitionMode={transitionMode}>
-          {item.content}
+          {ctx.getCachedContent(item.id)}
         </PivotContent>
       ))}
     </>
@@ -156,6 +168,24 @@ export function usePivot<TId extends string = string>(options: UsePivotOptions<T
     subscribersRef.current.forEach((callback) => callback());
   }, [activeId, transitionMode]);
 
+  // Content resolver for useContentCache
+  const resolveContent = React.useCallback(
+    (itemId: string): React.ReactNode | null => {
+      const item = stateRef.current.items.find((i) => i.id === itemId);
+      return item?.content ?? null;
+    },
+    [],
+  );
+
+  // Valid IDs for cache cleanup (cast to string[] for useContentCache compatibility)
+  const validIds = React.useMemo((): readonly string[] => items.map((i) => i.id), [items]);
+
+  // Use shared content cache hook
+  const { getCachedContent } = useContentCache({
+    resolveContent,
+    validIds,
+  });
+
   // Stable context value (never changes)
   const contextValue = React.useMemo<PivotOutletContextValue>(
     () => ({
@@ -164,8 +194,9 @@ export function usePivot<TId extends string = string>(options: UsePivotOptions<T
         subscribersRef.current.add(callback);
         return () => subscribersRef.current.delete(callback);
       },
+      getCachedContent,
     }),
-    [],
+    [getCachedContent],
   );
 
   // Stable Outlet component (reference never changes)

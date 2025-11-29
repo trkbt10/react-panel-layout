@@ -1,11 +1,15 @@
 /**
  * @file Layer list rendering inside the grid layout.
+ *
+ * Uses content caching from PanelSystemContext to preserve component state
+ * when parent components re-render and recreate the layers array.
  */
 import * as React from "react";
 import type { LayerDefinition } from "../../types";
 import { useGridLayoutContext } from "../../modules/grid/GridLayoutContext";
 import type { ResizeHandleConfig } from "../../modules/grid/GridLayoutContext";
 import { LayerInstanceProvider } from "../../modules/grid/LayerInstanceContext";
+import { usePanelSystem } from "../../PanelSystemContext";
 import { PopupLayerPortal } from "../window/PopupLayerPortal";
 import { FloatingWindow } from "../window/FloatingWindow";
 import { GridLayerResizeHandles } from "./GridLayerResizeHandles";
@@ -18,12 +22,17 @@ type GridLayerListProps = {
 /**
  * Renders layer content with optional FloatingWindow chrome.
  * Handles both chrome and non-chrome layers.
+ * Uses cached content to preserve component state across re-renders.
  */
 const LayerContentRenderer = React.memo<{
   layer: LayerDefinition;
   onClose: () => void;
 }>(({ layer, onClose }) => {
-  const content = layer.pivot ? <PivotLayer pivot={layer.pivot} /> : <>{layer.component}</>;
+  const { getCachedContent } = usePanelSystem();
+
+  // For pivot layers, render PivotLayer component
+  // For regular layers, use cached content to preserve state
+  const content = layer.pivot ? <PivotLayer pivot={layer.pivot} /> : <>{getCachedContent(layer.id)}</>;
 
   if (!layer.floating?.chrome) {
     return content;

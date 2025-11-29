@@ -32,6 +32,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import type { PanelId, GroupId, TabDefinition } from "../state/types";
 import { useIsomorphicLayoutEffect } from "../../../hooks/useIsomorphicLayoutEffect";
+import { useContentCache } from "../../../hooks/useContentCache";
 
 type PanelPlacement = {
   groupId: GroupId;
@@ -136,7 +137,6 @@ export const ContentRegistryProvider: React.FC<ContentRegistryProviderProps> = (
   placements,
 }) => {
   const [containers, setContainers] = React.useState<Map<GroupId, HTMLElement>>(new Map());
-  const contentCacheRef = React.useRef<Map<PanelId, React.ReactNode>>(new Map());
 
   const registerContentContainer = React.useCallback((groupId: GroupId, element: HTMLElement | null): void => {
     setContainers((prev) => {
@@ -155,15 +155,27 @@ export const ContentRegistryProvider: React.FC<ContentRegistryProviderProps> = (
     [registerContentContainer],
   );
 
-  const getOrCreateContent = React.useCallback((panelId: PanelId, tab: TabDefinition): React.ReactNode => {
-    const cached = contentCacheRef.current.get(panelId);
-    if (cached) {
-      return cached;
+  // Store panels in ref for stable resolveContent function
+  const panelsRef = React.useRef(panels);
+  panelsRef.current = panels;
+
+  // Content resolver for useContentCache
+  const resolveContent = React.useCallback((panelId: PanelId): React.ReactNode | null => {
+    const tab = panelsRef.current[panelId];
+    if (!tab) {
+      return null;
     }
-    const newContent = tab.render(tab.id);
-    contentCacheRef.current.set(panelId, newContent);
-    return newContent;
+    return tab.render(tab.id);
   }, []);
+
+  // Valid IDs for cache cleanup
+  const validIds = React.useMemo(() => Object.keys(panels), [panels]);
+
+  // Use shared content cache hook
+  const { getCachedContent } = useContentCache({
+    resolveContent,
+    validIds,
+  });
 
   const panelIds = Object.keys(panels);
 
@@ -177,7 +189,7 @@ export const ContentRegistryProvider: React.FC<ContentRegistryProviderProps> = (
         }
         const placement = placements[panelId] ?? null;
         const containerElement = placement ? containers.get(placement.groupId) ?? null : null;
-        const content = getOrCreateContent(panelId, tab);
+        const content = getCachedContent(panelId);
         return (
           <PanelContentHost
             key={panelId}
