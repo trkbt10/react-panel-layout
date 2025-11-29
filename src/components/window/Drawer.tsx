@@ -6,6 +6,7 @@
 import * as React from "react";
 import type { DrawerBehavior, WindowPosition } from "../../types";
 import {
+  FloatingPanelCloseButton,
   FloatingPanelContent,
   FloatingPanelFrame,
   FloatingPanelHeader,
@@ -15,7 +16,6 @@ import {
   DRAWER_HEADER_PADDING_Y,
   DRAWER_HEADER_PADDING_X,
   DRAWER_HEADER_GAP,
-  DRAWER_CLOSE_BUTTON_FONT_SIZE,
   DRAWER_CONTENT_PADDING,
   COLOR_DRAWER_BACKDROP,
   DRAWER_TRANSITION_DURATION,
@@ -86,14 +86,6 @@ export type DrawerProps = {
   position?: WindowPosition;
 };
 
-type DrawerViewProps = {
-  header?: DrawerBehavior["header"];
-  dismissible: boolean;
-  onClose: () => void;
-  chrome: boolean;
-  children: React.ReactNode;
-};
-
 const shouldShowCloseButton = (dismissible: boolean, showClose: boolean): boolean => {
   if (!dismissible) {
     return false;
@@ -101,12 +93,29 @@ const shouldShowCloseButton = (dismissible: boolean, showClose: boolean): boolea
   return showClose;
 };
 
-const closeButtonStyle: React.CSSProperties = {
-  marginLeft: "auto",
-  border: "none",
-  background: "transparent",
-  cursor: "pointer",
-  fontSize: DRAWER_CLOSE_BUTTON_FONT_SIZE,
+type DrawerContentProps = {
+  chrome: boolean;
+  frameStyle: React.CSSProperties;
+  header?: DrawerBehavior["header"];
+  dismissible: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+};
+
+const DrawerContent: React.FC<DrawerContentProps> = ({ chrome, frameStyle, header, dismissible, onClose, children }) => {
+  if (!chrome) {
+    return <>{children}</>;
+  }
+  return (
+    <FloatingPanelFrame style={frameStyle}>
+      <DrawerHeaderView header={header} dismissible={dismissible} onClose={onClose} />
+      <FloatingPanelContent
+        style={{ padding: DRAWER_CONTENT_PADDING, flex: 1, display: "flex", flexDirection: "column" }}
+      >
+        {children}
+      </FloatingPanelContent>
+    </FloatingPanelFrame>
+  );
 };
 
 const DrawerHeaderView: React.FC<{
@@ -130,29 +139,14 @@ const DrawerHeaderView: React.FC<{
           <FloatingPanelTitle>{header.title}</FloatingPanelTitle>
         </React.Activity>
         <React.Activity mode={shouldShowClose ? "visible" : "hidden"}>
-          <button style={closeButtonStyle} onClick={onClose} aria-label="Close drawer" type="button">
-            ×
-          </button>
+          <FloatingPanelCloseButton
+            onClick={onClose}
+            aria-label="Close drawer"
+            style={{ marginLeft: "auto" }}
+          />
         </React.Activity>
       </FloatingPanelHeader>
     </React.Activity>
-  );
-};
-
-const DrawerView: React.FC<DrawerViewProps> = ({ header, dismissible, onClose, chrome, children }) => {
-  if (!chrome) {
-    return <>{children}</>;
-  }
-
-  return (
-    <FloatingPanelFrame style={{ height: "100%", borderRadius: 0 }}>
-      <DrawerHeaderView header={header} dismissible={dismissible} onClose={onClose} />
-      <FloatingPanelContent
-        style={{ padding: DRAWER_CONTENT_PADDING, flex: 1, display: "flex", flexDirection: "column" }}
-      >
-        {children}
-      </FloatingPanelContent>
-    </FloatingPanelFrame>
   );
 };
 
@@ -252,6 +246,15 @@ export const Drawer: React.FC<DrawerProps> = ({
     };
   }, [inline, isOpen, transitionDuration, transitionMode, zIndex]);
 
+  const frameStyle = React.useMemo((): React.CSSProperties => {
+    const isVertical = placement === "left" || placement === "right";
+    const style: React.CSSProperties = { borderRadius: 0 };
+    if (isVertical) {
+      style.height = "100%";
+    }
+    return style;
+  }, [placement]);
+
   return (
     <>
       <div style={backdropStyle} onClick={dismissible ? onClose : undefined} />
@@ -264,9 +267,15 @@ export const Drawer: React.FC<DrawerProps> = ({
         aria-hidden={isOpen ? undefined : true}
         aria-label={ariaLabel}
       >
-        <DrawerView header={header} dismissible={dismissible} onClose={onClose} chrome={chrome}>
+        <DrawerContent
+          chrome={chrome}
+          frameStyle={frameStyle}
+          header={header}
+          dismissible={dismissible}
+          onClose={onClose}
+        >
           {children}
-        </DrawerView>
+        </DrawerContent>
       </div>
     </>
   );

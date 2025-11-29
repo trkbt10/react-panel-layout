@@ -3,6 +3,7 @@
  */
 import * as React from "react";
 import {
+  FloatingPanelCloseButton,
   FloatingPanelFrame,
   FloatingPanelHeader,
   FloatingPanelTitle,
@@ -34,19 +35,7 @@ export const ComplexPanel: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
         <DemoButton variant="outline" size="sm" style={{ marginRight: "0.5rem" }}>
           Edit
         </DemoButton>
-        <button
-          onClick={onClose}
-          style={{
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1.25rem",
-            padding: "0.25rem 0.5rem",
-            color: "var(--rpl-demo-text-secondary)",
-          }}
-        >
-          ×
-        </button>
+        <FloatingPanelCloseButton onClick={onClose} style={{ color: "var(--rpl-demo-text-secondary)" }} />
       </FloatingPanelControls>
     </FloatingPanelHeader>
     <FloatingPanelContent>

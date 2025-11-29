@@ -7,6 +7,7 @@
 import * as React from "react";
 import type { FloatingBehavior } from "../../types";
 import {
+  FloatingPanelCloseButton,
   FloatingPanelFrame,
   FloatingPanelHeader,
   FloatingPanelTitle,
@@ -21,31 +22,13 @@ export type FloatingWindowProps = {
   children: React.ReactNode;
 };
 
-const closeButtonStyle: React.CSSProperties = {
-  marginLeft: "auto",
-  border: "none",
-  background: "transparent",
-  cursor: "pointer",
-  fontSize: "1.25rem",
-  padding: "0.25rem 0.5rem",
-  lineHeight: 1,
-};
-
 type CloseButtonProps = {
   onClick: () => void;
 };
 
 const CloseButton: React.FC<CloseButtonProps> = ({ onClick }) => (
   <FloatingPanelControls>
-    <button
-      style={closeButtonStyle}
-      onClick={onClick}
-      aria-label="Close window"
-      type="button"
-      data-drag-ignore="true"
-    >
-      ×
-    </button>
+    <FloatingPanelCloseButton onClick={onClick} aria-label="Close window" data-drag-ignore="true" />
   </FloatingPanelControls>
 );
 

@@ -35,6 +35,11 @@
       "import": "./dist/pivot.js",
       "require": "./dist/pivot.cjs"
     },
+    "./sticky-header": {
+      "types": "./dist/sticky-header/index.d.ts",
+      "import": "./dist/sticky-header.js",
+      "require": "./dist/sticky-header.cjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [

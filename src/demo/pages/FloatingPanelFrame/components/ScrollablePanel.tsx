@@ -3,6 +3,7 @@
  */
 import * as React from "react";
 import {
+  FloatingPanelCloseButton,
   FloatingPanelFrame,
   FloatingPanelHeader,
   FloatingPanelTitle,
@@ -26,7 +27,7 @@ export const ScrollablePanel: React.FC<{ onClose?: () => void }> = ({ onClose })
     <FloatingPanelHeader>
       <FloatingPanelTitle>Long Article</FloatingPanelTitle>
       <FloatingPanelControls>
-        <button onClick={onClose}>×</button>
+        <FloatingPanelCloseButton onClick={onClose} />
       </FloatingPanelControls>
     </FloatingPanelHeader>
     <FloatingPanelContent style={{ overflow: "auto" }}>

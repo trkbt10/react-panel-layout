@@ -10,6 +10,8 @@ import {
   FLOATING_PANEL_CONTENT_PADDING,
   FLOATING_PANEL_META_FONT_SIZE,
   FLOATING_PANEL_CONTROLS_GAP,
+  FLOATING_PANEL_CLOSE_BUTTON_FONT_SIZE,
+  FLOATING_PANEL_CLOSE_BUTTON_PADDING,
   FLOATING_PANEL_SURFACE_COLOR,
   FLOATING_PANEL_SURFACE_2_COLOR,
   FLOATING_PANEL_BORDER_COLOR,
@@ -56,6 +58,15 @@ const controlsStyle: React.CSSProperties = {
   gap: FLOATING_PANEL_CONTROLS_GAP,
 };
 
+const closeButtonStyle: React.CSSProperties = {
+  border: "none",
+  background: "transparent",
+  cursor: "pointer",
+  fontSize: FLOATING_PANEL_CLOSE_BUTTON_FONT_SIZE,
+  padding: FLOATING_PANEL_CLOSE_BUTTON_PADDING,
+  lineHeight: 1,
+};
+
 const contentStyle: React.CSSProperties = {
   padding: FLOATING_PANEL_CONTENT_PADDING,
   overflow: "auto",
@@ -71,11 +82,22 @@ export const FloatingPanelFrame = React.forwardRef<HTMLDivElement, FloatingPanel
 ) {
   const combinedStyle = React.useMemo(() => ({ ...frameStyle, ...propStyle }), [propStyle]);
   const combinedInnerStyle = React.useMemo(() => {
-    if (propStyle?.borderRadius === undefined) {
+    const hasCustomBorderRadius = propStyle?.borderRadius !== undefined;
+    const hasHeight = propStyle?.height !== undefined;
+
+    if (!hasCustomBorderRadius && !hasHeight) {
       return innerStyle;
     }
-    return { ...innerStyle, borderRadius: propStyle.borderRadius };
-  }, [propStyle?.borderRadius]);
+
+    const result: React.CSSProperties = { ...innerStyle };
+    if (hasCustomBorderRadius) {
+      result.borderRadius = propStyle.borderRadius;
+    }
+    if (hasHeight) {
+      result.height = propStyle.height;
+    }
+    return result;
+  }, [propStyle?.borderRadius, propStyle?.height]);
   return (
     <div ref={ref} style={combinedStyle} {...props}>
       <div style={combinedInnerStyle}>{children}</div>
@@ -130,9 +152,26 @@ export const FloatingPanelContent = React.forwardRef<HTMLDivElement, FloatingPan
   },
 );
 
+export type FloatingPanelCloseButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "className" | "style" | "children"
+> & {
+  style?: React.CSSProperties;
+};
+
+export const FloatingPanelCloseButton: React.FC<FloatingPanelCloseButtonProps> = ({ style: propStyle, ...props }) => {
+  const combinedStyle = React.useMemo(() => ({ ...closeButtonStyle, ...propStyle }), [propStyle]);
+  return (
+    <button type="button" style={combinedStyle} {...props}>
+      ×
+    </button>
+  );
+};
+
 FloatingPanelFrame.displayName = "FloatingPanelFrame";
 FloatingPanelHeader.displayName = "FloatingPanelHeader";
 FloatingPanelTitle.displayName = "FloatingPanelTitle";
 FloatingPanelMeta.displayName = "FloatingPanelMeta";
 FloatingPanelControls.displayName = "FloatingPanelControls";
 FloatingPanelContent.displayName = "FloatingPanelContent";
+FloatingPanelCloseButton.displayName = "FloatingPanelCloseButton";
