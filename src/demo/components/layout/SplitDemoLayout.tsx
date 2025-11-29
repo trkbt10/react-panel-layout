@@ -10,6 +10,47 @@ import styles from "./SplitDemoLayout.module.css";
 
 const COMPACT_BREAKPOINT = 900;
 
+type CodeToggleButtonProps = {
+  onClick: () => void;
+};
+
+const CodeToggleButton: React.FC<CodeToggleButtonProps> = ({ onClick }) => {
+  return (
+    <button
+      type="button"
+      className={styles.codeToggle}
+      onClick={onClick}
+      aria-label="Show source code"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <polyline points="16 18 22 12 16 6" />
+        <polyline points="8 6 2 12 8 18" />
+      </svg>
+      <span>Code</span>
+    </button>
+  );
+};
+
+type DrawerCloseButtonProps = {
+  onClick: () => void;
+};
+
+const DrawerCloseButton: React.FC<DrawerCloseButtonProps> = ({ onClick }) => {
+  return (
+    <button
+      type="button"
+      className={styles.drawerClose}
+      onClick={onClick}
+      aria-label="Close code panel"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  );
+};
+
 export type SplitDemoLayoutProps = {
   /** Source code to display */
   code: string;
@@ -38,10 +79,14 @@ export const SplitDemoLayout: React.FC<SplitDemoLayoutProps> = ({
 
   // Track container width for responsive behavior
   React.useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") {
+      return;
+    }
 
     const node = containerRef.current;
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     const updateWidth = () => {
       const rect = node.getBoundingClientRect();
@@ -160,40 +205,14 @@ export const SplitDemoLayout: React.FC<SplitDemoLayoutProps> = ({
   const config = isCompact ? compactConfig : desktopConfig;
   const layers = isCompact ? compactLayers : desktopLayers;
 
+  const showToggleButton = isCompact ? !drawerOpen : false;
+  const showCloseButton = isCompact ? drawerOpen : false;
+
   return (
     <div className={styles.container} ref={containerRef}>
       <GridLayout config={config} layers={layers} />
-
-      {/* Floating button to open code drawer in compact mode */}
-      {isCompact && !drawerOpen && (
-        <button
-          type="button"
-          className={styles.codeToggle}
-          onClick={() => setDrawerOpen(true)}
-          aria-label="Show source code"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="16 18 22 12 16 6" />
-            <polyline points="8 6 2 12 8 18" />
-          </svg>
-          <span>Code</span>
-        </button>
-      )}
-
-      {/* Close button inside drawer */}
-      {isCompact && drawerOpen && (
-        <button
-          type="button"
-          className={styles.drawerClose}
-          onClick={() => setDrawerOpen(false)}
-          aria-label="Close code panel"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      )}
+      {showToggleButton ? <CodeToggleButton onClick={() => setDrawerOpen(true)} /> : null}
+      {showCloseButton ? <DrawerCloseButton onClick={() => setDrawerOpen(false)} /> : null}
     </div>
   );
 };

@@ -164,11 +164,13 @@ export const Layout: React.FC = () => {
         id: "sidebar",
         gridArea: "sidebar",
         component: <SidebarNav />,
+        scrollable: true,
       },
       {
         id: "main",
         gridArea: "main",
         component: <Outlet />,
+        scrollable: true,
       },
     ];
   }, [handleOpenNav, isStackedLayout, navOpen]);
