@@ -74,14 +74,79 @@ export type PopupWindowFactoryConfig = {
 // Display mode for floating windows
 export type FloatingWindowMode = "embedded" | "popup";
 
-// Unified configuration for floating windows (embedded or popup)
-export type FloatingWindowConfig = {
-  mode?: FloatingWindowMode;
+// Floating window header configuration
+export type FloatingHeaderConfig = {
+  /** Header title text */
+  title?: string;
+  /** Show close button (requires onClose callback) */
+  showCloseButton?: boolean;
+};
+
+// Unified configuration for floating windows with controlled/uncontrolled support
+export type FloatingBehavior = {
+  // === Position (controlled/uncontrolled) ===
+  /** Controlled position - when defined, component uses this value directly */
+  position?: WindowPosition;
+  /** Initial position for uncontrolled mode */
+  defaultPosition?: WindowPosition;
+
+  // === Size (controlled/uncontrolled) ===
+  /** Controlled size - when defined, component uses this value directly */
+  size?: WindowSize;
+  /** Initial size for uncontrolled mode */
+  defaultSize?: WindowSize;
+
+  // === Stacking ===
+  /** Z-index for stacking order */
+  zIndex?: number;
+
+  // === Interaction ===
+  /** Enable drag-to-move functionality */
   draggable?: boolean;
+  /** Enable resize handles */
   resizable?: boolean;
+  /** Size constraints for resizing */
   constraints?: WindowConstraints;
+
+  // === Callbacks ===
+  /** Called when position changes (drag/move) */
   onMove?: (position: WindowPosition) => void;
+  /** Called when size changes (resize) */
   onResize?: (size: WindowSize) => void;
+  /** Called when close button is clicked */
+  onClose?: () => void;
+
+  // === Chrome (like DrawerBehavior) ===
+  /**
+   * Use built-in chrome (FloatingPanelFrame with border, shadow, background).
+   * When true and header is provided, header auto-enables drag handle.
+   * Defaults to false.
+   */
+  chrome?: boolean;
+  /**
+   * Header configuration (renders header when provided).
+   * When chrome is true and header is provided, header becomes the drag handle.
+   */
+  header?: FloatingHeaderConfig;
+  /** Accessible label when header.title is not provided */
+  ariaLabel?: string;
+
+  // === Transitions ===
+  /**
+   * Transition mode for position/size changes.
+   * - "css" uses CSS transitions.
+   * - "none" disables transitions.
+   */
+  transitionMode?: "css" | "none";
+  /** Override transition duration (e.g., "200ms") */
+  transitionDuration?: string;
+  /** Override transition easing (e.g., "ease-out") */
+  transitionEasing?: string;
+
+  // === Display mode ===
+  /** Display mode: "embedded" (default) or "popup" (browser window) */
+  mode?: FloatingWindowMode;
+  /** Popup-specific options when mode is "popup" */
   popup?: PopupWindowOptions;
 };
 
@@ -191,12 +256,26 @@ export type LayerDefinition = {
    * If `floating` is present, behaves as absolute (embedded) or relative (popup).
    */
   positionMode?: LayerPositionMode;
-  /** Absolute/fixed offsets when positionMode !== 'grid'. */
+  /**
+   * Position offsets for non-floating layers (drawer, absolute positioned).
+   * For floating layers, use `floating.position` or `floating.defaultPosition` instead.
+   */
   position?: WindowPosition;
 
-  // Stacking and dimensions (applies when not using floating.bounds)
+  /**
+   * Stacking order for non-floating layers.
+   * For floating layers, use `floating.zIndex` instead.
+   */
   zIndex?: number;
+  /**
+   * Width for non-floating layers.
+   * For floating layers, use `floating.size` or `floating.defaultSize` instead.
+   */
   width?: string | number;
+  /**
+   * Height for non-floating layers.
+   * For floating layers, use `floating.size` or `floating.defaultSize` instead.
+   */
   height?: string | number;
   pointerEvents?: boolean | "auto" | "none";
   /** Optional backdrop style (used by DrawerBehaviour) */
@@ -204,7 +283,8 @@ export type LayerDefinition = {
 
   // Behaviors
   drawer?: DrawerBehavior;
-  floating?: FloatingWindowConfig;
+  /** Floating window behavior configuration */
+  floating?: FloatingBehavior;
   pivot?: PivotBehavior;
 
   // Styling

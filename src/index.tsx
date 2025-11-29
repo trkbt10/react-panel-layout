@@ -26,7 +26,8 @@ export type {
   PopupWindowOptions,
   PopupWindowFactoryConfig,
   FloatingWindowMode,
-  FloatingWindowConfig,
+  FloatingBehavior,
+  FloatingHeaderConfig,
   DrawerBehavior,
 } from "./types";
 
@@ -45,6 +46,12 @@ export { DrawerLayers } from "./components/window/DrawerLayers";
 export type { DrawerLayersProps } from "./components/window/DrawerLayers";
 
 // ============================================================================
+// Floating Window Components
+// ============================================================================
+export { FloatingWindow } from "./components/window/FloatingWindow";
+export type { FloatingWindowProps } from "./components/window/FloatingWindow";
+
+// ============================================================================
 // Panel Components
 // ============================================================================
 export { HorizontalDivider } from "./components/resizer/HorizontalDivider";
@@ -57,6 +64,7 @@ export type { ResizeHandleProps } from "./components/resizer/ResizeHandle";
 // Public Hooks
 // ============================================================================
 export { useLayerDragHandle } from "./modules/grid/useLayerDragHandle";
+export { useFloatingState } from "./modules/window/useFloatingState";
 export { useTransitionState, runTransition } from "./hooks/useTransitionState";
 export type { TransitionMode, TransitionOptions, UseTransitionStateOptions } from "./hooks/useTransitionState";
 

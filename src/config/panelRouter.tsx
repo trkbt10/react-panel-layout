@@ -7,7 +7,7 @@
 import * as React from "react";
 import type {
   DrawerBehavior,
-  FloatingWindowConfig,
+  FloatingBehavior,
   LayerDefinition,
   LayerPositionMode,
   PanelLayoutConfig,
@@ -50,7 +50,7 @@ export type PanelRoute = {
   /** Drawer behavior for mobile-friendly panels. */
   drawer?: DrawerBehavior;
   /** Floating window configuration. */
-  floating?: FloatingWindowConfig;
+  floating?: FloatingBehavior;
   /** Pivot behavior for content switching. */
   pivot?: PivotBehavior;
 

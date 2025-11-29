@@ -122,6 +122,10 @@ const getPointerEventsStyle = (layer: LayerDefinition, mode: LayerDefinition["po
 const resolveEffectivePosition = (
   layer: LayerDefinition,
 ): WindowPosition | LayerDefinition["position"] | undefined => {
+  // For floating layers, prioritize floating.position/defaultPosition
+  if (layer.floating) {
+    return layer.floating.position ?? layer.floating.defaultPosition ?? layer.position;
+  }
   return layer.position;
 };
 
@@ -131,6 +135,16 @@ const resolveEffectiveSize = (
   width?: number | string;
   height?: number | string;
 } => {
+  // For floating layers, prioritize floating.size/defaultSize
+  if (layer.floating) {
+    const floatingSize = layer.floating.size ?? layer.floating.defaultSize;
+    if (floatingSize) {
+      return {
+        width: floatingSize.width,
+        height: floatingSize.height,
+      };
+    }
+  }
   return {
     width: layer.width,
     height: layer.height,
@@ -138,6 +152,10 @@ const resolveEffectiveSize = (
 };
 
 const resolveEffectiveZIndex = (layer: LayerDefinition): number | undefined => {
+  // For floating layers, prioritize floating.zIndex
+  if (layer.floating?.zIndex !== undefined) {
+    return layer.floating.zIndex;
+  }
   return layer.zIndex;
 };
 
@@ -203,7 +221,8 @@ const resolveDragAnchor = (layer: LayerDefinition): { left: number; top: number 
   if (!floating) {
     throw new Error(`Floating layer "${layer.id}" is missing floating configuration required for dragging.`);
   }
-  const position = layer.position;
+  // Prioritize floating.position/defaultPosition over layer.position
+  const position = floating.position ?? floating.defaultPosition ?? layer.position;
   if (!position) {
     throw new Error(`Floating layer "${layer.id}" must define position with left and top values.`);
   }
@@ -814,6 +833,13 @@ export const useLayerInteractions = ({
 
 /* Debug note: Reviewed GridLayout.module.css and LayerInstanceContext to keep drag handle integration consistent. */
 const getNumericLayerSize = (layer: LayerDefinition): LayerSize | undefined => {
+  // For floating layers, prioritize floating.size/defaultSize
+  if (layer.floating) {
+    const floatingSize = layer.floating.size ?? layer.floating.defaultSize;
+    if (floatingSize) {
+      return { width: floatingSize.width, height: floatingSize.height };
+    }
+  }
   if (typeof layer.width === "number" && typeof layer.height === "number") {
     return { width: layer.width, height: layer.height };
   }
