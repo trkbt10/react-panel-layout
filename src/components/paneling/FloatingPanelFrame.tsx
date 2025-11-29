@@ -18,12 +18,17 @@ import {
 } from "../../constants/styles";
 
 const frameStyle: React.CSSProperties = {
+  borderRadius: FLOATING_PANEL_BORDER_RADIUS,
+  boxShadow: FLOATING_PANEL_SHADOW,
+};
+
+const innerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   borderRadius: FLOATING_PANEL_BORDER_RADIUS,
   border: `1px solid ${FLOATING_PANEL_BORDER_COLOR}`,
   background: FLOATING_PANEL_SURFACE_COLOR,
-  boxShadow: FLOATING_PANEL_SHADOW,
+  overflow: "hidden",
 };
 
 const headerStyle: React.CSSProperties = {
@@ -61,11 +66,21 @@ export type FloatingPanelFrameProps = Omit<React.HTMLAttributes<HTMLDivElement>,
 };
 
 export const FloatingPanelFrame = React.forwardRef<HTMLDivElement, FloatingPanelFrameProps>(function FloatingPanelFrame(
-  { style: propStyle, ...props },
+  { style: propStyle, children, ...props },
   ref,
 ) {
   const combinedStyle = React.useMemo(() => ({ ...frameStyle, ...propStyle }), [propStyle]);
-  return <div ref={ref} style={combinedStyle} {...props} />;
+  const combinedInnerStyle = React.useMemo(() => {
+    if (propStyle?.borderRadius === undefined) {
+      return innerStyle;
+    }
+    return { ...innerStyle, borderRadius: propStyle.borderRadius };
+  }, [propStyle?.borderRadius]);
+  return (
+    <div ref={ref} style={combinedStyle} {...props}>
+      <div style={combinedInnerStyle}>{children}</div>
+    </div>
+  );
 });
 
 export type FloatingPanelHeaderProps = Omit<React.HTMLAttributes<HTMLDivElement>, "className" | "style"> & {
