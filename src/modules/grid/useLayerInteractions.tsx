@@ -413,11 +413,13 @@ const computeResizableLayerSizes = (
 type UseLayerInteractionsArgs = {
   layers: LayerDefinition[];
   layerById: Map<string, LayerDefinition>;
+  isRootLevel: boolean;
 };
 
 export const useLayerInteractions = ({
   layers,
   layerById,
+  isRootLevel,
 }: UseLayerInteractionsArgs): {
   providerValue: GridLayoutContextValue;
   draggingLayerId: string | null;
@@ -820,8 +822,9 @@ export const useLayerInteractions = ({
       handleLayerPointerDown,
       getLayerRenderState,
       getLayerHandleProps,
+      isRootLevel,
     }),
-    [getLayerHandleProps, getLayerRenderState, handleLayerPointerDown],
+    [getLayerHandleProps, getLayerRenderState, handleLayerPointerDown, isRootLevel],
   );
 
   return {

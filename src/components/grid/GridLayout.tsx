@@ -27,19 +27,34 @@ const gridLayoutDraggingStyle: React.CSSProperties = {
   userSelect: "none",
 };
 
+const gridLayoutRootLevelStyle: React.CSSProperties = {
+  ...gridLayoutBaseStyle,
+  height: "auto",
+  minHeight: "100%",
+};
+
+const resolveGridBaseStyle = (isRootLevel: boolean): React.CSSProperties => {
+  return isRootLevel ? gridLayoutRootLevelStyle : gridLayoutBaseStyle;
+};
+
 export type GridLayoutProps = {
   config: PanelLayoutConfig;
   layers: LayerDefinition[];
   style?: React.CSSProperties;
+  /**
+   * When true, enables browser-native scrolling for scrollable layers.
+   * Use this when GridLayout is at the root level of the application.
+   */
+  root?: boolean;
 };
 
-export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: styleProp }) => {
+export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: styleProp, root = false }) => {
   const gridRef = React.useRef<HTMLDivElement | null>(null);
   const { isIntersecting } = useIntersectionObserver(gridRef, { threshold: 0 });
 
   return (
     <PanelSystemProvider config={config} layers={layers} style={styleProp}>
-      <GridLayoutInner gridRef={gridRef} isIntersecting={isIntersecting} />
+      <GridLayoutInner gridRef={gridRef} isIntersecting={isIntersecting} isRoot={root} />
     </PanelSystemProvider>
   );
 };
@@ -47,23 +62,26 @@ export const GridLayout: React.FC<GridLayoutProps> = ({ config, layers, style: s
 const GridLayoutInner: React.FC<{
   gridRef: React.RefObject<HTMLDivElement | null>;
   isIntersecting: boolean;
-}> = ({ gridRef, isIntersecting }) => {
+  isRoot: boolean;
+}> = ({ gridRef, isIntersecting, isRoot }) => {
   const { config, style, layers } = usePanelSystem();
   const { normalizedLayers, visibleLayers, regularLayers, layerById } = useGridPlacements(config, layers.defs);
   const { columnHandles, rowHandles, gapSizes, gridStyle, handleResize } = useGridTracks(config, style, gridRef);
   const { providerValue, draggingLayerId, resizingLayerId } = useLayerInteractions({
     layers: normalizedLayers,
     layerById,
+    isRootLevel: isRoot,
   });
 
   const isDraggingOrResizing = draggingLayerId ? true : Boolean(resizingLayerId);
   const combinedStyle = React.useMemo(() => {
+    const baseStyle = resolveGridBaseStyle(isRoot);
     return {
-      ...gridLayoutBaseStyle,
+      ...baseStyle,
       ...gridStyle,
       ...(isDraggingOrResizing ? gridLayoutDraggingStyle : {}),
     };
-  }, [gridStyle, isDraggingOrResizing]);
+  }, [gridStyle, isDraggingOrResizing, isRoot]);
 
   return (
     <>

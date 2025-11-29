@@ -175,5 +175,5 @@ export const Layout: React.FC = () => {
     ];
   }, [handleOpenNav, isStackedLayout, navOpen]);
 
-  return <GridLayout config={config} layers={layers} />;
+  return <GridLayout config={config} layers={layers} root />;
 };

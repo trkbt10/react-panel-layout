@@ -33,6 +33,11 @@ export type GridLayoutContextValue = {
   handleLayerPointerDown: (event: React.PointerEvent<HTMLDivElement>) => void;
   getLayerRenderState: (layer: LayerDefinition) => GridLayerRenderState;
   getLayerHandleProps: (layerId: string) => GridLayerHandleProps;
+  /**
+   * Whether the GridLayout is mounted at root level.
+   * When true, scrollable layers should delegate to browser's native scroll.
+   */
+  isRootLevel: boolean;
 };
 
 const GridLayoutContext = React.createContext<GridLayoutContextValue | null>(null);
