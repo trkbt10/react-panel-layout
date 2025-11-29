@@ -20,10 +20,6 @@ export const ComplexPanel: React.FC<{ onClose?: () => void }> = ({ onClose }) =>
     style={{
       width: "500px",
       maxWidth: "100%",
-      boxShadow: "var(--rpl-demo-shadow-lg)",
-      borderRadius: "var(--rpl-demo-radius-lg)",
-      border: "1px solid var(--rpl-demo-sidebar-border)",
-      background: "#fff",
     }}
   >
     <FloatingPanelHeader>

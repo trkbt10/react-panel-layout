@@ -19,9 +19,14 @@ import {
   FLOATING_PANEL_SHADOW,
 } from "../../constants/styles";
 
-const frameStyle: React.CSSProperties = {
+const shadowWrapperStyle: React.CSSProperties = {
   borderRadius: FLOATING_PANEL_BORDER_RADIUS,
   boxShadow: FLOATING_PANEL_SHADOW,
+};
+
+const overflowWrapperStyle: React.CSSProperties = {
+  borderRadius: FLOATING_PANEL_BORDER_RADIUS,
+  overflow: "hidden",
 };
 
 const innerStyle: React.CSSProperties = {
@@ -30,7 +35,6 @@ const innerStyle: React.CSSProperties = {
   borderRadius: FLOATING_PANEL_BORDER_RADIUS,
   border: `1px solid ${FLOATING_PANEL_BORDER_COLOR}`,
   background: FLOATING_PANEL_SURFACE_COLOR,
-  overflow: "hidden",
 };
 
 const headerStyle: React.CSSProperties = {
@@ -80,7 +84,29 @@ export const FloatingPanelFrame = React.forwardRef<HTMLDivElement, FloatingPanel
   { style: propStyle, children, ...props },
   ref,
 ) {
-  const combinedStyle = React.useMemo(() => ({ ...frameStyle, ...propStyle }), [propStyle]);
+  const combinedShadowStyle = React.useMemo(
+    () => ({ ...shadowWrapperStyle, ...propStyle }),
+    [propStyle],
+  );
+
+  const combinedOverflowStyle = React.useMemo(() => {
+    const hasCustomBorderRadius = propStyle?.borderRadius !== undefined;
+    const hasHeight = propStyle?.height !== undefined;
+
+    if (!hasCustomBorderRadius && !hasHeight) {
+      return overflowWrapperStyle;
+    }
+
+    const result: React.CSSProperties = { ...overflowWrapperStyle };
+    if (hasCustomBorderRadius) {
+      result.borderRadius = propStyle.borderRadius;
+    }
+    if (hasHeight) {
+      result.height = propStyle.height;
+    }
+    return result;
+  }, [propStyle?.borderRadius, propStyle?.height]);
+
   const combinedInnerStyle = React.useMemo(() => {
     const hasCustomBorderRadius = propStyle?.borderRadius !== undefined;
     const hasHeight = propStyle?.height !== undefined;
@@ -98,9 +124,12 @@ export const FloatingPanelFrame = React.forwardRef<HTMLDivElement, FloatingPanel
     }
     return result;
   }, [propStyle?.borderRadius, propStyle?.height]);
+
   return (
-    <div ref={ref} style={combinedStyle} {...props}>
-      <div style={combinedInnerStyle}>{children}</div>
+    <div ref={ref} style={combinedShadowStyle} {...props}>
+      <div style={combinedOverflowStyle}>
+        <div style={combinedInnerStyle}>{children}</div>
+      </div>
     </div>
   );
 });

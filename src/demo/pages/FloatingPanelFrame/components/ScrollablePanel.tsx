@@ -18,10 +18,6 @@ export const ScrollablePanel: React.FC<{ onClose?: () => void }> = ({ onClose })
       width: "400px",
       maxWidth: "100%",
       maxHeight: "400px",
-      boxShadow: "var(--rpl-demo-shadow-lg)",
-      borderRadius: "var(--rpl-demo-radius-lg)",
-      border: "1px solid var(--rpl-demo-sidebar-border)",
-      background: "#fff",
     }}
   >
     <FloatingPanelHeader>
