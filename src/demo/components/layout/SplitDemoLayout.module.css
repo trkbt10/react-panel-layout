@@ -1,0 +1,109 @@
+/**
+ * SplitDemoLayout styles
+ */
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--rpl-color-surface-2);
+}
+
+.codeWrapper {
+  height: 100%;
+  border-right: 1px solid var(--rpl-color-border);
+  background: #1e1e2e;
+}
+
+.codeWrapper > * {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.previewWrapper {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background: var(--rpl-color-surface);
+  padding: var(--rpl-demo-space-md);
+}
+
+/* Drawer content */
+.drawerContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e2e;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.drawerContent > * {
+  border-radius: 0;
+  box-shadow: none;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Floating code toggle button for compact mode */
+.codeToggle {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  font-family: var(--rpl-demo-font-family);
+  z-index: 50;
+}
+
+.codeToggle:hover {
+  background: #2a2a3e;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.codeToggle:active {
+  transform: translateY(0);
+}
+
+.codeToggle svg {
+  opacity: 0.7;
+}
+
+/* Drawer close button */
+.drawerClose {
+  position: absolute;
+  top: calc(40% - 48px);
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 110;
+}
+
+.drawerClose:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+

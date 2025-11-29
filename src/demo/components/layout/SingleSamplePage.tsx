@@ -2,8 +2,7 @@
  * @file Convenience component for single-sample demo pages
  */
 import * as React from "react";
-import { CodePreview } from "../CodePreview";
-import { DemoPage } from "./DemoPage";
+import { SplitDemoLayout } from "./SplitDemoLayout";
 import styles from "./SingleSamplePage.module.css";
 
 export type SingleSamplePageProps = {
@@ -15,29 +14,22 @@ export type SingleSamplePageProps = {
   maxWidth?: number | string;
 };
 
-const toCssValue = (value?: number | string): string | undefined => {
-  if (typeof value === "number") {
-    return `${value}px`;
-  }
-  return value;
-};
-
+/**
+ * SingleSamplePage - Full-height layout for demo pages
+ * Uses the entire right pane with left code / right preview split
+ * No extra chrome - directly renders the SplitDemoLayout
+ */
 export const SingleSamplePage: React.FC<SingleSamplePageProps> = ({
   title,
   code,
   children,
   codeTitle,
-  previewHeight,
-  maxWidth,
 }) => {
-  const heightValue = toCssValue(previewHeight);
-
   return (
-    <DemoPage title={title} maxWidth={maxWidth}>
-      <div className={styles.preview} style={heightValue ? { height: heightValue } : undefined}>
+    <div className={styles.container}>
+      <SplitDemoLayout code={code} codeTitle={codeTitle ?? title}>
         {children}
-      </div>
-      <CodePreview code={code} title={codeTitle ?? `${title} Code`} />
-    </DemoPage>
+      </SplitDemoLayout>
+    </div>
   );
 };

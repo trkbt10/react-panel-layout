@@ -1,4 +1,11 @@
-.preview {
+/**
+ * SingleSamplePage styles - Full-height layout for demo pages
+ * Acts as a passthrough container to fill the entire parent area
+ */
+
+.container {
   width: 100%;
-  margin-bottom: 1rem;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
 }

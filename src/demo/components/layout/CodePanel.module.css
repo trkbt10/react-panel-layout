@@ -1,0 +1,180 @@
+/**
+ * CodePanel styles - Modern IDE-like appearance
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  background: #1e1e2e;
+  border-radius: var(--rpl-demo-radius-md);
+  overflow: hidden;
+  box-shadow: var(--rpl-demo-shadow-md);
+  height: 100%;
+  min-height: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #181825;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dotRed {
+  background: #ff5f57;
+}
+
+.dotYellow {
+  background: #febc2e;
+}
+
+.dotGreen {
+  background: #28c840;
+}
+
+.title {
+  font-size: var(--rpl-demo-font-size-xs);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--rpl-demo-font-family);
+  letter-spacing: 0.02em;
+}
+
+.copyButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--rpl-demo-font-family);
+}
+
+.copyButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.copyButton.copied {
+  background: rgba(40, 200, 64, 0.15);
+  border-color: rgba(40, 200, 64, 0.3);
+  color: #28c840;
+}
+
+.content {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.pre {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  font-family: "JetBrains Mono", "Fira Code", "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.lineNumbers {
+  position: sticky;
+  left: 0;
+  padding: 14px 0;
+  padding-right: 12px;
+  padding-left: 14px;
+  background: #1e1e2e;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  user-select: none;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.lineNumber {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.code {
+  flex: 1;
+  padding: 14px 16px;
+  color: #cdd6f4;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Syntax highlighting colors (Catppuccin Mocha inspired) */
+.code :global(.keyword) {
+  color: #cba6f7;
+}
+
+.code :global(.string) {
+  color: #a6e3a1;
+}
+
+.code :global(.number) {
+  color: #fab387;
+}
+
+.code :global(.comment) {
+  color: #6c7086;
+  font-style: italic;
+}
+
+.code :global(.function) {
+  color: #89b4fa;
+}
+
+.code :global(.type) {
+  color: #f9e2af;
+}
+
+/* Scrollbar styling */
+.content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.content::-webkit-scrollbar-corner {
+  background: transparent;
+}

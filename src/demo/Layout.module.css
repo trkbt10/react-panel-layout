@@ -161,11 +161,21 @@
   text-align: center;
 }
 
-.mainContent {
+/**
+ * Stacked (mobile) layout wrapper
+ */
+.stackedMainContent {
   height: 100%;
   background: var(--rpl-demo-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.stackedContentArea {
+  flex: 1;
+  min-height: 0;
   overflow: auto;
-  position: relative;
 }
 
 .mobileHeader {
@@ -227,11 +237,6 @@
 
   .nav {
     padding: 0 var(--rpl-demo-space-sm) var(--rpl-demo-space-sm);
-  }
-
-  .mainContent {
-    height: auto;
-    min-height: 0;
   }
 
   .sidebarFooter {

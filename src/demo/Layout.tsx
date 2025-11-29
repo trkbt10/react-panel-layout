@@ -69,32 +69,37 @@ const SidebarNav: React.FC = () => {
   );
 };
 
-const MainContent: React.FC<{ isStacked: boolean; onOpenNav: () => void }> = ({ isStacked, onOpenNav }) => {
-  const mobileHeader = React.useMemo(() => {
-    if (!isStacked) {
-      return null;
-    }
-
-    return (
-      <div className={styles.mobileHeader}>
-        <button
-          type="button"
-          className={styles.mobileNavButton}
-          onClick={onOpenNav}
-          aria-label="Open navigation drawer"
-        >
-          <FiMenu aria-hidden />
-          <span className={styles.mobileNavLabel}>Menu</span>
-        </button>
-        <h2 className={styles.mobileTitle}>Panel Layout</h2>
-      </div>
-    );
-  }, [isStacked, onOpenNav]);
-
+/**
+ * Mobile header component - rendered as part of main content area
+ */
+const MobileHeader: React.FC<{ onOpenNav: () => void }> = ({ onOpenNav }) => {
   return (
-    <div className={styles.mainContent}>
-      {mobileHeader}
-      <Outlet />
+    <div className={styles.mobileHeader}>
+      <button
+        type="button"
+        className={styles.mobileNavButton}
+        onClick={onOpenNav}
+        aria-label="Open navigation drawer"
+      >
+        <FiMenu aria-hidden />
+        <span className={styles.mobileNavLabel}>Menu</span>
+      </button>
+      <h2 className={styles.mobileTitle}>Panel Layout</h2>
+    </div>
+  );
+};
+
+/**
+ * MainContent wrapper - only used in stacked (mobile) mode
+ * In desktop mode, Outlet is rendered directly without wrapper
+ */
+const StackedMainContent: React.FC<{ onOpenNav: () => void }> = ({ onOpenNav }) => {
+  return (
+    <div className={styles.stackedMainContent}>
+      <MobileHeader onOpenNav={onOpenNav} />
+      <div className={styles.stackedContentArea}>
+        <Outlet />
+      </div>
     </div>
   );
 };
@@ -128,11 +133,12 @@ export const Layout: React.FC = () => {
 
   const layers = React.useMemo<LayerDefinition[]>(() => {
     if (isStackedLayout) {
+      // Mobile: Use wrapper with mobile header
       return [
         {
           id: "main",
           gridArea: "main",
-          component: <MainContent isStacked onOpenNav={handleOpenNav} />,
+          component: <StackedMainContent onOpenNav={handleOpenNav} />,
         },
         {
           id: "sidebar-drawer",
@@ -152,6 +158,7 @@ export const Layout: React.FC = () => {
       ];
     }
 
+    // Desktop: Render Outlet directly without wrapper for clean grid integration
     return [
       {
         id: "sidebar",
@@ -161,7 +168,7 @@ export const Layout: React.FC = () => {
       {
         id: "main",
         gridArea: "main",
-        component: <MainContent isStacked={false} onOpenNav={handleOpenNav} />,
+        component: <Outlet />,
       },
     ];
   }, [handleOpenNav, isStackedLayout, navOpen]);
