@@ -78,16 +78,17 @@ const EmbeddedLayer = React.memo<{
 
   const combinedStyle = React.useMemo<React.CSSProperties>(() => {
     // min-width/height: 0 allows grid items to shrink below content size
-    // overflow: hidden prevents content from causing layout overflow
+    // overflow: hidden by default prevents content from causing layout overflow
+    // scrollable: true enables overflow: auto for scrollable content
     const baseStyle: React.CSSProperties = {
       ...style,
       ...gridPlacementStyle,
       minWidth: 0,
       minHeight: 0,
-      overflow: "hidden",
+      overflow: layer.scrollable ? "auto" : "hidden",
     };
     return isResizable ? { ...baseStyle, position: "relative" } : baseStyle;
-  }, [style, gridPlacementStyle, isResizable]);
+  }, [style, gridPlacementStyle, isResizable, layer.scrollable]);
 
   const handleClose = React.useCallback(() => {
     layer.floating?.onClose?.();

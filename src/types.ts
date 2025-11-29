@@ -295,6 +295,12 @@ export type LayerDefinition = {
 
   // Styling
   style?: React.CSSProperties;
+
+  /**
+   * When true, enables scrolling within this panel (overflow: auto).
+   * When false or omitted, content overflow is hidden (default behavior).
+   */
+  scrollable?: boolean;
 };
 
 // Props for top-level layout components
