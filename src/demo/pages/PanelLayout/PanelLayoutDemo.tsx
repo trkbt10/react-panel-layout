@@ -10,13 +10,9 @@ import { Section, Story } from "../../components/Story";
 import { CodePreview } from "../../components/CodePreview";
 import { DemoPage } from "../../components/layout/index";
 import styles from "./PanelLayoutDemo.module.css";
-import "../../demo.css";
 import { FiFolder, FiSearch, FiSettings, FiCommand, FiLayers, FiLayout } from "react-icons/fi";
 
-const DemoPanel: React.FC<{ title: string; children?: React.ReactNode }> = ({
-  title,
-  children,
-}) => {
+const DemoPanel: React.FC<{ title: string; children?: React.ReactNode }> = ({ title, children }) => {
   return (
     <div className={styles.demoPanel}>
       <h3 className={styles.panelTitle}>{title}</h3>
@@ -33,11 +29,7 @@ const featuredConfig: PanelLayoutConfig = {
     ["sidebar", "canvas", "inspector"],
     ["statusbar", "statusbar", "statusbar"],
   ],
-  rows: [
-    { size: "52px" },
-    { size: "1fr" },
-    { size: "28px" },
-  ],
+  rows: [{ size: "52px" }, { size: "1fr" }, { size: "28px" }],
   columns: [
     { size: "260px", resizable: true, minSize: 200, maxSize: 400 },
     { size: "1fr" },
@@ -50,11 +42,25 @@ const featuredLayers: LayerDefinition[] = [
   {
     id: "toolbar",
     component: (
-      <div className={styles.demoPanel} style={{ flexDirection: 'row', alignItems: 'center', padding: '0 8px', borderBottom: '1px solid var(--rpl-demo-sidebar-border)' }}>
+      <div
+        className={styles.demoPanel}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          padding: "0 8px",
+          borderBottom: "1px solid var(--rpl-demo-sidebar-border)",
+        }}
+      >
         <div className={styles.toolbar}>
-          <button className={styles.toolbarButton}><FiCommand /> File</button>
-          <button className={styles.toolbarButton}><FiLayout /> View</button>
-          <button className={styles.toolbarButton}><FiLayers /> Layer</button>
+          <button className={styles.toolbarButton}>
+            <FiCommand /> File
+          </button>
+          <button className={styles.toolbarButton}>
+            <FiLayout /> View
+          </button>
+          <button className={styles.toolbarButton}>
+            <FiLayers /> Layer
+          </button>
         </div>
       </div>
     ),
@@ -67,11 +73,21 @@ const featuredLayers: LayerDefinition[] = [
     component: (
       <DemoPanel title="Explorer">
         <ul className={styles.sidebarList}>
-          <li className={styles.sidebarItem}><FiFolder /> src</li>
-          <li className={styles.sidebarItem}><FiFolder /> components</li>
-          <li className={styles.sidebarItem}><FiFolder /> assets</li>
-          <li className={styles.sidebarItem}><FiSearch /> Search</li>
-          <li className={styles.sidebarItem}><FiSettings /> Settings</li>
+          <li className={styles.sidebarItem}>
+            <FiFolder /> src
+          </li>
+          <li className={styles.sidebarItem}>
+            <FiFolder /> components
+          </li>
+          <li className={styles.sidebarItem}>
+            <FiFolder /> assets
+          </li>
+          <li className={styles.sidebarItem}>
+            <FiSearch /> Search
+          </li>
+          <li className={styles.sidebarItem}>
+            <FiSettings /> Settings
+          </li>
         </ul>
       </DemoPanel>
     ),
@@ -82,17 +98,19 @@ const featuredLayers: LayerDefinition[] = [
   {
     id: "canvas",
     component: (
-      <div className={styles.demoPanel} style={{ background: '#f5f5f7' }}>
+      <div className={styles.demoPanel} style={{ background: "#f5f5f7" }}>
         <div className={styles.canvasArea}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{
-              width: 64,
-              height: 64,
-              background: 'var(--rpl-demo-accent)',
-              borderRadius: '16px',
-              margin: '0 auto 16px',
-              opacity: 0.1
-            }} />
+          <div style={{ textAlign: "center" }}>
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                background: "var(--rpl-demo-accent)",
+                borderRadius: "16px",
+                margin: "0 auto 16px",
+                opacity: 0.1,
+              }}
+            />
             <p className={styles.canvasText}>Drag panels to resize</p>
           </div>
         </div>
@@ -109,21 +127,21 @@ const featuredLayers: LayerDefinition[] = [
         <div className={styles.inspectorForm}>
           <div>
             <label className={styles.formLabel}>Dimensions</label>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: "flex", gap: 8 }}>
               <input type="number" defaultValue={1920} className={styles.formInputNumber} placeholder="W" />
               <input type="number" defaultValue={1080} className={styles.formInputNumber} placeholder="H" />
             </div>
           </div>
           <div>
             <label className={styles.formLabel}>Fill</label>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <input type="color" defaultValue="#0071e3" className={styles.formInputColor} style={{ width: 40 }} />
               <input type="text" defaultValue="#0071E3" className={styles.formInputNumber} />
             </div>
           </div>
           <div>
             <label className={styles.formLabel}>Opacity</label>
-            <input type="range" style={{ width: '100%' }} />
+            <input type="range" style={{ width: "100%" }} />
           </div>
         </div>
       </DemoPanel>
@@ -138,7 +156,7 @@ const featuredLayers: LayerDefinition[] = [
       <div className={styles.statusBar}>
         <span style={{ marginRight: 16 }}>Ready</span>
         <span style={{ opacity: 0.6 }}>UTF-8</span>
-        <span style={{ marginLeft: 'auto', opacity: 0.6 }}>TypeScript React</span>
+        <span style={{ marginLeft: "auto", opacity: 0.6 }}>TypeScript React</span>
       </div>
     ),
     gridArea: "statusbar",
@@ -202,7 +220,6 @@ const layers: LayerDefinition[] = [
 
 <GridLayout config={config} layers={layers} />;`;
 
-
 export const PanelLayoutDemo: React.FC = () => {
   return (
     <DemoPage
@@ -210,8 +227,8 @@ export const PanelLayoutDemo: React.FC = () => {
       padding="var(--rpl-demo-space-xl)"
       intro={
         <p className={styles.intro}>
-          Explore the featured workspace configuration and browse additional panel layout presets.
-          This demo showcases the power of the grid system combined with floating panels.
+          Explore the featured workspace configuration and browse additional panel layout presets. This demo showcases
+          the power of the grid system combined with floating panels.
         </p>
       }
     >
