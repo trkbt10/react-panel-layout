@@ -23,7 +23,6 @@ const frameStyle: React.CSSProperties = {
   borderRadius: FLOATING_PANEL_BORDER_RADIUS,
   border: `1px solid ${FLOATING_PANEL_BORDER_COLOR}`,
   background: FLOATING_PANEL_SURFACE_COLOR,
-  overflow: "hidden",
   boxShadow: FLOATING_PANEL_SHADOW,
 };
 
@@ -122,4 +121,3 @@ FloatingPanelTitle.displayName = "FloatingPanelTitle";
 FloatingPanelMeta.displayName = "FloatingPanelMeta";
 FloatingPanelControls.displayName = "FloatingPanelControls";
 FloatingPanelContent.displayName = "FloatingPanelContent";
-
