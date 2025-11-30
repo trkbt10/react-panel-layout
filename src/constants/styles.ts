@@ -23,7 +23,7 @@
  * Unified CSS variable prefix for all react-panel-layout variables
  * All theme variables use this prefix: --rpl-*
  */
-export const CSS_VAR_PREFIX = 'rpl';
+export const CSS_VAR_PREFIX = "rpl";
 
 // ========================================
 // COLORS
@@ -46,7 +46,7 @@ export const COLOR_PANEL_BG = "var(--rpl-color-panel-bg, #0b0b0c)";
  * Primary color - used for resize handles, highlights
  */
 export const COLOR_PRIMARY = "var(--rpl-color-primary, #2196f3)";
-export const COLOR_RESIZE_HANDLE_IDLE = "var(--rpl-color-resize-handle-idle, rgba(255, 255, 255, 0.12))";
+export const COLOR_RESIZE_HANDLE_IDLE = "var(--rpl-color-resize-handle-idle, rgba(255, 255, 255, 0.0))";
 export const COLOR_RESIZE_HANDLE_HOVER = "var(--rpl-color-resize-handle-hover, rgba(33, 150, 243, 0.35))";
 export const COLOR_RESIZE_HANDLE_ACTIVE = "var(--rpl-color-resize-handle-active, rgba(33, 150, 243, 0.55))";
 
@@ -213,7 +213,8 @@ export const FLOATING_PANEL_CONTENT_PADDING = "var(--rpl-space-floating-panel-co
 export const FLOATING_PANEL_META_FONT_SIZE = "var(--rpl-size-floating-panel-meta-font, 12px)";
 export const FLOATING_PANEL_CONTROLS_GAP = "var(--rpl-space-floating-panel-controls-gap, 6px)";
 export const FLOATING_PANEL_CLOSE_BUTTON_FONT_SIZE = "var(--rpl-size-floating-panel-close-button-font, 1.25rem)";
-export const FLOATING_PANEL_CLOSE_BUTTON_PADDING = "var(--rpl-space-floating-panel-close-button-padding, 0.25rem 0.5rem)";
+export const FLOATING_PANEL_CLOSE_BUTTON_PADDING =
+  "var(--rpl-space-floating-panel-close-button-padding, 0.25rem 0.5rem)";
 export const FLOATING_PANEL_SURFACE_COLOR = COLOR_NODE_EDITOR_SURFACE;
 export const FLOATING_PANEL_SURFACE_2_COLOR = COLOR_NODE_EDITOR_SURFACE_2;
 export const FLOATING_PANEL_BORDER_COLOR = COLOR_NODE_EDITOR_BORDER;
