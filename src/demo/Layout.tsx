@@ -75,12 +75,7 @@ const SidebarNav: React.FC = () => {
 const MobileHeader: React.FC<{ onOpenNav: () => void }> = ({ onOpenNav }) => {
   return (
     <div className={styles.mobileHeader}>
-      <button
-        type="button"
-        className={styles.mobileNavButton}
-        onClick={onOpenNav}
-        aria-label="Open navigation drawer"
-      >
+      <button type="button" className={styles.mobileNavButton} onClick={onOpenNav} aria-label="Open navigation drawer">
         <FiMenu aria-hidden />
         <span className={styles.mobileNavLabel}>Menu</span>
       </button>
@@ -96,7 +91,9 @@ const MobileHeader: React.FC<{ onOpenNav: () => void }> = ({ onOpenNav }) => {
 const StackedMainContent: React.FC<{ onOpenNav: () => void }> = ({ onOpenNav }) => {
   return (
     <div className={styles.stackedMainContent}>
-      <MobileHeader onOpenNav={onOpenNav} />
+      <div className={styles.stackedMobileHeader}>
+        <MobileHeader onOpenNav={onOpenNav} />
+      </div>
       <div className={styles.stackedContentArea}>
         <Outlet />
       </div>
@@ -120,14 +117,14 @@ export const Layout: React.FC = () => {
       return {
         areas: [["main"]],
         columns: [{ size: "1fr" }],
-        rows: [{ size: "100vh" }],
+        rows: [{ size: "auto" }],
       };
     }
 
     return {
       areas: [["sidebar", "main"]],
       columns: [{ size: "250px", resizable: true, minSize: 200, maxSize: 400 }, { size: "1fr" }],
-      rows: [{ size: "100vh" }],
+      rows: [{ size: "minmax(0, 100vh)" }],
     };
   }, [isStackedLayout]);
 

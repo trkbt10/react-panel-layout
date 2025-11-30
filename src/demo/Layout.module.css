@@ -165,17 +165,18 @@
  * Stacked (mobile) layout wrapper
  */
 .stackedMainContent {
-  height: 100%;
+
   background: var(--rpl-demo-bg);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  position: relative;
 }
 
 .stackedContentArea {
   flex: 1;
   min-height: 0;
   overflow: auto;
+  padding-top: 54px;
 }
 
 .mobileHeader {
@@ -188,6 +189,14 @@
   top: 0;
   z-index: 2;
   background: var(--rpl-demo-bg);
+}
+
+.stackedMobileHeader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
 }
 
 .mobileNavButton {

@@ -29,6 +29,7 @@ const gridLayoutDraggingStyle: React.CSSProperties = {
 
 const gridLayoutRootLevelStyle: React.CSSProperties = {
   ...gridLayoutBaseStyle,
+  overflow: "visible",
   height: "auto",
   minHeight: "100%",
 };
