@@ -16,6 +16,12 @@ export type PivotItem<TId extends string = string> = {
   content: React.ReactNode;
   /** Whether this item can be selected (defaults to true) */
   disabled?: boolean;
+  /**
+   * Enable content caching to preserve React component state across re-renders.
+   * When disabled (default), content is re-created on each render.
+   * @default false
+   */
+  cache?: boolean;
 };
 
 /**

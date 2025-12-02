@@ -114,11 +114,12 @@ describe("useContentCache", () => {
 
     it("returns null for non-existent IDs", () => {
       const { fn: resolveContent } = createFake(null);
+      const validIds: string[] = ["item-1"];
 
       const { result } = renderHook(() =>
         useContentCache({
           resolveContent,
-          validIds: ["item-1"],
+          validIds,
         }),
       );
 

@@ -20,9 +20,26 @@ type GridLayerListProps = {
 };
 
 /**
+ * Resolves layer content based on pivot and cache settings.
+ * Pivot layers use PivotLayer component, others use cache or direct content.
+ */
+const resolveLayerContent = (
+  layer: LayerDefinition,
+  getCachedContent: (layerId: string) => React.ReactNode | null,
+): React.ReactNode => {
+  if (layer.pivot) {
+    return <PivotLayer pivot={layer.pivot} />;
+  }
+  if (layer.cache) {
+    return getCachedContent(layer.id);
+  }
+  return layer.component;
+};
+
+/**
  * Renders layer content with optional FloatingWindow chrome.
  * Handles both chrome and non-chrome layers.
- * Uses cached content to preserve component state across re-renders.
+ * Uses cached content only when layer.cache is true.
  */
 const LayerContentRenderer = React.memo<{
   layer: LayerDefinition;
@@ -30,9 +47,7 @@ const LayerContentRenderer = React.memo<{
 }>(({ layer, onClose }) => {
   const { getCachedContent } = usePanelSystem();
 
-  // For pivot layers, render PivotLayer component
-  // For regular layers, use cached content to preserve state
-  const content = layer.pivot ? <PivotLayer pivot={layer.pivot} /> : <>{getCachedContent(layer.id)}</>;
+  const content = resolveLayerContent(layer, getCachedContent);
 
   if (!layer.floating?.chrome) {
     return content;

@@ -160,6 +160,12 @@ export type PivotBehaviorItem = {
   content: React.ReactNode;
   /** Whether this item can be selected */
   disabled?: boolean;
+  /**
+   * Enable content caching to preserve React component state across re-renders.
+   * When disabled (default), content is re-created on each render.
+   * @default false
+   */
+  cache?: boolean;
 };
 
 // Pivot behavior configuration for content switching
@@ -301,6 +307,13 @@ export type LayerDefinition = {
    * When false or omitted, content overflow is hidden (default behavior).
    */
   scrollable?: boolean;
+
+  /**
+   * Enable content caching to preserve React component state across re-renders.
+   * When disabled (default), content is re-created on each render.
+   * @default false
+   */
+  cache?: boolean;
 };
 
 // Props for top-level layout components

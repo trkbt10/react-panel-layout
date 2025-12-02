@@ -84,10 +84,7 @@ export const FloatingPanelFrame = React.forwardRef<HTMLDivElement, FloatingPanel
   { style: propStyle, children, ...props },
   ref,
 ) {
-  const combinedShadowStyle = React.useMemo(
-    () => ({ ...shadowWrapperStyle, ...propStyle }),
-    [propStyle],
-  );
+  const combinedShadowStyle = React.useMemo(() => ({ ...shadowWrapperStyle, ...propStyle }), [propStyle]);
 
   const combinedOverflowStyle = React.useMemo(() => {
     const hasCustomBorderRadius = propStyle?.borderRadius !== undefined;

@@ -34,7 +34,7 @@ const PivotOutletContext = React.createContext<PivotOutletContextValue | null>(n
 /**
  * Stable Outlet component that subscribes to state changes.
  * This prevents remounting when activeId changes.
- * Uses cached content to preserve component state across re-renders.
+ * Uses cached content only when item.cache is true.
  */
 const PivotOutletInner: React.FC = React.memo(() => {
   const ctx = React.useContext(PivotOutletContext);
@@ -54,7 +54,7 @@ const PivotOutletInner: React.FC = React.memo(() => {
     <>
       {items.map((item) => (
         <PivotContent key={item.id} id={item.id} isActive={item.id === activeId} transitionMode={transitionMode}>
-          {ctx.getCachedContent(item.id)}
+          {item.cache ? ctx.getCachedContent(item.id) : item.content}
         </PivotContent>
       ))}
     </>
