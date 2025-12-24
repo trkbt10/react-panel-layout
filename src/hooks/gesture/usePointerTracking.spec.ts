@@ -25,6 +25,7 @@ describe("usePointerTracking", () => {
         start: null,
         current: null,
         pointerId: null,
+        wasCanceled: false,
       });
     });
   });
@@ -246,7 +247,7 @@ describe("usePointerTracking", () => {
       expect(result.current.state.pointerId).toBe(null);
     });
 
-    it("resets state on pointer cancel", () => {
+    it("resets state on pointer cancel and sets wasCanceled flag", () => {
       const { result } = renderHook(() =>
         usePointerTracking({ enabled: true }),
       );
@@ -271,6 +272,35 @@ describe("usePointerTracking", () => {
       });
 
       expect(result.current.state.isDown).toBe(false);
+      expect(result.current.state.wasCanceled).toBe(true);
+    });
+
+    it("does not set wasCanceled on normal pointer up", () => {
+      const { result } = renderHook(() =>
+        usePointerTracking({ enabled: true }),
+      );
+
+      const downEvent = {
+        clientX: 100,
+        clientY: 200,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent;
+
+      act(() => {
+        result.current.onPointerDown(downEvent);
+      });
+
+      const upEvent = new PointerEvent("pointerup", { pointerId: 1 });
+
+      act(() => {
+        document.dispatchEvent(upEvent);
+      });
+
+      expect(result.current.state.isDown).toBe(false);
+      expect(result.current.state.wasCanceled).toBe(false);
     });
   });
 

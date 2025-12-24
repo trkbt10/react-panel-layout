@@ -533,4 +533,117 @@ describe("usePivotSwipeInput", () => {
       expect(pivot.go).toHaveBeenCalledWith(1);
     });
   });
+
+  describe("pointercancel - TDD for 'navigation confirmed while finger still down' issue", () => {
+    /**
+     * 問題の再現:
+     * 指を離していないのに移動が確定してしまう。
+     *
+     * 原因の仮説:
+     * - ブラウザがネイティブスクロールやジェスチャーを検出するとpointercancelが発火
+     * - 現在の実装ではpointercancelでもpointerupと同様にナビゲーションがトリガーされる
+     * - ユーザーは指を離していないにもかかわらず、ページ遷移が確定してしまう
+     *
+     * 期待動作:
+     * - pointercancelが発火した場合は、ナビゲーションをトリガーしない（キャンセル扱い）
+     * - 正常なpointerup時のみナビゲーションを実行
+     */
+
+    it("should NOT trigger navigation when pointercancel fires (finger still down)", () => {
+      const containerRef = createRef();
+      const pivot = createMockPivot();
+
+      const { result } = renderHook(() =>
+        usePivotSwipeInput({
+          containerRef,
+          pivot,
+          thresholds: { distanceThreshold: 50, velocityThreshold: 0.3, lockThreshold: 10 },
+        }),
+      );
+
+      // Pointer down
+      const downEvent = {
+        clientX: 200,
+        clientY: 100,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent<HTMLElement>;
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(downEvent);
+      });
+
+      // Swipe left past threshold (100px > 50px threshold)
+      const moveEvent = new PointerEvent("pointermove", {
+        clientX: 100, // -100px
+        clientY: 102,
+        pointerId: 1,
+      });
+
+      act(() => {
+        document.dispatchEvent(moveEvent);
+      });
+
+      // Browser fires pointercancel (e.g., native scroll detected)
+      // User's finger is still on the screen!
+      const cancelEvent = new PointerEvent("pointercancel", { pointerId: 1 });
+
+      act(() => {
+        document.dispatchEvent(cancelEvent);
+      });
+
+      // Navigation should NOT be triggered - the swipe was canceled, not completed
+      expect(pivot.go).not.toHaveBeenCalled();
+    });
+
+    it("should trigger navigation normally on pointerup", () => {
+      const containerRef = createRef();
+      const pivot = createMockPivot();
+
+      const { result } = renderHook(() =>
+        usePivotSwipeInput({
+          containerRef,
+          pivot,
+          thresholds: { distanceThreshold: 50, velocityThreshold: 0.3, lockThreshold: 10 },
+        }),
+      );
+
+      // Pointer down
+      const downEvent = {
+        clientX: 200,
+        clientY: 100,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent<HTMLElement>;
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(downEvent);
+      });
+
+      // Swipe left past threshold
+      const moveEvent = new PointerEvent("pointermove", {
+        clientX: 100,
+        clientY: 102,
+        pointerId: 1,
+      });
+
+      act(() => {
+        document.dispatchEvent(moveEvent);
+      });
+
+      // User lifts finger normally
+      const upEvent = new PointerEvent("pointerup", { pointerId: 1 });
+
+      act(() => {
+        document.dispatchEvent(upEvent);
+      });
+
+      // Navigation SHOULD be triggered
+      expect(pivot.go).toHaveBeenCalledWith(1);
+    });
+  });
 });

@@ -22,6 +22,7 @@ const INITIAL_STATE: PointerTrackingState = {
   start: null,
   current: null,
   pointerId: null,
+  wasCanceled: false,
 };
 
 /**
@@ -84,6 +85,7 @@ export function usePointerTracking(options: UsePointerTrackingOptions): UsePoint
       start: point,
       current: point,
       pointerId: event.pointerId,
+      wasCanceled: false,
     });
   });
 
@@ -101,16 +103,20 @@ export function usePointerTracking(options: UsePointerTrackingOptions): UsePoint
     }));
   });
 
-  const handlePointerEnd = useEffectEvent(() => {
+  const handlePointerUp = useEffectEvent(() => {
     setState(INITIAL_STATE);
+  });
+
+  const handlePointerCancel = useEffectEvent(() => {
+    setState({ ...INITIAL_STATE, wasCanceled: true });
   });
 
   // Use document-level pointer events for tracking after pointer down
   const shouldTrackDocument = state.isDown ? enabled : false;
   useDocumentPointerEvents(shouldTrackDocument, {
     onMove: handlePointerMove,
-    onUp: handlePointerEnd,
-    onCancel: handlePointerEnd,
+    onUp: handlePointerUp,
+    onCancel: handlePointerCancel,
   });
 
   // Reset state when disabled

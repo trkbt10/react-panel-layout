@@ -100,6 +100,8 @@ export type PointerTrackingState = {
   current: TimestampedPoint | null;
   /** Active pointer ID */
   pointerId: number | null;
+  /** Whether tracking ended via pointercancel (not pointerup) */
+  wasCanceled: boolean;
 };
 
 /**

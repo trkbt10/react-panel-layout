@@ -12,6 +12,7 @@ const createTrackingState = (
   start: null,
   current: null,
   pointerId: null,
+  wasCanceled: false,
   ...overrides,
 });
 

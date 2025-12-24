@@ -236,7 +236,7 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     }
   }, [pointerState]);
 
-  // Handle pointer up
+  // Handle pointer up (but not cancel)
   React.useEffect(() => {
     if (tracking.isDown) {
       return;
@@ -248,8 +248,14 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     }
 
     lastActiveStateRef.current = null;
+
+    // Skip navigation if the gesture was canceled (e.g., browser took over for native scroll)
+    if (tracking.wasCanceled) {
+      return;
+    }
+
     evaluateSwipeEnd(lastState.displacement, lastState.velocity, axis, thresholds, handleSwipeEnd);
-  }, [tracking.isDown, axis, thresholds, handleSwipeEnd]);
+  }, [tracking.isDown, tracking.wasCanceled, axis, thresholds, handleSwipeEnd]);
 
   // Merge states
   const state = pointerState.phase !== "idle" ? pointerState : wheelState;
