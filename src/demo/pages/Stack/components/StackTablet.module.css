@@ -1,0 +1,238 @@
+/* Stack Tablet demo styles - iPad Settings-style stacking sidebar */
+
+/* Exit animation for popped panels */
+@keyframes stack-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.exitingPanel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: stack-slide-out 0.3s ease-out forwards;
+}
+
+.container {
+  display: flex;
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--rpl-color-background, #f2f2f7);
+}
+
+/* Sidebar (left side) - contains stacking menus */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--rpl-color-surface, #fff);
+  border-right: 1px solid var(--rpl-color-border, #c6c6c8);
+}
+
+.sidebarContent {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Menu panel - each stacked panel has its own header */
+.menuPanel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--rpl-color-surface, #fff);
+}
+
+.panelHeader {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rpl-color-border, #c6c6c8);
+  background: var(--rpl-color-surface, #fff);
+}
+
+.panelBackButton {
+  padding: 4px 0;
+  margin-bottom: 4px;
+  font-size: 17px;
+  color: var(--rpl-color-primary, #007aff);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.panelBackButton:hover {
+  text-decoration: underline;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--rpl-color-text-primary, #000);
+}
+
+/* Menu list */
+.menuList {
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.menuItem {
+  margin-bottom: 2px;
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+  gap: 12px;
+}
+
+.menuButton:hover {
+  background: var(--rpl-color-surface-hover, #e5e5ea);
+}
+
+.menuButtonActive {
+  background: var(--rpl-color-primary, #007aff);
+}
+
+.menuButtonActive .menuLabel {
+  color: #fff;
+}
+
+.menuButtonActive .menuChevron {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.menuIcon {
+  font-size: 24px;
+  width: 32px;
+  text-align: center;
+}
+
+.menuLabel {
+  flex: 1;
+  font-size: 17px;
+  color: var(--rpl-color-text-primary, #000);
+}
+
+.menuChevron {
+  font-size: 20px;
+  color: var(--rpl-color-text-tertiary, #c7c7cc);
+  font-weight: 600;
+}
+
+/* Leaf content (when no more children) */
+.leafContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.leafText {
+  margin: 0 0 8px 0;
+  font-size: 17px;
+  color: var(--rpl-color-text-primary, #000);
+}
+
+.leafHint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--rpl-color-text-tertiary, #aeaeb2);
+}
+
+/* Detail panel (right side) */
+.detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--rpl-color-background, #f2f2f7);
+  min-width: 0;
+}
+
+.detailHeader {
+  padding: 16px 24px;
+  background: var(--rpl-color-surface, #fff);
+  border-bottom: 1px solid var(--rpl-color-border, #c6c6c8);
+}
+
+.detailTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--rpl-color-text-primary, #000);
+}
+
+.detailBody {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.detailList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--rpl-color-surface, #fff);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.detailItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rpl-color-border, #c6c6c8);
+}
+
+.detailItem:last-child {
+  border-bottom: none;
+}
+
+.detailLabel {
+  font-size: 17px;
+  color: var(--rpl-color-text-primary, #000);
+}
+
+.detailValue {
+  font-size: 17px;
+  color: var(--rpl-color-text-secondary, #8e8e93);
+}
+
+/* Debug info */
+.debugInfo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--rpl-color-text-tertiary, #8e8e93);
+  background: var(--rpl-color-surface, #fff);
+  border-top: 1px solid var(--rpl-color-border, #c6c6c8);
+}

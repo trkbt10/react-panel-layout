@@ -1,0 +1,234 @@
+/* Stack Navigation demo styles */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--rpl-color-background, #f2f2f7);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--rpl-color-surface, #fff);
+  border-bottom: 1px solid var(--rpl-color-border, #c6c6c8);
+  min-height: 44px;
+}
+
+.backButton {
+  padding: 8px 12px;
+  font-size: 16px;
+  color: var(--rpl-color-primary, #007aff);
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.backButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.title {
+  flex: 1;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--rpl-color-text-primary, #000);
+  text-align: center;
+}
+
+.actionButton {
+  padding: 8px 12px;
+  font-size: 16px;
+  color: var(--rpl-color-primary, #007aff);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.stackContainer {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel {
+  /* Panel content styling - position is handled by StackContent */
+  width: 100%;
+  height: 100%;
+  background: var(--rpl-color-background, #f2f2f7);
+  overflow-y: auto;
+}
+
+/* data-active attributes are now handled by StackContent */
+
+/* List styles */
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listItem {
+  border-bottom: 1px solid var(--rpl-color-border, #c6c6c8);
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}
+
+.listItemButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--rpl-color-surface, #fff);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s ease;
+}
+
+.listItemButton:hover {
+  background: var(--rpl-color-surface-hover, #e5e5ea);
+}
+
+.listItemButton:active {
+  background: var(--rpl-color-surface-active, #d1d1d6);
+}
+
+.listItemName {
+  flex: 1;
+  font-size: 17px;
+  color: var(--rpl-color-text-primary, #000);
+}
+
+.listItemDesc {
+  font-size: 15px;
+  color: var(--rpl-color-text-secondary, #8e8e93);
+  margin-right: 12px;
+}
+
+.chevron {
+  color: var(--rpl-color-text-tertiary, #c7c7cc);
+  font-size: 18px;
+}
+
+/* Detail panel */
+.detailContent {
+  padding: 24px;
+  background: var(--rpl-color-surface, #fff);
+  margin: 16px;
+  border-radius: 10px;
+}
+
+.detailContent h2 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--rpl-color-text-primary, #000);
+}
+
+.detailContent p {
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  color: var(--rpl-color-text-secondary, #8e8e93);
+  line-height: 1.5;
+}
+
+.detailMeta {
+  padding: 12px 0;
+  border-top: 1px solid var(--rpl-color-border, #c6c6c8);
+  font-size: 13px;
+  color: var(--rpl-color-text-tertiary, #8e8e93);
+}
+
+.hint {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--rpl-color-text-tertiary, #aeaeb2);
+}
+
+/* Edit panel */
+.editContent {
+  padding: 24px;
+  background: var(--rpl-color-surface, #fff);
+  margin: 16px;
+  border-radius: 10px;
+}
+
+.editContent h2 {
+  margin: 0 0 24px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--rpl-color-text-primary, #000);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rpl-color-text-secondary, #8e8e93);
+  text-transform: uppercase;
+}
+
+.input,
+.textarea {
+  padding: 12px;
+  font-size: 17px;
+  border: 1px solid var(--rpl-color-border, #c6c6c8);
+  border-radius: 8px;
+  background: var(--rpl-color-background, #f2f2f7);
+  color: var(--rpl-color-text-primary, #000);
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.saveButton {
+  width: 100%;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--rpl-color-primary, #007aff);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.saveButton:hover {
+  background: var(--rpl-color-primary-hover, #0066d6);
+}
+
+.saveButton:active {
+  background: var(--rpl-color-primary-active, #0055b3);
+}
+
+/* Debug info */
+.debugInfo {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--rpl-color-text-tertiary, #8e8e93);
+  background: var(--rpl-color-surface, #fff);
+  border-top: 1px solid var(--rpl-color-border, #c6c6c8);
+}

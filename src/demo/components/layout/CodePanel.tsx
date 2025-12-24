@@ -2,6 +2,8 @@
  * @file CodePanel component - Modern IDE-like code display panel
  */
 import * as React from "react";
+import type { BundledLanguage, BundledTheme } from "shiki";
+import { useShikiHighlight } from "../../hooks/useShikiHighlight";
 import styles from "./CodePanel.module.css";
 
 type CopyIconProps = {
@@ -86,6 +88,10 @@ export type CodePanelProps = {
   showHeader?: boolean;
   /** Maximum height for scrollable content */
   maxHeight?: string | number;
+  /** Language for syntax highlighting (default: typescript) */
+  language?: BundledLanguage;
+  /** Theme for syntax highlighting (default: github-dark) */
+  theme?: BundledTheme;
 };
 
 /**
@@ -99,9 +105,12 @@ export const CodePanel: React.FC<CodePanelProps> = ({
   showLineNumbers = true,
   showHeader = true,
   maxHeight,
+  language = "jsx",
+  theme = "github-dark",
 }) => {
   const [copied, setCopied] = React.useState(false);
   const lineCount = React.useMemo(() => code.split("\n").length, [code]);
+  const { html, isLoading } = useShikiHighlight({ code, language, theme });
 
   const handleCopy = React.useCallback(() => {
     navigator.clipboard.writeText(code);
@@ -119,13 +128,20 @@ export const CodePanel: React.FC<CodePanelProps> = ({
 
   const containerClassName = className ? `${styles.container} ${className}` : styles.container;
 
+  const renderCode = (): React.ReactNode => {
+    if (isLoading) {
+      return <code className={styles.code}>{code}</code>;
+    }
+    return <div className={styles.shikiWrapper} dangerouslySetInnerHTML={{ __html: html }} />;
+  };
+
   return (
     <div className={containerClassName}>
       {showHeader ? <CodePanelHeader title={title} copied={copied} onCopy={handleCopy} /> : null}
       <div className={styles.content} style={containerStyle}>
         <pre className={styles.pre}>
           {showLineNumbers ? <LineNumbers count={lineCount} /> : null}
-          <code className={styles.code}>{code}</code>
+          {renderCode()}
         </pre>
       </div>
     </div>

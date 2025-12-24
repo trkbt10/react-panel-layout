@@ -96,6 +96,24 @@ export const DRAWER_TRANSITION_EASING = "var(--rpl-drawer-transition-easing, cub
 export const PIVOT_ANIMATION_ENTER = "var(--rpl-pivot-animation-enter, none)";
 export const PIVOT_ANIMATION_LEAVE = "var(--rpl-pivot-animation-leave, none)";
 
+/**
+ * Pivot swipe animations
+ * Used by SwipePivotContent for snap-back animation after swipe ends.
+ */
+export const PIVOT_SWIPE_SNAP_DURATION = "var(--rpl-pivot-swipe-snap-duration, 300ms)";
+export const PIVOT_SWIPE_SNAP_EASING = "var(--rpl-pivot-swipe-snap-easing, cubic-bezier(0.22, 1, 0.36, 1))";
+
+/**
+ * Stack animations
+ * User defines @keyframes in their CSS and references via these tokens.
+ * - Push: Applied when a new panel is pushed onto the stack
+ * - Pop: Applied when a panel is popped from the stack
+ */
+export const STACK_ANIMATION_PUSH = "var(--rpl-stack-animation-push, none)";
+export const STACK_ANIMATION_POP = "var(--rpl-stack-animation-pop, none)";
+export const STACK_TRANSITION_DURATION = "var(--rpl-stack-transition-duration, 350ms)";
+export const STACK_TRANSITION_EASING = "var(--rpl-stack-transition-easing, cubic-bezier(0.32, 0.72, 0, 1))";
+
 // ========================================
 // SIZING & SPACING
 // ========================================

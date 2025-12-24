@@ -2,7 +2,6 @@
  * @file ContentRegistry tests - state persistence across tab switch, panel move, and split
  */
 /* eslint-disable no-restricted-imports, no-restricted-properties, no-restricted-syntax -- integration test */
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { ContentRegistryProvider, useContentRegistry } from "./ContentRegistry";

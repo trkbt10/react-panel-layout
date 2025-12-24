@@ -1,0 +1,68 @@
+/**
+ * Demo animation definitions (global CSS, not scoped by CSS modules)
+ *
+ * Users should define their own keyframes and CSS variables in their global CSS.
+ * This file demonstrates the pattern.
+ */
+
+/* ===============================
+ * Pivot Animations
+ * =============================== */
+
+@keyframes pivotEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pivotLeave {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* ===============================
+ * Stack Animations
+ * =============================== */
+
+@keyframes stackPush {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes stackPop {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* ===============================
+ * CSS Variable Registration
+ * =============================== */
+
+:root {
+  /* Pivot animations */
+  --rpl-pivot-animation-enter: pivotEnter 200ms ease-out forwards;
+  --rpl-pivot-animation-leave: pivotLeave 150ms ease-in forwards;
+
+  /* Stack animations */
+  --rpl-stack-animation-push: stackPush 350ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  --rpl-stack-animation-pop: stackPop 350ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}

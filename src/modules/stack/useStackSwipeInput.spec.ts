@@ -1,0 +1,300 @@
+/**
+ * @file Tests for useStackSwipeInput hook.
+ */
+import { renderHook, act } from "@testing-library/react";
+import * as React from "react";
+import { useStackSwipeInput } from "./useStackSwipeInput.js";
+import type { UseStackNavigationResult, StackNavigationState } from "./types.js";
+
+describe("useStackSwipeInput", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const createRef = (width = 300): React.RefObject<HTMLDivElement> => {
+    const element = document.createElement("div");
+    Object.defineProperty(element, "clientWidth", { value: width });
+    const defaultRect: DOMRect = {
+      left: 0,
+      right: width,
+      top: 0,
+      bottom: 500,
+      width,
+      height: 500,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    };
+    vi.spyOn(element, "getBoundingClientRect").mockReturnValue(defaultRect);
+    return { current: element };
+  };
+
+  const createMockNavigation = (canGoBack = true): Pick<
+    UseStackNavigationResult,
+    "go" | "canGo" | "revealParent" | "dismissReveal" | "state"
+  > => ({
+    go: vi.fn(),
+    canGo: vi.fn().mockReturnValue(canGoBack),
+    revealParent: vi.fn(),
+    dismissReveal: vi.fn(),
+    state: {
+      stack: ["root", "detail"],
+      depth: 1,
+      isRevealing: false,
+      revealDepth: null,
+    },
+  });
+
+  describe("initialization", () => {
+    it("starts with isEdgeSwiping false and progress 0", () => {
+      const containerRef = createRef();
+      const navigation = createMockNavigation();
+
+      const { result } = renderHook(() =>
+        useStackSwipeInput({ containerRef, navigation }),
+      );
+
+      expect(result.current.isEdgeSwiping).toBe(false);
+      expect(result.current.progress).toBe(0);
+    });
+
+    it("provides container props with style", () => {
+      const containerRef = createRef();
+      const navigation = createMockNavigation();
+
+      const { result } = renderHook(() =>
+        useStackSwipeInput({ containerRef, navigation }),
+      );
+
+      expect(result.current.containerProps.style).toBeDefined();
+    });
+  });
+
+  describe("edge swipe to go back", () => {
+    it("calls go(-1) when swiping from left edge", () => {
+      const containerRef = createRef();
+      const navigation = createMockNavigation();
+
+      const { result } = renderHook(() =>
+        useStackSwipeInput({
+          containerRef,
+          navigation,
+          edgeWidth: 20,
+        }),
+      );
+
+      // Pointer down at left edge
+      const downEvent = {
+        clientX: 10,
+        clientY: 100,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent<HTMLElement>;
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(downEvent);
+      });
+
+      expect(result.current.isEdgeSwiping).toBe(true);
+
+      // Swipe right (to reveal previous panel) - must exceed 100px threshold
+      const moveEvent = new PointerEvent("pointermove", {
+        clientX: 120, // 110px movement (exceeds 100px threshold)
+        clientY: 105,
+        pointerId: 1,
+      });
+
+      act(() => {
+        document.dispatchEvent(moveEvent);
+      });
+
+      // Pointer up
+      const upEvent = new PointerEvent("pointerup", { pointerId: 1 });
+
+      act(() => {
+        document.dispatchEvent(upEvent);
+      });
+
+      expect(navigation.go).toHaveBeenCalledWith(-1);
+    });
+
+    it("does not activate when canGo returns false", () => {
+      const containerRef = createRef();
+      const navigation = createMockNavigation(false);
+
+      const { result } = renderHook(() =>
+        useStackSwipeInput({
+          containerRef,
+          navigation,
+          edgeWidth: 20,
+        }),
+      );
+
+      // Pointer down at left edge
+      const downEvent = {
+        clientX: 10,
+        clientY: 100,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent<HTMLElement>;
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(downEvent);
+      });
+
+      // Should not activate because canGo(-1) is false
+      expect(result.current.isEdgeSwiping).toBe(false);
+    });
+  });
+
+  describe("progress tracking", () => {
+    it("calculates progress based on displacement", () => {
+      const containerRef = createRef(300);
+      const navigation = createMockNavigation();
+
+      const { result } = renderHook(() =>
+        useStackSwipeInput({
+          containerRef,
+          navigation,
+          edgeWidth: 20,
+        }),
+      );
+
+      // Pointer down at left edge
+      const downEvent = {
+        clientX: 10,
+        clientY: 100,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent<HTMLElement>;
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(downEvent);
+      });
+
+      // Move 150px (half the container width)
+      const moveEvent = new PointerEvent("pointermove", {
+        clientX: 160, // 150px from start
+        clientY: 102,
+        pointerId: 1,
+      });
+
+      act(() => {
+        document.dispatchEvent(moveEvent);
+      });
+
+      expect(result.current.progress).toBeCloseTo(0.5, 1);
+    });
+
+    it("caps progress at 1.0", () => {
+      const containerRef = createRef(300);
+      const navigation = createMockNavigation();
+
+      const { result } = renderHook(() =>
+        useStackSwipeInput({
+          containerRef,
+          navigation,
+          edgeWidth: 20,
+        }),
+      );
+
+      // Pointer down at left edge
+      const downEvent = {
+        clientX: 10,
+        clientY: 100,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent<HTMLElement>;
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(downEvent);
+      });
+
+      // Move beyond container width
+      const moveEvent = new PointerEvent("pointermove", {
+        clientX: 400, // 390px from start (> 300px width)
+        clientY: 102,
+        pointerId: 1,
+      });
+
+      act(() => {
+        document.dispatchEvent(moveEvent);
+      });
+
+      expect(result.current.progress).toBe(1);
+    });
+  });
+
+  describe("disabled state", () => {
+    it("does not track when disabled", () => {
+      const containerRef = createRef();
+      const navigation = createMockNavigation();
+
+      const { result } = renderHook(() =>
+        useStackSwipeInput({
+          containerRef,
+          navigation,
+          enabled: false,
+        }),
+      );
+
+      const downEvent = {
+        clientX: 10,
+        clientY: 100,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent<HTMLElement>;
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(downEvent);
+      });
+
+      expect(result.current.isEdgeSwiping).toBe(false);
+    });
+  });
+
+  describe("edge configuration", () => {
+    it("respects custom edge width", () => {
+      const containerRef = createRef();
+      const navigation = createMockNavigation();
+
+      const { result } = renderHook(() =>
+        useStackSwipeInput({
+          containerRef,
+          navigation,
+          edgeWidth: 50,
+        }),
+      );
+
+      // Pointer down within 50px edge
+      const downEvent = {
+        clientX: 40, // Within 50px, but outside default 20px
+        clientY: 100,
+        pointerId: 1,
+        isPrimary: true,
+        pointerType: "touch",
+        button: 0,
+      } as React.PointerEvent<HTMLElement>;
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(downEvent);
+      });
+
+      expect(result.current.isEdgeSwiping).toBe(true);
+    });
+  });
+});

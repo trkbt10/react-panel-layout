@@ -112,6 +112,27 @@
   overflow-x: auto;
 }
 
+.shikiWrapper {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.shikiWrapper :global(pre.shiki) {
+  margin: 0;
+  padding: 14px 16px;
+  background: transparent !important;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.shikiWrapper :global(pre.shiki code) {
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
 /* Syntax highlighting colors (Catppuccin Mocha inspired) */
 .code :global(.keyword) {
   color: #cba6f7;

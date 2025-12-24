@@ -56,17 +56,54 @@ export type PivotItemProps = {
 };
 
 /**
+ * Options for navigation methods (go, setActiveId).
+ */
+export type PivotNavigationOptions = {
+  /**
+   * Whether to animate the transition.
+   * - undefined: use transitionMode setting (default)
+   * - true: force animation
+   * - false: instant transition without animation
+   */
+  animated?: boolean;
+};
+
+/**
  * Result from usePivot hook.
  */
 export type UsePivotResult<TId extends string = string> = {
   /** Current active item ID */
   activeId: TId;
-  /** Function to change the active item */
-  setActiveId: (id: TId) => void;
+  /**
+   * Function to change the active item.
+   * @param id - Target item ID
+   * @param options - Navigation options (animated, etc.)
+   */
+  setActiveId: (id: TId, options?: PivotNavigationOptions) => void;
   /** Helper to check if an item is active */
   isActive: (id: TId) => boolean;
   /** Function to get props for navigation items (buttons, links, etc.) */
   getItemProps: (id: TId) => PivotItemProps;
   /** Outlet component that renders the active content (react-router style) */
   Outlet: React.FC;
+  /**
+   * Navigate in a direction relative to the current item.
+   * @param direction - Number of items to move: -1=prev, 1=next, -2=skip2Back, etc.
+   * @param options - Navigation options (animated, etc.)
+   */
+  go: (direction: number, options?: PivotNavigationOptions) => void;
+  /**
+   * Check if navigation in a direction is possible.
+   * @param direction - Direction to check
+   * @returns true if navigation is possible
+   */
+  canGo: (direction: number) => boolean;
+  /** Current index of active item in the items array */
+  activeIndex: number;
+  /** Total number of enabled items */
+  itemCount: number;
+  /** Whether a transition animation is currently in progress */
+  isAnimating: boolean;
+  /** Call to signal that animation has completed */
+  endAnimation: () => void;
 };

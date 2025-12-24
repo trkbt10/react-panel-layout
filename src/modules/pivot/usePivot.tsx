@@ -6,7 +6,7 @@
  * re-create the items array.
  */
 import * as React from "react";
-import type { UsePivotOptions, UsePivotResult, PivotItemProps, PivotItem } from "./types";
+import type { UsePivotOptions, UsePivotResult, PivotItemProps, PivotItem, PivotNavigationOptions } from "./types";
 import { PivotContent } from "./PivotContent";
 import { useContentCache } from "../../hooks/useContentCache";
 
@@ -105,8 +105,11 @@ export function usePivot<TId extends string = string>(options: UsePivotOptions<T
 
   const activeId = isControlled ? controlledActiveId : uncontrolledActiveId;
 
+  // Animation state
+  const [isAnimating, setIsAnimating] = React.useState(false);
+
   const setActiveId = React.useCallback(
-    (id: TId) => {
+    (id: TId, options?: PivotNavigationOptions) => {
       const target = items.find((item) => item.id === id);
       if (!target) {
         return;
@@ -114,15 +117,67 @@ export function usePivot<TId extends string = string>(options: UsePivotOptions<T
       if (target.disabled) {
         return;
       }
+
+      // Determine if we should animate
+      const shouldAnimate = options?.animated ?? (transitionMode === "css");
+      setIsAnimating(shouldAnimate);
+
       if (!isControlled) {
         setUncontrolledActiveId(id);
       }
       onActiveChange?.(id);
     },
-    [items, isControlled, onActiveChange],
+    [items, isControlled, onActiveChange, transitionMode],
   );
 
+  // End animation callback
+  const endAnimation = React.useCallback(() => {
+    setIsAnimating(false);
+  }, []);
+
   const isActive = React.useCallback((id: TId): boolean => id === activeId, [activeId]);
+
+  // Get only enabled items for navigation
+  const enabledItems = React.useMemo(
+    () => items.filter((item) => item.disabled !== true),
+    [items],
+  );
+
+  // Current index in enabled items
+  const activeIndex = React.useMemo(() => {
+    const index = enabledItems.findIndex((item) => item.id === activeId);
+    return index === -1 ? 0 : index;
+  }, [enabledItems, activeId]);
+
+  // Total count of enabled items
+  const itemCount = enabledItems.length;
+
+  // Check if navigation in a direction is possible
+  const canGo = React.useCallback(
+    (direction: number): boolean => {
+      if (direction === 0) {
+        return false;
+      }
+      const targetIndex = activeIndex + direction;
+      return targetIndex >= 0 && targetIndex < itemCount;
+    },
+    [activeIndex, itemCount],
+  );
+
+  // Navigate in a direction
+  const go = React.useCallback(
+    (direction: number, options?: PivotNavigationOptions): void => {
+      if (!canGo(direction)) {
+        return;
+      }
+      const targetIndex = activeIndex + direction;
+      const targetItem = enabledItems[targetIndex];
+      if (targetItem) {
+        setActiveId(targetItem.id, options);
+      }
+    },
+    [canGo, activeIndex, enabledItems, setActiveId],
+  );
 
   const getItemProps = React.useCallback(
     (id: TId): PivotItemProps => ({
@@ -212,5 +267,5 @@ export function usePivot<TId extends string = string>(options: UsePivotOptions<T
     return OutletComponent;
   }, [contextValue, containerStyle]);
 
-  return { activeId, setActiveId, isActive, getItemProps, Outlet };
+  return { activeId, setActiveId, isActive, getItemProps, Outlet, go, canGo, activeIndex, itemCount, isAnimating, endAnimation };
 }

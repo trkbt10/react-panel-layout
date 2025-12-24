@@ -11,6 +11,7 @@ import { demoCategories } from "./routes";
 import * as React from "react";
 import { useMedia } from "./hooks/useMedia";
 import "./demo.css";
+import "./styles/animations.css";
 
 import { DemoButton } from "./components/ui/DemoButton";
 import { DemoCard } from "./components/ui/DemoCard";

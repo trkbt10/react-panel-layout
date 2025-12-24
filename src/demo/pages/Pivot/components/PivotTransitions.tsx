@@ -5,6 +5,7 @@ import * as React from "react";
 import { usePivot } from "../../../../pivot/index";
 import type { PivotItem } from "../../../../pivot/index";
 import styles from "./Pivot.module.css";
+import animationsCss from "../../../styles/animations.css?raw";
 
 const createItems = (prefix: string): PivotItem[] => [
   {
@@ -112,22 +113,7 @@ export const PivotTransitions: React.FC = () => {
       <div className={styles.designTokensSection}>
         <h4>Design Tokens</h4>
         <p>Customize animations via CSS custom properties:</p>
-        <pre className={styles.codeBlock}>{`/* Define enter/leave keyframes */
-@keyframes pivotEnter {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes pivotLeave {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-/* Reference via design tokens */
-:root {
-  --rpl-pivot-animation-enter: pivotEnter 150ms ease-out forwards;
-  --rpl-pivot-animation-leave: pivotLeave 150ms ease-out forwards;
-}`}</pre>
+        <pre className={styles.codeBlock}>{animationsCss.trim()}</pre>
       </div>
     </div>
   );

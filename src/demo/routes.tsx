@@ -37,6 +37,10 @@ import PV_Basics from "./pages/Pivot/basics";
 import PV_Tabs from "./pages/Pivot/tabs";
 import PV_Sidebar from "./pages/Pivot/sidebar";
 import PV_Transitions from "./pages/Pivot/transitions";
+import PV_Swipe from "./pages/Pivot/swipe";
+
+import ST_Basics from "./pages/Stack/basics";
+import ST_Tablet from "./pages/Stack/tablet";
 
 import SH_Basics from "./pages/StickyHeader/basics";
 import SH_NestedScroll from "./pages/StickyHeader/nested-scroll";
@@ -161,6 +165,17 @@ export const demoCategories: DemoCategory[] = [
       { id: "tabs", label: "Tab Navigation", path: "tabs", element: <PV_Tabs /> },
       { id: "sidebar", label: "Sidebar Navigation", path: "sidebar", element: <PV_Sidebar /> },
       { id: "transitions", label: "Transitions", path: "transitions", element: <PV_Transitions /> },
+      { id: "swipe", label: "Swipe Navigation", path: "swipe", element: <PV_Swipe /> },
+    ],
+  },
+  {
+    id: "stack",
+    label: "Stack",
+    icon: <FiLayers />,
+    base: "/components/stack",
+    pages: [
+      { id: "basics", label: "Basics", path: "basics", element: <ST_Basics /> },
+      { id: "tablet", label: "Tablet Layout", path: "tablet", element: <ST_Tablet /> },
     ],
   },
   {
