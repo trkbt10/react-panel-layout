@@ -166,8 +166,6 @@ export type UseSwipeInputOptions = {
   onSwipeEnd?: (state: SwipeInputState) => void;
   /** Whether to enable trackpad two-finger swipe (wheel events). @default true */
   enableWheel?: boolean;
-  /** Idle timeout in ms for wheel swipe before ending. @default 150 */
-  wheelIdleTimeout?: number;
 };
 
 /**

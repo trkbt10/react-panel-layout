@@ -72,21 +72,19 @@ export function useNativeGestureGuard(options: UseNativeGestureGuardOptions): Us
   }, [active, preventEdgeBack, containerRef, edgeWidth]);
 
   // Build container props
+  // Styles are applied immediately (not waiting for active) to prevent browser gestures
   const containerProps = React.useMemo(() => {
-    const style: React.CSSProperties = {};
-
-    if (active && preventOverscroll) {
-      style.overscrollBehavior = "contain";
-    }
-
-    // Ensure smooth scrolling on iOS
-    style.WebkitOverflowScrolling = "touch";
+    const style: React.CSSProperties = {
+      // Always apply to prevent browser navigation gestures
+      overscrollBehavior: preventOverscroll ? "contain" : undefined,
+      WebkitOverflowScrolling: "touch",
+    };
 
     return {
       onPointerDown: preventEdgeBack ? onPointerDown : undefined,
       style,
     };
-  }, [active, preventOverscroll, preventEdgeBack, onPointerDown]);
+  }, [preventOverscroll, preventEdgeBack, onPointerDown]);
 
   return {
     containerProps,

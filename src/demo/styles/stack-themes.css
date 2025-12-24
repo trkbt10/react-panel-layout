@@ -1,0 +1,35 @@
+/**
+ * Stack navigation theme presets
+ * Apply to a container element to customize stack animations
+ *
+ * CSS custom properties:
+ * - --stack-duration: Animation duration
+ * - --stack-easing: Animation timing function
+ */
+
+/* iOS Theme (Default) - Accurate iOS 17 navigation timing */
+.stack-theme-ios {
+  /* iOS uses ~350ms with a custom spring-like curve */
+  --stack-duration: 350ms;
+  --stack-easing: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Android Material 3 Theme */
+.stack-theme-android {
+  /* Material 3 uses emphasized easing for spatial transitions */
+  --stack-duration: 400ms;
+  --stack-easing: cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+/* Windows/Fluent Theme */
+.stack-theme-fluent {
+  /* Fluent uses faster, snappier animations */
+  --stack-duration: 250ms;
+  --stack-easing: cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+/* Instant (No animation) */
+.stack-theme-instant {
+  --stack-duration: 0ms;
+  --stack-easing: linear;
+}

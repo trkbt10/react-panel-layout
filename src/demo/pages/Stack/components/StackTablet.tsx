@@ -5,9 +5,22 @@
 import * as React from "react";
 import { useStackNavigation } from "../../../../modules/stack/useStackNavigation.js";
 import { useStackSwipeInput } from "../../../../modules/stack/useStackSwipeInput.js";
-import { StackContent } from "../../../../modules/stack/StackContent.js";
+import {
+  useStackAnimationState,
+  type PanelAnimationPhase,
+} from "../../../../modules/stack/useStackAnimationState.js";
 import type { StackPanel } from "../../../../modules/stack/types.js";
 import styles from "./StackTablet.module.css";
+import "../../../styles/stack-themes.css";
+
+export type StackTheme = "ios" | "android" | "fluent" | "instant";
+
+const THEME_CLASSES: Record<StackTheme, string> = {
+  ios: "stack-theme-ios",
+  android: "stack-theme-android",
+  fluent: "stack-theme-fluent",
+  instant: "stack-theme-instant",
+};
 
 const panels: StackPanel[] = [
   { id: "root", title: "Settings", content: null },
@@ -44,9 +57,7 @@ const menus: Record<string, { title: string; parentTitle?: string; items: MenuIt
   about: {
     title: "About",
     parentTitle: "General",
-    items: [
-      { id: "name", icon: "📝", label: "Name" },
-    ],
+    items: [{ id: "name", icon: "📝", label: "Name" }],
   },
   name: {
     title: "Name",
@@ -214,44 +225,121 @@ const MenuPanel: React.FC<MenuPanelProps> = ({
   );
 };
 
-// Track exiting panels for exit animation
-type ExitingPanel = {
+// Animated panel wrapper
+type AnimatedStackPanelProps = {
   id: string;
   depth: number;
-};
-
-// Component for panels that are exiting (being popped)
-type ExitingStackContentProps = {
-  id: string;
-  depth: number;
-  onExitComplete: () => void;
+  phase: PanelAnimationPhase;
+  isTopmost: boolean;
+  totalDepth: number;
+  onAnimationEnd: () => void;
   children: React.ReactNode;
 };
 
-const ExitingStackContent: React.FC<ExitingStackContentProps> = ({
+const getPhaseClassName = (phase: PanelAnimationPhase): string => {
+  switch (phase) {
+    case "entering":
+      return styles.panelEntering;
+    case "exiting":
+      return styles.panelExiting;
+    default:
+      return "";
+  }
+};
+
+const AnimatedStackPanel: React.FC<AnimatedStackPanelProps> = ({
   id,
   depth,
-  onExitComplete,
+  phase,
+  isTopmost,
+  totalDepth,
+  onAnimationEnd,
   children,
 }) => {
+  /*
+   * iOS Navigation behavior:
+   * - Topmost panel: translateX(0), scale(1), opacity(1)
+   * - Underlying panels: shift left, scale down, fade slightly
+   * - Shadow is cast BY the top panel ONTO the underlying panel (overlay effect)
+   */
+  const levelsBack = isTopmost ? 0 : totalDepth - depth - 1;
+
+  const getTransform = (): string => {
+    if (phase === "exiting") {
+      return ""; // CSS animation handles exit
+    }
+    if (phase === "entering") {
+      return ""; // CSS animation handles enter
+    }
+    if (isTopmost) {
+      return "translateX(0) scale(1)";
+    }
+    // Underlying panels: shift left + scale down
+    const parallaxOffset = levelsBack * -33;
+    const scale = 1 - levelsBack * 0.05; // 5% smaller per level
+    return `translateX(${parallaxOffset}%) scale(${scale})`;
+  };
+
+  /*
+   * Shadow dynamics:
+   * - Shadow is cast by this panel onto the space to the left
+   * - Distance affects: width (wider when far), opacity (lighter when far)
+   * - Gradient: darkest at panel edge (right), fades to left
+   */
+  const getShadowStyle = (): React.CSSProperties | null => {
+    if (depth === 0) return null;
+
+    const distance = levelsBack;
+
+    // Shadow gets wider and softer as distance increases
+    const baseWidth = 30;
+    const width = baseWidth + distance * 15;
+    const opacity = Math.max(0.12 - distance * 0.03, 0.04);
+
+    return {
+      position: 'absolute' as const,
+      top: 0,
+      left: -width,
+      width: width,
+      height: '100%',
+      pointerEvents: 'none' as const,
+      // Gradient from right (panel edge, darkest) to left (fades out)
+      background: `linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,${opacity * 0.5}) 60%, rgba(0,0,0,${opacity}) 100%)`,
+    };
+  };
+
+  const style: React.CSSProperties = {
+    zIndex: depth,
+    transform: getTransform(),
+    pointerEvents: isTopmost && phase !== "exiting" ? "auto" : "none",
+  };
+
+  const className = `${styles.stackPanel} ${getPhaseClassName(phase)}`;
+  const shadowStyle = getShadowStyle();
+
   return (
     <div
-      className={styles.exitingPanel}
-      data-stack-content={id}
+      className={className}
+      data-stack-panel={id}
       data-depth={depth}
-      data-exiting="true"
-      style={{ zIndex: depth }}
-      onAnimationEnd={onExitComplete}
+      data-phase={phase}
+      style={style}
+      onAnimationEnd={onAnimationEnd}
     >
+      {/* Shadow cast by THIS panel onto the space below */}
+      {shadowStyle && <div style={shadowStyle} />}
       {children}
     </div>
   );
 };
 
-export const StackTablet: React.FC = () => {
+type StackTabletProps = {
+  theme?: StackTheme;
+};
+
+export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
   const sidebarRef = React.useRef<HTMLDivElement>(null);
-  const [exitingPanels, setExitingPanels] = React.useState<ExitingPanel[]>([]);
-  const prevStackRef = React.useRef<ReadonlyArray<string>>([]);
+  const [selectedTheme, setSelectedTheme] = React.useState<StackTheme>(theme);
 
   const navigation = useStackNavigation({
     panels,
@@ -267,28 +355,18 @@ export const StackTablet: React.FC = () => {
   });
 
   const stack = navigation.state.stack;
-  const stackLength = stack.length;
 
-  // Detect popped panels and add them to exiting list
-  React.useEffect(() => {
-    const prevStack = prevStackRef.current;
-    if (prevStack.length > stack.length) {
-      // Panels were popped - add them to exiting list
-      const poppedPanels = prevStack.slice(stack.length).map((id, i) => ({
-        id,
-        depth: stack.length + i,
-      }));
-      setExitingPanels((prev) => [...prev, ...poppedPanels]);
-    }
-    prevStackRef.current = stack;
-  }, [stack]);
-
-  const handleAnimationEnd = React.useCallback((panelId: string) => {
-    setExitingPanels((prev) => prev.filter((p) => p.id !== panelId));
-  }, []);
+  // Use centralized animation state management
+  const {
+    panels: animatedPanels,
+    markEnterComplete,
+    markExitComplete,
+  } = useStackAnimationState({
+    stack: stack as ReadonlyArray<string>,
+  });
 
   const handleMenuClick = (id: string) => {
-    navigation.push(id as typeof panels[number]["id"]);
+    navigation.push(id as (typeof panels)[number]["id"]);
   };
 
   const handleBack = () => {
@@ -298,66 +376,53 @@ export const StackTablet: React.FC = () => {
   const currentPanelId = navigation.currentPanelId;
   const currentDetail = detailContent[currentPanelId] ?? detailContent.root;
 
+  // Find the topmost active panel (not exiting)
+  const activePanels = animatedPanels.filter((p) => p.phase !== "exiting");
+  const topmostDepth = Math.max(...activePanels.map((p) => p.depth), 0);
+
+  const containerClassName = `${styles.container} ${THEME_CLASSES[selectedTheme]}`;
+
   return (
-    <div className={styles.container}>
-      {/* Sidebar with stacking menus - NO fixed header */}
+    <div className={containerClassName}>
+      {/* Sidebar with stacking menus */}
       <aside className={styles.sidebar}>
         <div ref={sidebarRef} className={styles.sidebarContent}>
-          {/* Render active stack panels */}
-          {stack.map((id, depth) => {
-            const menu = menus[id];
+          {animatedPanels.map((panel) => {
+            const menu = menus[panel.id];
             if (menu == null) {
               return null;
             }
-            const isTop = depth === stackLength - 1 && exitingPanels.length === 0;
+
+            const isTopmost = panel.depth === topmostDepth && panel.phase !== "exiting";
+            const handleAnimEnd = () => {
+              if (panel.phase === "entering") {
+                markEnterComplete(panel.id);
+              } else if (panel.phase === "exiting") {
+                markExitComplete(panel.id);
+              }
+            };
+
             return (
-              <StackContent
-                key={id}
-                id={id}
-                depth={depth}
-                isActive={isTop}
-                displayMode="stack"
-                transitionMode="css"
-                navigationState={navigation.state}
-                swipeProgress={isTop ? progress : undefined}
+              <AnimatedStackPanel
+                key={panel.id}
+                id={panel.id}
+                depth={panel.depth}
+                phase={panel.phase}
+                isTopmost={isTopmost}
+                totalDepth={topmostDepth + 1}
+                onAnimationEnd={handleAnimEnd}
               >
                 <MenuPanel
-                  id={id}
+                  id={panel.id}
                   title={menu.title}
                   parentTitle={menu.parentTitle}
                   items={menu.items}
                   onItemClick={handleMenuClick}
                   onBack={handleBack}
-                  canGoBack={depth > 0}
+                  canGoBack={panel.depth > 0}
                   currentPanelId={currentPanelId}
                 />
-              </StackContent>
-            );
-          })}
-          {/* Render exiting panels (for pop animation) */}
-          {exitingPanels.map(({ id, depth }) => {
-            const menu = menus[id];
-            if (menu == null) {
-              return null;
-            }
-            return (
-              <ExitingStackContent
-                key={`exiting-${id}`}
-                id={id}
-                depth={depth}
-                onExitComplete={() => handleAnimationEnd(id)}
-              >
-                <MenuPanel
-                  id={id}
-                  title={menu.title}
-                  parentTitle={menu.parentTitle}
-                  items={menu.items}
-                  onItemClick={handleMenuClick}
-                  onBack={handleBack}
-                  canGoBack={depth > 0}
-                  currentPanelId={currentPanelId}
-                />
-              </ExitingStackContent>
+              </AnimatedStackPanel>
             );
           })}
         </div>
@@ -384,6 +449,18 @@ export const StackTablet: React.FC = () => {
       <div className={styles.debugInfo}>
         <span>Depth: {navigation.state.depth}</span>
         <span>Stack: [{navigation.state.stack.join(" → ")}]</span>
+        <label className={styles.themeSelector}>
+          Theme:
+          <select
+            value={selectedTheme}
+            onChange={(e) => setSelectedTheme(e.target.value as StackTheme)}
+          >
+            <option value="ios">iOS</option>
+            <option value="android">Android</option>
+            <option value="fluent">Fluent</option>
+            <option value="instant">Instant</option>
+          </select>
+        </label>
         {isEdgeSwiping ? <span>Swiping: {Math.round(progress * 100)}%</span> : null}
       </div>
     </div>

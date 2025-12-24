@@ -15,11 +15,12 @@ import type {
   SwipeInputThresholds,
   UseSwipeInputOptions,
   UseSwipeInputResult,
+  Vector2,
 } from "./types.js";
 import { DEFAULT_SWIPE_THRESHOLDS, IDLE_SWIPE_INPUT_STATE } from "./types.js";
 
-/** Default idle timeout for wheel swipe in ms */
-const DEFAULT_WHEEL_IDLE_TIMEOUT = 150;
+/** Idle timeout to reset wheel state after swipe stops */
+const WHEEL_RESET_TIMEOUT = 150;
 
 /**
  * Calculate velocity from displacement and time elapsed.
@@ -50,42 +51,38 @@ const determineDirection = (displacement: number): -1 | 0 | 1 => {
 };
 
 /**
- * Check if swipe threshold is met.
+ * Evaluate swipe end and call callback if threshold is met.
  */
-const isSwipeTriggered = (
-  displacement: number,
-  velocity: number,
+const evaluateSwipeEnd = (
+  displacement: Vector2,
+  velocity: Vector2,
+  axis: GestureAxis,
   thresholds: SwipeInputThresholds,
-): boolean => {
-  const absDisplacement = Math.abs(displacement);
-  const absVelocity = Math.abs(velocity);
+  onSwipeEnd: ((state: SwipeInputState) => void) | undefined,
+): void => {
+  const axisDisplacement = axis === "horizontal" ? displacement.x : displacement.y;
+  const axisVelocity = axis === "horizontal" ? velocity.x : velocity.y;
 
-  // Triggered if distance OR velocity threshold is exceeded
-  return absDisplacement >= thresholds.distanceThreshold ||
+  const absDisplacement = Math.abs(axisDisplacement);
+  const absVelocity = Math.abs(axisVelocity);
+
+  const triggered = absDisplacement >= thresholds.distanceThreshold ||
     absVelocity >= thresholds.velocityThreshold;
+
+  if (triggered) {
+    const direction = determineDirection(axisDisplacement);
+    const endState: SwipeInputState = {
+      phase: "ended",
+      displacement,
+      velocity,
+      direction,
+    };
+    onSwipeEnd?.(endState);
+  }
 };
 
 /**
  * Hook for detecting swipe gestures on a container element.
- *
- * Tracks pointer movement and detects swipe gestures based on displacement
- * and velocity thresholds. Locks to the configured axis to prevent
- * diagonal gestures from triggering both swipe and scroll.
- *
- * @example
- * ```tsx
- * const containerRef = useRef<HTMLDivElement>(null);
- * const { state, containerProps } = useSwipeInput({
- *   containerRef,
- *   axis: "horizontal",
- *   onSwipeEnd: (state) => {
- *     if (state.direction === 1) navigateNext();
- *     if (state.direction === -1) navigatePrev();
- *   },
- * });
- *
- * return <div ref={containerRef} {...containerProps}>{children}</div>;
- * ```
  */
 export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResult {
   const {
@@ -95,13 +92,15 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     thresholds: customThresholds,
     onSwipeEnd,
     enableWheel = true,
-    wheelIdleTimeout = DEFAULT_WHEEL_IDLE_TIMEOUT,
   } = options;
 
   const thresholds: SwipeInputThresholds = {
     ...DEFAULT_SWIPE_THRESHOLDS,
     ...customThresholds,
   };
+
+  // Stable callback for swipe end
+  const handleSwipeEnd = useEffectEvent(onSwipeEnd);
 
   // ===== Pointer-based swipe tracking =====
   const { state: tracking, onPointerDown } = usePointerTracking({
@@ -113,53 +112,30 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     lockThreshold: thresholds.lockThreshold,
   });
 
-  // Stable callback for swipe end
-  const handleSwipeEnd = useEffectEvent(onSwipeEnd);
-
-  // Store the last active state for checking when pointer is released
   const lastActiveStateRef = React.useRef<SwipeInputState | null>(null);
 
-  // ===== Wheel-based swipe tracking (for trackpad two-finger swipe) =====
+  // ===== Wheel-based swipe tracking =====
   const [wheelState, setWheelState] = React.useState<SwipeInputState>(IDLE_SWIPE_INPUT_STATE);
   const wheelAccumulatedRef = React.useRef({ x: 0, y: 0 });
-  const wheelStartTimeRef = React.useRef<number>(0);
   const wheelIdleTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const wheelLockedRef = React.useRef(false);
   const wheelLockedAxisRef = React.useRef<GestureAxis | null>(null);
 
   const resetWheelState = React.useCallback(() => {
     wheelAccumulatedRef.current = { x: 0, y: 0 };
-    wheelStartTimeRef.current = 0;
     wheelLockedRef.current = false;
     wheelLockedAxisRef.current = null;
     setWheelState(IDLE_SWIPE_INPUT_STATE);
   }, []);
 
   const endWheelSwipe = React.useCallback(() => {
-    const accumulated = wheelAccumulatedRef.current;
-    const axisDisplacement = axis === "horizontal" ? accumulated.x : accumulated.y;
-
-    if (Math.abs(axisDisplacement) >= thresholds.distanceThreshold) {
-      const direction = determineDirection(axisDisplacement);
-      const endState: SwipeInputState = {
-        phase: "ended",
-        displacement: { ...accumulated },
-        velocity: { x: 0, y: 0 },
-        direction,
-      };
-      handleSwipeEnd?.(endState);
-    }
-
+    const displacement = { ...wheelAccumulatedRef.current };
+    evaluateSwipeEnd(displacement, { x: 0, y: 0 }, axis, thresholds, handleSwipeEnd);
     resetWheelState();
-  }, [axis, thresholds.distanceThreshold, handleSwipeEnd, resetWheelState]);
+  }, [axis, thresholds, handleSwipeEnd, resetWheelState]);
 
   const handleWheel = useEffectEvent((event: WheelEvent) => {
-    if (!enabled || !enableWheel) {
-      return;
-    }
-
-    // If pointer is active, ignore wheel
-    if (tracking.isDown) {
+    if (!enabled || !enableWheel || tracking.isDown) {
       return;
     }
 
@@ -169,9 +145,8 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     if (!wheelLockedRef.current) {
       const absX = Math.abs(deltaX);
       const absY = Math.abs(deltaY);
-      const lockThreshold = thresholds.lockThreshold;
 
-      if (absX >= lockThreshold || absY >= lockThreshold) {
+      if (absX >= thresholds.lockThreshold || absY >= thresholds.lockThreshold) {
         wheelLockedRef.current = true;
         wheelLockedAxisRef.current = absX > absY ? "horizontal" : "vertical";
       }
@@ -182,40 +157,25 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
       return;
     }
 
-    // Check significant movement on our axis (use abs, direction doesn't matter for threshold)
-    const absAxisDelta = axis === "horizontal" ? Math.abs(deltaX) : Math.abs(deltaY);
-    if (!wheelLockedRef.current && absAxisDelta < thresholds.lockThreshold) {
-      return;
-    }
-
-    // Initialize start time
-    if (wheelStartTimeRef.current === 0) {
-      wheelStartTimeRef.current = performance.now();
-    }
-
-    // Accumulate displacement (negate because wheel delta is scroll direction, not swipe direction)
+    // Accumulate displacement (negate: wheel delta is scroll direction)
     wheelAccumulatedRef.current.x -= deltaX;
     wheelAccumulatedRef.current.y -= deltaY;
 
     const accumulated = wheelAccumulatedRef.current;
     const axisDisplacement = axis === "horizontal" ? accumulated.x : accumulated.y;
-    const direction = determineDirection(axisDisplacement);
 
     setWheelState({
       phase: "swiping",
       displacement: { ...accumulated },
       velocity: { x: 0, y: 0 },
-      direction,
+      direction: determineDirection(axisDisplacement),
     });
 
-    // Reset idle timer
+    // When wheel stops, treat as "release"
     if (wheelIdleTimerRef.current !== null) {
       clearTimeout(wheelIdleTimerRef.current);
     }
-
-    wheelIdleTimerRef.current = setTimeout(() => {
-      endWheelSwipe();
-    }, wheelIdleTimeout);
+    wheelIdleTimerRef.current = setTimeout(endWheelSwipe, WHEEL_RESET_TIMEOUT);
   });
 
   // Set up wheel event listener
@@ -226,27 +186,10 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     }
 
     const listener = (event: WheelEvent) => {
-      const { deltaX, deltaY } = event;
-      const absX = Math.abs(deltaX);
-      const absY = Math.abs(deltaY);
-
-      // Debug log
-      console.log("[wheel]", { deltaX, deltaY, absX, absY });
-
-      // Only prevent default for horizontal swipes on horizontal axis (or vice versa)
-      const isHorizontalSwipe = absX > absY;
-      const shouldPrevent = (axis === "horizontal" && isHorizontalSwipe) ||
-                           (axis === "vertical" && !isHorizontalSwipe);
-
-      if (shouldPrevent && (absX > 5 || absY > 5)) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-
+      event.preventDefault();
       handleWheel(event);
     };
 
-    // Must be passive: false to allow preventDefault
     container.addEventListener("wheel", listener, { passive: false });
 
     return () => {
@@ -255,9 +198,8 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
         clearTimeout(wheelIdleTimerRef.current);
       }
     };
-  }, [containerRef, enabled, enableWheel, handleWheel, axis]);
+  }, [containerRef, enabled, enableWheel, handleWheel]);
 
-  // Cleanup wheel timer on unmount
   React.useEffect(() => {
     return () => {
       if (wheelIdleTimerRef.current !== null) {
@@ -266,7 +208,7 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     };
   }, []);
 
-  // ===== Pointer swipe state calculation =====
+  // ===== Pointer swipe state =====
   const pointerState = React.useMemo<SwipeInputState>(() => {
     if (!tracking.isDown || !tracking.start || !tracking.current) {
       return IDLE_SWIPE_INPUT_STATE;
@@ -276,99 +218,59 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     const deltaY = tracking.current.y - tracking.start.y;
     const displacement = { x: deltaX, y: deltaY };
 
-    const velocityX = calculateVelocity(deltaX, tracking.start.timestamp, tracking.current.timestamp);
-    const velocityY = calculateVelocity(deltaY, tracking.start.timestamp, tracking.current.timestamp);
-    const velocity = { x: velocityX, y: velocityY };
+    const velocity = {
+      x: calculateVelocity(deltaX, tracking.start.timestamp, tracking.current.timestamp),
+      y: calculateVelocity(deltaY, tracking.start.timestamp, tracking.current.timestamp),
+    };
 
-    if (!isLocked) {
-      return {
-        phase: "tracking",
-        displacement,
-        velocity,
-        direction: 0,
-      };
-    }
-
-    if (lockedAxis !== axis) {
-      return {
-        phase: "tracking",
-        displacement,
-        velocity,
-        direction: 0,
-      };
+    if (!isLocked || lockedAxis !== axis) {
+      return { phase: "tracking", displacement, velocity, direction: 0 };
     }
 
     const axisDisplacement = axis === "horizontal" ? deltaX : deltaY;
-    const direction = determineDirection(axisDisplacement);
-
     return {
       phase: "swiping",
       displacement,
       velocity,
-      direction,
+      direction: determineDirection(axisDisplacement),
     };
   }, [tracking.isDown, tracking.start, tracking.current, isLocked, lockedAxis, axis]);
 
-  // Store the last active pointer state
   React.useEffect(() => {
     if (pointerState.phase !== "idle") {
       lastActiveStateRef.current = pointerState;
     }
   }, [pointerState]);
 
-  // Handle pointer up - check if swipe was triggered
+  // Handle pointer up
   React.useEffect(() => {
     if (tracking.isDown) {
       return;
     }
 
     const lastState = lastActiveStateRef.current;
-    if (!lastState) {
+    if (!lastState || (lastState.phase !== "swiping" && lastState.phase !== "tracking")) {
       return;
     }
 
     lastActiveStateRef.current = null;
-
-    if (lastState.phase === "swiping" || lastState.phase === "tracking") {
-      const axisDisplacement = axis === "horizontal" ? lastState.displacement.x : lastState.displacement.y;
-      const axisVelocity = axis === "horizontal" ? lastState.velocity.x : lastState.velocity.y;
-
-      if (isSwipeTriggered(axisDisplacement, axisVelocity, thresholds)) {
-        const direction = determineDirection(axisDisplacement);
-        const endState: SwipeInputState = {
-          phase: "ended",
-          displacement: lastState.displacement,
-          velocity: lastState.velocity,
-          direction,
-        };
-        handleSwipeEnd?.(endState);
-      }
-    }
+    evaluateSwipeEnd(lastState.displacement, lastState.velocity, axis, thresholds, handleSwipeEnd);
   }, [tracking.isDown, axis, thresholds, handleSwipeEnd]);
 
-  // ===== Merge pointer and wheel states =====
-  // Pointer takes priority when active
+  // Merge states
   const state = pointerState.phase !== "idle" ? pointerState : wheelState;
 
-  // Container props for gesture handling
   const containerProps = React.useMemo(() => {
     const touchAction = axis === "horizontal" ? "pan-y pinch-zoom" : "pan-x pinch-zoom";
-
     return {
       onPointerDown,
       style: {
         touchAction,
         userSelect: "none" as const,
         WebkitUserSelect: "none" as const,
-        overscrollBehavior: "contain",
-        overscrollBehaviorX: axis === "horizontal" ? "contain" : "auto",
-        overscrollBehaviorY: axis === "vertical" ? "contain" : "auto",
-      } as React.CSSProperties,
+      },
     };
   }, [axis, onPointerDown]);
 
-  return {
-    state,
-    containerProps,
-  };
+  return { state, containerProps };
 }
