@@ -151,6 +151,16 @@ export type UseScrollBoundaryResult = {
 };
 
 /**
+ * Filter function to determine if a pointer event should start tracking.
+ * Receives the pointer event and container element.
+ * Return true to allow tracking, false to ignore the event.
+ */
+export type PointerStartFilter = (
+  event: React.PointerEvent,
+  container: HTMLElement,
+) => boolean;
+
+/**
  * Options for useSwipeInput hook.
  */
 export type UseSwipeInputOptions = {
@@ -166,6 +176,12 @@ export type UseSwipeInputOptions = {
   onSwipeEnd?: (state: SwipeInputState) => void;
   /** Whether to enable trackpad two-finger swipe (wheel events). @default true */
   enableWheel?: boolean;
+  /**
+   * Optional filter to determine if a pointer event should start tracking.
+   * If provided, only events that pass this filter will be tracked.
+   * Useful for edge-based swipe detection.
+   */
+  pointerStartFilter?: PointerStartFilter;
 };
 
 /**

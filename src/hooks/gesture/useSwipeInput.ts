@@ -9,6 +9,7 @@ import * as React from "react";
 import { usePointerTracking } from "./usePointerTracking.js";
 import { useDirectionalLock } from "./useDirectionalLock.js";
 import { useEffectEvent } from "../useEffectEvent.js";
+import { calculateVelocity, determineDirection } from "./utils.js";
 import type {
   GestureAxis,
   SwipeInputState,
@@ -21,34 +22,6 @@ import { DEFAULT_SWIPE_THRESHOLDS, IDLE_SWIPE_INPUT_STATE } from "./types.js";
 
 /** Idle timeout to reset wheel state after swipe stops */
 const WHEEL_RESET_TIMEOUT = 150;
-
-/**
- * Calculate velocity from displacement and time elapsed.
- */
-const calculateVelocity = (
-  displacement: number,
-  startTime: number,
-  currentTime: number,
-): number => {
-  const elapsed = currentTime - startTime;
-  if (elapsed <= 0) {
-    return 0;
-  }
-  return displacement / elapsed;
-};
-
-/**
- * Determine direction from displacement.
- */
-const determineDirection = (displacement: number): -1 | 0 | 1 => {
-  if (displacement > 0) {
-    return 1;
-  }
-  if (displacement < 0) {
-    return -1;
-  }
-  return 0;
-};
 
 /**
  * Evaluate swipe end and call callback if threshold is met.
@@ -92,6 +65,7 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     thresholds: customThresholds,
     onSwipeEnd,
     enableWheel = true,
+    pointerStartFilter,
   } = options;
 
   const thresholds: SwipeInputThresholds = {
@@ -103,9 +77,29 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
   const handleSwipeEnd = useEffectEvent(onSwipeEnd);
 
   // ===== Pointer-based swipe tracking =====
-  const { state: tracking, onPointerDown } = usePointerTracking({
+  const { state: tracking, onPointerDown: baseOnPointerDown } = usePointerTracking({
     enabled,
   });
+
+  // Wrap pointer down handler with optional filter
+  const onPointerDown = React.useCallback(
+    (event: React.PointerEvent) => {
+      if (!enabled) {
+        return;
+      }
+      if (pointerStartFilter) {
+        const container = containerRef.current;
+        if (!container) {
+          return;
+        }
+        if (!pointerStartFilter(event, container)) {
+          return;
+        }
+      }
+      baseOnPointerDown(event);
+    },
+    [enabled, pointerStartFilter, containerRef, baseOnPointerDown],
+  );
 
   const { lockedAxis, isLocked } = useDirectionalLock({
     tracking,

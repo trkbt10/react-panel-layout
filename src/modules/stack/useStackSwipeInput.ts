@@ -7,6 +7,7 @@
 import * as React from "react";
 import { useEdgeSwipeInput } from "../../hooks/gesture/useEdgeSwipeInput.js";
 import { useNativeGestureGuard } from "../../hooks/gesture/useNativeGestureGuard.js";
+import { mergeGestureContainerProps } from "../../hooks/gesture/utils.js";
 import type { SwipeInputState } from "../../hooks/gesture/types.js";
 import type { UseStackSwipeInputOptions, UseStackSwipeInputResult } from "./types.js";
 
@@ -120,22 +121,10 @@ export function useStackSwipeInput(options: UseStackSwipeInputOptions): UseStack
   }, [swipeState, containerRef, edge]);
 
   // Merge container props
-  const containerProps = React.useMemo(() => {
-    const mergedStyle: React.CSSProperties = {
-      ...swipeProps.style,
-      ...guardProps.style,
-    };
-
-    const handlePointerDown = (event: React.PointerEvent<HTMLElement>) => {
-      swipeProps.onPointerDown?.(event);
-      guardProps.onPointerDown?.(event);
-    };
-
-    return {
-      onPointerDown: handlePointerDown,
-      style: mergedStyle,
-    };
-  }, [swipeProps, guardProps]);
+  const containerProps = React.useMemo(
+    () => mergeGestureContainerProps(swipeProps, guardProps),
+    [swipeProps, guardProps],
+  );
 
   return {
     isEdgeSwiping: isEdgeGesture,
