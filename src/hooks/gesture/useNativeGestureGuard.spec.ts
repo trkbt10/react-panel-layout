@@ -1,7 +1,7 @@
 /**
  * @file Tests for useNativeGestureGuard hook.
  */
-/* eslint-disable no-restricted-globals, no-restricted-properties, custom/no-as-outside-guard -- test requires mocks */
+/* eslint-disable custom/no-as-outside-guard -- test requires overrides */
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { useNativeGestureGuard } from "./useNativeGestureGuard.js";
@@ -20,8 +20,29 @@ describe("useNativeGestureGuard", () => {
       y: 0,
       toJSON: () => ({}),
     };
-    vi.spyOn(element, "getBoundingClientRect").mockReturnValue({ ...defaultRect, ...rect });
+    // Override getBoundingClientRect directly instead of using vi.spyOn
+    element.getBoundingClientRect = () => ({ ...defaultRect, ...rect });
     return { current: element };
+  };
+
+  /**
+   * Creates a fake pointer event with preventDefault tracking.
+   * Uses an object to track state instead of let variable.
+   */
+  const createFakePointerEvent = (props: {
+    clientX: number;
+    clientY: number;
+    pointerType: string;
+  }) => {
+    const state = { preventDefaultCalled: false };
+    const event = {
+      ...props,
+      preventDefault: () => {
+        state.preventDefaultCalled = true;
+      },
+      wasDefaultPrevented: () => state.preventDefaultCalled,
+    };
+    return event as unknown as React.PointerEvent<HTMLElement> & { wasDefaultPrevented: () => boolean };
   };
 
   describe("overscroll behavior", () => {
@@ -78,18 +99,17 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = {
+      const mockEvent = createFakePointerEvent({
         clientX: 10, // Within 20px edge zone
         clientY: 100,
         pointerType: "touch",
-        preventDefault: vi.fn(),
-      } as unknown as React.PointerEvent<HTMLElement>;
+      });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(mockEvent);
       });
 
-      expect(mockEvent.preventDefault).toHaveBeenCalled();
+      expect(mockEvent.wasDefaultPrevented()).toBe(true);
     });
 
     it("does not call preventDefault for touch events outside left edge zone", () => {
@@ -103,18 +123,17 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = {
+      const mockEvent = createFakePointerEvent({
         clientX: 50, // Outside 20px edge zone
         clientY: 100,
         pointerType: "touch",
-        preventDefault: vi.fn(),
-      } as unknown as React.PointerEvent<HTMLElement>;
+      });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(mockEvent);
       });
 
-      expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      expect(mockEvent.wasDefaultPrevented()).toBe(false);
     });
 
     it("does not call preventDefault for mouse events in edge zone", () => {
@@ -128,18 +147,17 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = {
+      const mockEvent = createFakePointerEvent({
         clientX: 10, // Within edge zone
         clientY: 100,
         pointerType: "mouse", // Not touch
-        preventDefault: vi.fn(),
-      } as unknown as React.PointerEvent<HTMLElement>;
+      });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(mockEvent);
       });
 
-      expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      expect(mockEvent.wasDefaultPrevented()).toBe(false);
     });
 
     it("does not call preventDefault when not active", () => {
@@ -153,18 +171,17 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = {
+      const mockEvent = createFakePointerEvent({
         clientX: 10,
         clientY: 100,
         pointerType: "touch",
-        preventDefault: vi.fn(),
-      } as unknown as React.PointerEvent<HTMLElement>;
+      });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(mockEvent);
       });
 
-      expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      expect(mockEvent.wasDefaultPrevented()).toBe(false);
     });
 
     it("does not call preventDefault when preventEdgeBack is false", () => {
@@ -208,18 +225,17 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEventInCustomEdge = {
+      const mockEventInCustomEdge = createFakePointerEvent({
         clientX: 40, // Within 50px edge, but outside default 20px
         clientY: 100,
         pointerType: "touch",
-        preventDefault: vi.fn(),
-      } as unknown as React.PointerEvent<HTMLElement>;
+      });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(mockEventInCustomEdge);
       });
 
-      expect(mockEventInCustomEdge.preventDefault).toHaveBeenCalled();
+      expect(mockEventInCustomEdge.wasDefaultPrevented()).toBe(true);
     });
   });
 
@@ -248,19 +264,18 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = {
+      const mockEvent = createFakePointerEvent({
         clientX: 10,
         clientY: 100,
         pointerType: "touch",
-        preventDefault: vi.fn(),
-      } as unknown as React.PointerEvent<HTMLElement>;
+      });
 
       // Should not throw
       act(() => {
         result.current.containerProps.onPointerDown?.(mockEvent);
       });
 
-      expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      expect(mockEvent.wasDefaultPrevented()).toBe(false);
     });
   });
 });

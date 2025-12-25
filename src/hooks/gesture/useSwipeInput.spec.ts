@@ -1,10 +1,22 @@
 /**
  * @file Tests for useSwipeInput hook.
  */
-/* eslint-disable no-restricted-globals, no-restricted-properties, no-restricted-syntax -- test requires vi for timing control and mocks */
+/* eslint-disable no-restricted-globals -- test requires vi for timing control */
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { useSwipeInput } from "./useSwipeInput.js";
+import type { SwipeInputState } from "./types.js";
+
+/**
+ * Simple fake callback that tracks calls.
+ */
+const createFakeCallback = () => {
+  const calls: SwipeInputState[] = [];
+  const callback = (state: SwipeInputState) => {
+    calls.push(state);
+  };
+  return { callback, calls };
+};
 
 describe("useSwipeInput", () => {
   beforeEach(() => {
@@ -256,7 +268,7 @@ describe("useSwipeInput", () => {
   describe("swipe completion callback", () => {
     it("calls onSwipeEnd when swipe is triggered by distance", () => {
       const containerRef = createRef();
-      const onSwipeEnd = vi.fn();
+      const { callback: onSwipeEnd, calls } = createFakeCallback();
 
       const { result } = renderHook(() =>
         useSwipeInput({
@@ -299,17 +311,16 @@ describe("useSwipeInput", () => {
         document.dispatchEvent(upEvent);
       });
 
-      expect(onSwipeEnd).toHaveBeenCalledWith(
-        expect.objectContaining({
-          phase: "ended",
-          direction: 1,
-        }),
-      );
+      expect(calls).toHaveLength(1);
+      expect(calls[0]).toMatchObject({
+        phase: "ended",
+        direction: 1,
+      });
     });
 
     it("does not call onSwipeEnd when threshold is not met", () => {
       const containerRef = createRef();
-      const onSwipeEnd = vi.fn();
+      const { callback: onSwipeEnd, calls } = createFakeCallback();
 
       const { result } = renderHook(() =>
         useSwipeInput({
@@ -352,7 +363,7 @@ describe("useSwipeInput", () => {
         document.dispatchEvent(upEvent);
       });
 
-      expect(onSwipeEnd).not.toHaveBeenCalled();
+      expect(calls).toHaveLength(0);
     });
   });
 
@@ -465,7 +476,7 @@ describe("useSwipeInput", () => {
 
     it("ends wheel swipe after idle timeout", () => {
       const containerRef = createContainerRef();
-      const onSwipeEnd = vi.fn();
+      const { callback: onSwipeEnd, calls } = createFakeCallback();
 
       renderHook(() =>
         useSwipeInput({
@@ -487,11 +498,10 @@ describe("useSwipeInput", () => {
         vi.advanceTimersByTime(150);
       });
 
-      expect(onSwipeEnd).toHaveBeenCalledWith(
-        expect.objectContaining({
-          direction: -1,
-        }),
-      );
+      expect(calls).toHaveLength(1);
+      expect(calls[0]).toMatchObject({
+        direction: -1,
+      });
     });
 
     it("ignores vertical scroll when axis is horizontal", () => {
