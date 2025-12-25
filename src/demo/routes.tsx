@@ -38,12 +38,12 @@ import PV_Tabs from "./pages/Pivot/tabs";
 import PV_Sidebar from "./pages/Pivot/sidebar";
 import PV_Transitions from "./pages/Pivot/transitions";
 import PV_Swipe from "./pages/Pivot/swipe";
+import PV_SwipeDebug from "./pages/Pivot/swipe-debug";
 
 import ST_Basics from "./pages/Stack/basics";
 import ST_Tablet from "./pages/Stack/tablet";
 
 import SH_Basics from "./pages/StickyHeader/basics";
-import SH_NestedScroll from "./pages/StickyHeader/nested-scroll";
 
 import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone, FiSidebar, FiNavigation, FiImage } from "react-icons/fi";
 
@@ -166,6 +166,7 @@ export const demoCategories: DemoCategory[] = [
       { id: "sidebar", label: "Sidebar Navigation", path: "sidebar", element: <PV_Sidebar /> },
       { id: "transitions", label: "Transitions", path: "transitions", element: <PV_Transitions /> },
       { id: "swipe", label: "Swipe Navigation", path: "swipe", element: <PV_Swipe /> },
+      { id: "swipe-debug", label: "Swipe Debug (iOS)", path: "swipe-debug", element: <PV_SwipeDebug /> },
     ],
   },
   {
@@ -185,7 +186,6 @@ export const demoCategories: DemoCategory[] = [
     base: "/components/sticky-header",
     pages: [
       { id: "basics", label: "Basics", path: "basics", element: <SH_Basics /> },
-      { id: "nested-scroll", label: "Nested Scroll", path: "nested-scroll", element: <SH_NestedScroll /> },
     ],
   },
 ];

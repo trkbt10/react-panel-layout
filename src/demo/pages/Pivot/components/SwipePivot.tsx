@@ -5,9 +5,55 @@ import * as React from "react";
 import { usePivot } from "../../../../pivot/index.js";
 import { usePivotSwipeInput } from "../../../../modules/pivot/usePivotSwipeInput.js";
 import { SwipePivotContent } from "../../../../modules/pivot/SwipePivotContent.js";
-import type { PivotItem } from "../../../../pivot/index.js";
+import type { PivotItem, UsePivotResult } from "../../../../pivot/index.js";
 import type { SwipeInputState } from "../../../../hooks/gesture/types.js";
 import styles from "./SwipePivot.module.css";
+
+type PivotItemsProps = {
+  items: PivotItem[];
+  pivot: UsePivotResult;
+  inputState: SwipeInputState;
+  containerWidth: number;
+};
+
+/** Renders pivot items within the swipe container */
+const PivotItems: React.FC<PivotItemsProps> = ({ items, pivot, inputState, containerWidth }) => {
+  if (containerWidth <= 0) {
+    return null;
+  }
+
+  return (
+    <>
+      {items.map((item) => {
+        const itemIndex = items.findIndex((i) => i.id === item.id);
+        const offset = itemIndex - pivot.activeIndex;
+
+        // Only render items within ±1 of active
+        if (Math.abs(offset) > 1) {
+          return null;
+        }
+
+        const position = offset < 0 ? -1 : offset > 0 ? 1 : 0;
+        const canNavigate = position === 0 ? true : pivot.canGo(position);
+
+        return (
+          <SwipePivotContent
+            key={item.id}
+            id={item.id}
+            isActive={pivot.isActive(item.id)}
+            position={position}
+            inputState={inputState}
+            axis="horizontal"
+            containerSize={containerWidth}
+            canNavigate={canNavigate}
+          >
+            {item.content}
+          </SwipePivotContent>
+        );
+      })}
+    </>
+  );
+};
 
 /** Get hint text based on swipe state */
 const getSwipeHintText = (inputState: SwipeInputState): string => {
@@ -17,12 +63,14 @@ const getSwipeHintText = (inputState: SwipeInputState): string => {
   return "Swipe to navigate";
 };
 
+const pageColors = ["#ffe0e0", "#e0ffe0", "#e0e0ff"];
+
 const items: PivotItem[] = [
   {
     id: "page1",
     label: "Page 1",
     content: (
-      <div className={styles.pageContent}>
+      <div className={styles.pageContent} style={{ backgroundColor: pageColors[0] }}>
         <h2>Page 1</h2>
         <p>Swipe left to see Page 2</p>
         <p>This demo shows horizontal swipe navigation between content pages.</p>
@@ -33,7 +81,7 @@ const items: PivotItem[] = [
     id: "page2",
     label: "Page 2",
     content: (
-      <div className={styles.pageContent}>
+      <div className={styles.pageContent} style={{ backgroundColor: pageColors[1] }}>
         <h2>Page 2</h2>
         <p>Swipe left or right</p>
         <p>The content follows your finger during the swipe gesture.</p>
@@ -44,7 +92,7 @@ const items: PivotItem[] = [
     id: "page3",
     label: "Page 3",
     content: (
-      <div className={styles.pageContent}>
+      <div className={styles.pageContent} style={{ backgroundColor: pageColors[2] }}>
         <h2>Page 3</h2>
         <p>Swipe right to go back</p>
         <p>This is the last page. Swipe right to return to previous pages.</p>
@@ -87,28 +135,6 @@ export const SwipePivot: React.FC = () => {
     return () => window.removeEventListener("resize", updateWidth);
   }, []);
 
-  // Calculate position offset for each item relative to active
-  const getPositionOffset = (itemId: string): number => {
-    const itemIndex = items.findIndex((item) => item.id === itemId);
-    return itemIndex - pivot.activeIndex;
-  };
-
-  // Convert offset to display position (-1, 0, 1)
-  const toDisplayPosition = (offset: number): -1 | 0 | 1 => {
-    if (offset < 0) {
-      return -1;
-    }
-    if (offset > 0) {
-      return 1;
-    }
-    return 0;
-  };
-
-  // Only render items within ±1 of active
-  const shouldRenderItem = (offset: number): boolean => {
-    return Math.abs(offset) <= 1;
-  };
-
   return (
     <div className={styles.container}>
       {/* Page indicators */}
@@ -129,34 +155,14 @@ export const SwipePivot: React.FC = () => {
         ref={containerRef}
         className={styles.swipeContainer}
         {...containerProps}
+        style={containerProps.style}
       >
-        {items.map((item) => {
-          const offset = getPositionOffset(item.id);
-          // Only render items within ±1 of active (fixes Page 2,3 overlap issue)
-          if (!shouldRenderItem(offset)) {
-            return null;
-          }
-
-          const position = toDisplayPosition(offset);
-          // Determine if navigation to this position is possible
-          const canNavigateToPosition = position === 0;
-          const canNavigate = canNavigateToPosition ? true : pivot.canGo(position);
-
-          return (
-            <SwipePivotContent
-              key={item.id}
-              id={item.id}
-              isActive={pivot.isActive(item.id)}
-              position={position}
-              inputState={inputState}
-              axis="horizontal"
-              containerSize={containerWidth}
-              canNavigate={canNavigate}
-            >
-              {item.content}
-            </SwipePivotContent>
-          );
-        })}
+        <PivotItems
+          items={items}
+          pivot={pivot}
+          inputState={inputState}
+          containerWidth={containerWidth}
+        />
       </div>
 
       {/* Navigation info */}

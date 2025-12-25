@@ -5,6 +5,7 @@
   height: 100%;
   box-sizing: border-box;
   background: var(--rpl-color-background, #f8f9fa);
+  overflow: hidden;
 }
 
 .indicators {
@@ -36,6 +37,7 @@
 
 .swipeContainer {
   flex: 1;
+  min-height: 250px;
   position: relative;
   overflow: hidden;
   margin: 0 16px;

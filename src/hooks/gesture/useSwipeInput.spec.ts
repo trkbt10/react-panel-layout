@@ -1,7 +1,7 @@
 /**
  * @file Tests for useSwipeInput hook.
  */
-/* eslint-disable no-restricted-globals -- test requires vi for timing control */
+/* eslint-disable no-restricted-globals, no-restricted-properties, no-restricted-syntax -- test requires vi for timing control and mocks */
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { useSwipeInput } from "./useSwipeInput.js";
@@ -447,15 +447,17 @@ describe("useSwipeInput", () => {
         }),
       );
 
+      // Wheel delta is negated to get swipe displacement:
+      // deltaX > 0 (scroll right) → displacement < 0 (swipe left)
       act(() => {
-        dispatchWheelEvent(containerRef.current!, -30, 0);
+        dispatchWheelEvent(containerRef.current!, 30, 0);
       });
 
       expect(result.current.state.phase).toBe("swiping");
       expect(result.current.state.displacement.x).toBe(-30);
 
       act(() => {
-        dispatchWheelEvent(containerRef.current!, -20, 0);
+        dispatchWheelEvent(containerRef.current!, 20, 0);
       });
 
       expect(result.current.state.displacement.x).toBe(-50);
@@ -475,8 +477,9 @@ describe("useSwipeInput", () => {
         }),
       );
 
+      // deltaX > 0 (scroll right) → displacement < 0 → direction = -1
       act(() => {
-        dispatchWheelEvent(containerRef.current!, -100, 0);
+        dispatchWheelEvent(containerRef.current!, 100, 0);
       });
 
       // Wait for idle timeout (default 150ms)

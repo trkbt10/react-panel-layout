@@ -1,11 +1,18 @@
 /**
- * @file StickyHeader entry point - Native app-like overscroll experience
+ * @file StickyArea entry point - Native app-like overscroll experience
  *
- * Import via: import { StickyHeader } from "react-panel-layout/sticky-header";
+ * Import via: import { StickyArea } from "react-panel-layout/sticky-header";
  */
 
-// Component
-export { StickyHeader } from "./StickyHeader";
+// Components
+export { StickyArea, StickyHeader } from "./StickyArea";
 
 // Types
-export type { StickyHeaderProps, StickyHeaderState } from "./types";
+export type {
+  StickyAreaPosition,
+  StickyAreaProps,
+  StickyAreaState,
+  // Backwards compatibility
+  StickyHeaderProps,
+  StickyHeaderState,
+} from "./types";

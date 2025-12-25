@@ -38,7 +38,8 @@ describe("useNativeGestureGuard", () => {
       expect(result.current.containerProps.style.overscrollBehavior).toBe("contain");
     });
 
-    it("does not apply overscroll-behavior when not active", () => {
+    it("applies overscroll-behavior immediately even when not active", () => {
+      // Styles are applied immediately (not waiting for active) to prevent browser gestures
       const containerRef = createRef();
       const { result } = renderHook(() =>
         useNativeGestureGuard({
@@ -48,7 +49,7 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      expect(result.current.containerProps.style.overscrollBehavior).toBeUndefined();
+      expect(result.current.containerProps.style.overscrollBehavior).toBe("contain");
     });
 
     it("does not apply overscroll-behavior when preventOverscroll is false", () => {

@@ -1,52 +1,68 @@
 /**
- * @file Type definitions for the StickyHeader component.
+ * @file Type definitions for the StickyArea component.
  *
- * StickyHeader provides a native app-like experience for SPAs/PWAs
+ * StickyArea provides a native app-like experience for SPAs/PWAs
  * by displaying cover content during overscroll/bounce.
+ * Supports both top (header) and bottom (footer) positions.
+ * Works with document-level scroll only.
  */
 import type * as React from "react";
 
 /**
- * State information exposed by StickyHeader.
+ * Position of the sticky area.
+ * - "top": Header behavior - sticks to top, expands on pull-down overscroll
+ * - "bottom": Footer behavior - sticks to bottom, expands on pull-up overscroll
  */
-export type StickyHeaderState = {
+export type StickyAreaPosition = "top" | "bottom";
+
+/**
+ * State information exposed by StickyArea.
+ */
+export type StickyAreaState = {
   /**
-   * Whether the header is stuck at the top of the scroll container.
-   * True when the header has scrolled to (or past) the top edge.
+   * Whether the area is stuck at its edge of the viewport.
+   * - For "top": True when scrolled past the top edge
+   * - For "bottom": True when scrolled past the bottom edge
    */
   isStuck: boolean;
   /**
-   * The current scroll offset relative to the header.
-   * - Positive: Header has scrolled up past the viewport
-   * - Zero: Header is at the top
-   * - Negative: Overscroll/bounce (pulling down beyond top)
+   * The current scroll offset relative to the area.
+   * Positive when the area has scrolled past its edge.
    */
   scrollOffset: number;
-  /**
-   * The detected scroll container type.
-   * - "document": Using window/document scroll
-   * - "container": Using a nested overflow:scroll/auto element
-   */
-  containerType: "document" | "container";
 };
 
 /**
- * Props for the StickyHeader component.
+ * Props for the StickyArea component.
  */
-export type StickyHeaderProps = {
+export type StickyAreaProps = {
   /**
-   * Cover content displayed behind the header.
+   * Position of the sticky area.
+   * - "top": Header behavior (default)
+   * - "bottom": Footer behavior
+   *
+   * @default "top"
+   */
+  position?: StickyAreaPosition;
+  /**
+   * Cover content displayed behind the area.
    * This content expands during overscroll/bounce to create
    * a native app-like pull effect.
    */
   cover: React.ReactNode;
   /**
-   * Main header content that scrolls over the cover.
+   * Main content that scrolls over the cover.
    * Can be a ReactNode or a render function receiving state.
    */
-  children: React.ReactNode | ((state: StickyHeaderState) => React.ReactNode);
+  children: React.ReactNode | ((state: StickyAreaState) => React.ReactNode);
   /**
    * Callback fired when sticky state changes.
    */
-  onStateChange?: (state: StickyHeaderState) => void;
+  onStateChange?: (state: StickyAreaState) => void;
 };
+
+// Backwards compatibility aliases
+/** @deprecated Use StickyAreaState instead */
+export type StickyHeaderState = StickyAreaState;
+/** @deprecated Use StickyAreaProps instead */
+export type StickyHeaderProps = StickyAreaProps;

@@ -1,25 +1,48 @@
 /**
- * @file Basic StickyHeader demo - native app-like overscroll experience
+ * @file Basic StickyArea demo - native app-like overscroll experience
  */
 import * as React from "react";
-import { StickyHeader } from "../../../../sticky-header/index";
-import type { StickyHeaderState } from "../../../../sticky-header/index";
+import { StickyArea } from "../../../../sticky-header/index";
+import type { StickyAreaPosition, StickyAreaState } from "../../../../sticky-header/index";
 import styles from "./StickyHeader.module.css";
 
-const CoverContent: React.FC = () => (
-  <div className={`${styles.coverPlaceholder} ${styles.coverGradient1}`}>Hero Image</div>
+const HeaderCover: React.FC = () => (
+  <div className={`${styles.coverPlaceholder} ${styles.coverGradient1}`}>Header Cover</div>
+);
+
+const FooterCover: React.FC = () => (
+  <div className={`${styles.coverPlaceholder} ${styles.coverGradient2}`}>Footer Cover</div>
 );
 
 export const StickyHeaderBasics: React.FC = () => {
-  const [state, setState] = React.useState<StickyHeaderState>({
+  const [headerState, setHeaderState] = React.useState<StickyAreaState>({
     isStuck: false,
     scrollOffset: 0,
-    containerType: "document",
   });
+
+  const [footerState, setFooterState] = React.useState<StickyAreaState>({
+    isStuck: false,
+    scrollOffset: 0,
+  });
+
+  const [position, setPosition] = React.useState<StickyAreaPosition>("top");
+
+  const state = position === "top" ? headerState : footerState;
 
   return (
     <div className={styles.container}>
       <div className={styles.stateIndicator}>
+        <div className={styles.stateRow}>
+          <span className={styles.stateLabel}>position:</span>
+          <select
+            value={position}
+            onChange={(e) => setPosition(e.target.value as StickyAreaPosition)}
+            className={styles.stateValue}
+          >
+            <option value="top">top (header)</option>
+            <option value="bottom">bottom (footer)</option>
+          </select>
+        </div>
         <div className={styles.stateRow}>
           <span className={styles.stateLabel}>isStuck:</span>
           <span className={`${styles.stateValue} ${state.isStuck ? styles.stuck : ""}`}>
@@ -30,72 +53,50 @@ export const StickyHeaderBasics: React.FC = () => {
           <span className={styles.stateLabel}>scrollOffset:</span>
           <span className={styles.stateValue}>{state.scrollOffset.toFixed(0)}px</span>
         </div>
-        <div className={styles.stateRow}>
-          <span className={styles.stateLabel}>containerType:</span>
-          <span className={styles.stateValue}>{state.containerType}</span>
-        </div>
       </div>
 
       <div className={styles.scrollArea}>
-        <StickyHeader cover={<CoverContent />} onStateChange={setState}>
+        <StickyArea position="top" cover={<HeaderCover />} onStateChange={setHeaderState}>
           <div className={styles.header}>
-            <h1>StickyHeader Demo</h1>
+            <h1>StickyArea Demo</h1>
             <p>Pull down to see the overscroll effect (works best in PWA/WebApp mode)</p>
           </div>
-        </StickyHeader>
+        </StickyArea>
 
         <div className={styles.content}>
-          <h2>About StickyHeader</h2>
+          <h2>About StickyArea</h2>
           <p>
-            StickyHeader provides a native app-like experience for SPAs and PWAs. When the user pulls down beyond the
-            top of the page (overscroll/bounce), the cover content expands to fill the visible area.
+            StickyArea provides a native app-like experience for SPAs and PWAs. It supports both header (top) and
+            footer (bottom) positions. When the user overscrolls, the cover content expands to fill the visible area.
           </p>
 
           <h2>Features</h2>
           <ul>
             <li>
-              <strong>Overscroll Effect</strong> - Cover image expands during pull-down bounce
+              <strong>Header &amp; Footer</strong> - Use position="top" or position="bottom"
             </li>
             <li>
-              <strong>State Tracking</strong> - Know when header is "stuck" at top
+              <strong>Overscroll Effect</strong> - Cover expands during bounce
             </li>
             <li>
-              <strong>Nested Scroll Support</strong> - Works inside overflow:scroll containers
-            </li>
-            <li>
-              <strong>Inline Styles</strong> - No external CSS dependencies
+              <strong>State Tracking</strong> - Know when area is "stuck" at edge
             </li>
           </ul>
 
           <h2>Usage</h2>
-          <p>The StickyHeader component accepts a cover prop for the background content and children for the header:</p>
+          <p>Use position prop to control header or footer behavior:</p>
 
-          <h2>State Callback</h2>
-          <p>
-            Use the onStateChange callback to receive updates about the sticky state. This is useful for changing header
-            styles when scrolled.
-          </p>
-
-          <h2>Render Function</h2>
-          <p>
-            You can also use a render function as children to access state directly and conditionally render based on
-            isStuck:
-          </p>
-
-          <h2>Scroll Down</h2>
-          <p>Keep scrolling to see how the cover shrinks as you scroll past it...</p>
-          <p>The header area has a fixed height, and the cover image behind it will shrink as you scroll.</p>
-          <p>This creates a parallax-like effect that feels natural and app-like.</p>
-
-          <h2>Best Experience</h2>
-          <p>For the best experience, try this demo:</p>
-          <ul>
-            <li>On iOS Safari with "Add to Home Screen"</li>
-            <li>In a PWA shell</li>
-            <li>In a Capacitor/Cordova hybrid app</li>
-          </ul>
-          <p>In these environments, the rubber-band bounce effect will show the cover image expanding naturally.</p>
+          <h2>Scroll to Bottom</h2>
+          <p>Keep scrolling to see the footer with its own cover that expands on pull-up overscroll...</p>
+          <p>The footer area works the same as the header, but anchored to the bottom.</p>
+          <p>Try changing the position selector above to see the state for header or footer.</p>
         </div>
+
+        <StickyArea position="bottom" cover={<FooterCover />} onStateChange={setFooterState}>
+          <div className={styles.footer}>
+            <p>Footer Area - Pull up to see the overscroll effect</p>
+          </div>
+        </StickyArea>
       </div>
     </div>
   );

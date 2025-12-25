@@ -108,6 +108,32 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
 
   const lastActiveStateRef = React.useRef<SwipeInputState | null>(null);
 
+  // Prevent native scroll when swiping on iOS
+  const isLockedToSwipeAxisRef = React.useRef(false);
+
+  React.useEffect(() => {
+    isLockedToSwipeAxisRef.current = isLocked ? lockedAxis === axis : false;
+  }, [isLocked, lockedAxis, axis]);
+
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !enabled) {
+      return;
+    }
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (isLockedToSwipeAxisRef.current) {
+        event.preventDefault();
+      }
+    };
+
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      container.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [containerRef, enabled]);
+
   // ===== Wheel-based swipe tracking =====
   const [wheelState, setWheelState] = React.useState<SwipeInputState>(IDLE_SWIPE_INPUT_STATE);
   const wheelAccumulatedRef = React.useRef({ x: 0, y: 0 });

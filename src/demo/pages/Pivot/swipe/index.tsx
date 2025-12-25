@@ -3,19 +3,13 @@
  */
 import * as React from "react";
 import { SwipePivot } from "../components/SwipePivot";
-import SwipePivotSource from "../components/SwipePivot.tsx?raw";
-import { SingleSamplePage } from "../../../components/layout";
 
+// Temporarily render directly without SingleSamplePage to debug
 const Page: React.FC = () => {
   return (
-    <SingleSamplePage
-      title="Pivot / Swipe Navigation"
-      code={SwipePivotSource}
-      codeTitle="SwipePivot.tsx"
-      previewHeight={500}
-    >
+    <div style={{ height: "100%", padding: "16px" }}>
       <SwipePivot />
-    </SingleSamplePage>
+    </div>
   );
 };
 
