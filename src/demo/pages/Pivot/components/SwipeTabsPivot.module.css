@@ -1,0 +1,203 @@
+/**
+ * @file Swipe Tabs Pivot demo styles
+ */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--rpl-color-background, #f8f9fa);
+  overflow: hidden;
+}
+
+.title {
+  margin: 16px 16px 4px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--rpl-color-text-primary, #333);
+}
+
+.subtitle {
+  margin: 0 16px 16px;
+  font-size: 14px;
+  color: var(--rpl-color-text-secondary, #666);
+}
+
+.mainContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin: 0 16px;
+  overflow: hidden;
+}
+
+.tabsContainer {
+  position: relative;
+  height: 48px;
+  background: var(--rpl-color-surface, #fff);
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* iOS segmented control style */
+.tabsContainer[data-style="ios"] {
+  height: 44px;
+  margin: 0 8px;
+  padding: 4px;
+  background: rgba(118, 118, 128, 0.12);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--rpl-color-text-secondary, #666);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+  box-sizing: border-box;
+}
+
+.tab:hover {
+  background: var(--rpl-color-surface-hover, rgba(0, 0, 0, 0.05));
+}
+
+.tab[data-active="true"] {
+  color: var(--rpl-color-primary, #0066cc);
+  background: var(--rpl-color-primary-light, rgba(0, 102, 204, 0.1));
+}
+
+/* iOS style tab - no hover/active bg, text only */
+.tabIos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: color 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.tabIos[data-active="true"] {
+  color: #000;
+}
+
+.contentContainer {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--rpl-color-surface, #fff);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pageContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.pageContent h2 {
+  margin: 0 0 16px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--rpl-color-text-primary, #333);
+}
+
+.pageContent p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: var(--rpl-color-text-secondary, #666);
+  line-height: 1.6;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  font-size: 14px;
+  color: var(--rpl-color-text-secondary, #666);
+}
+
+.hint {
+  font-style: italic;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.navButton {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--rpl-color-border, #d0d0d0);
+  border-radius: 8px;
+  background: var(--rpl-color-surface, #fff);
+  color: var(--rpl-color-text-primary, #333);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.navButton:hover {
+  background: var(--rpl-color-surface-hover, #f0f0f0);
+  border-color: var(--rpl-color-primary, #0066cc);
+}
+
+.styleToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px 12px;
+  font-size: 14px;
+  color: var(--rpl-color-text-secondary, #666);
+}
+
+.toggleButton {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--rpl-color-border, #d0d0d0);
+  border-radius: 6px;
+  background: var(--rpl-color-surface, #fff);
+  color: var(--rpl-color-text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toggleButton:hover {
+  background: var(--rpl-color-surface-hover, #f0f0f0);
+}
+
+.toggleButton[data-active="true"] {
+  background: var(--rpl-color-primary, #007AFF);
+  border-color: var(--rpl-color-primary, #007AFF);
+  color: #fff;
+}

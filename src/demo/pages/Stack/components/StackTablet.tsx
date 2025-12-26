@@ -1,14 +1,12 @@
 /**
  * @file Stack Tablet demo - iPad Settings-style stacking sidebar
  * Each menu panel has its own header that stacks with the content.
+ * Uses SwipeStackContent for direct DOM manipulation during swipe gestures.
  */
 import * as React from "react";
 import { useStackNavigation } from "../../../../modules/stack/useStackNavigation.js";
 import { useStackSwipeInput } from "../../../../modules/stack/useStackSwipeInput.js";
-import {
-  useStackAnimationState,
-  type PanelAnimationPhase,
-} from "../../../../modules/stack/useStackAnimationState.js";
+import { SwipeStackContent } from "../../../../modules/stack/SwipeStackContent.js";
 import type { StackPanel } from "../../../../modules/stack/types.js";
 import styles from "./StackTablet.module.css";
 import "../../../styles/stack-themes.css";
@@ -20,6 +18,14 @@ const THEME_CLASSES: Record<StackTheme, string> = {
   android: "stack-theme-android",
   fluent: "stack-theme-fluent",
   instant: "stack-theme-instant",
+};
+
+// Animation durations matching CSS custom properties
+const THEME_DURATIONS: Record<StackTheme, number> = {
+  ios: 350,
+  android: 400,
+  fluent: 250,
+  instant: 0,
 };
 
 const panels: StackPanel[] = [
@@ -225,114 +231,6 @@ const MenuPanel: React.FC<MenuPanelProps> = ({
   );
 };
 
-// Animated panel wrapper
-type AnimatedStackPanelProps = {
-  id: string;
-  depth: number;
-  phase: PanelAnimationPhase;
-  isTopmost: boolean;
-  totalDepth: number;
-  onAnimationEnd: () => void;
-  children: React.ReactNode;
-};
-
-const getPhaseClassName = (phase: PanelAnimationPhase): string => {
-  switch (phase) {
-    case "entering":
-      return styles.panelEntering;
-    case "exiting":
-      return styles.panelExiting;
-    default:
-      return "";
-  }
-};
-
-const AnimatedStackPanel: React.FC<AnimatedStackPanelProps> = ({
-  id,
-  depth,
-  phase,
-  isTopmost,
-  totalDepth,
-  onAnimationEnd,
-  children,
-}) => {
-  /*
-   * iOS Navigation behavior:
-   * - Topmost panel: translateX(0), scale(1), opacity(1)
-   * - Underlying panels: shift left, scale down, fade slightly
-   * - Shadow is cast BY the top panel ONTO the underlying panel (overlay effect)
-   */
-  const levelsBack = isTopmost ? 0 : totalDepth - depth - 1;
-
-  const getTransform = (): string => {
-    if (phase === "exiting") {
-      return ""; // CSS animation handles exit
-    }
-    if (phase === "entering") {
-      return ""; // CSS animation handles enter
-    }
-    if (isTopmost) {
-      return "translateX(0) scale(1)";
-    }
-    // Underlying panels: shift left + scale down
-    const parallaxOffset = levelsBack * -33;
-    const scale = 1 - levelsBack * 0.05; // 5% smaller per level
-    return `translateX(${parallaxOffset}%) scale(${scale})`;
-  };
-
-  /*
-   * Shadow dynamics:
-   * - Shadow is cast by this panel onto the space to the left
-   * - Distance affects: width (wider when far), opacity (lighter when far)
-   * - Gradient: darkest at panel edge (right), fades to left
-   */
-  const getShadowStyle = (): React.CSSProperties | null => {
-    if (depth === 0) return null;
-
-    const distance = levelsBack;
-
-    // Shadow gets wider and softer as distance increases
-    const baseWidth = 30;
-    const width = baseWidth + distance * 15;
-    const opacity = Math.max(0.12 - distance * 0.03, 0.04);
-
-    return {
-      position: 'absolute' as const,
-      top: 0,
-      left: -width,
-      width: width,
-      height: '100%',
-      pointerEvents: 'none' as const,
-      // Gradient from right (panel edge, darkest) to left (fades out)
-      background: `linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,${opacity * 0.5}) 60%, rgba(0,0,0,${opacity}) 100%)`,
-    };
-  };
-
-  const style: React.CSSProperties = {
-    zIndex: depth,
-    transform: getTransform(),
-    pointerEvents: isTopmost && phase !== "exiting" ? "auto" : "none",
-  };
-
-  const className = `${styles.stackPanel} ${getPhaseClassName(phase)}`;
-  const shadowStyle = getShadowStyle();
-
-  return (
-    <div
-      className={className}
-      data-stack-panel={id}
-      data-depth={depth}
-      data-phase={phase}
-      style={style}
-      onAnimationEnd={onAnimationEnd}
-    >
-      {/* Shadow cast by THIS panel onto the space below */}
-      {shadowStyle && <div style={shadowStyle} />}
-      {children}
-    </div>
-  );
-};
-
 type StackTabletProps = {
   theme?: StackTheme;
 };
@@ -340,30 +238,35 @@ type StackTabletProps = {
 export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
   const sidebarRef = React.useRef<HTMLDivElement>(null);
   const [selectedTheme, setSelectedTheme] = React.useState<StackTheme>(theme);
+  const [containerSize, setContainerSize] = React.useState(0);
 
   const navigation = useStackNavigation({
     panels,
     displayMode: "stack",
-    transitionMode: "css",
+    transitionMode: "none", // Using direct DOM manipulation instead
   });
 
-  const { isEdgeSwiping, progress } = useStackSwipeInput({
+  const { isEdgeSwiping, progress, inputState, containerProps } = useStackSwipeInput({
     containerRef: sidebarRef,
     navigation,
     edge: "left",
     edgeWidth: 20,
   });
 
-  const stack = navigation.state.stack;
+  // Track container size for SwipeStackContent
+  React.useLayoutEffect(() => {
+    const container = sidebarRef.current;
+    if (!container) return;
 
-  // Use centralized animation state management
-  const {
-    panels: animatedPanels,
-    markEnterComplete,
-    markExitComplete,
-  } = useStackAnimationState({
-    stack: stack as ReadonlyArray<string>,
-  });
+    const updateSize = () => {
+      setContainerSize(container.clientWidth);
+    };
+    updateSize();
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
   const handleMenuClick = (id: string) => {
     navigation.push(id as (typeof panels)[number]["id"]);
@@ -376,9 +279,51 @@ export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
   const currentPanelId = navigation.currentPanelId;
   const currentDetail = detailContent[currentPanelId] ?? detailContent.root;
 
-  // Find the topmost active panel (not exiting)
-  const activePanels = animatedPanels.filter((p) => p.phase !== "exiting");
-  const topmostDepth = Math.max(...activePanels.map((p) => p.depth), 0);
+  // Get visible panels: active + behind (for swipe reveal) + exiting (for back animation)
+  const { stack, depth } = navigation.state;
+
+  // Track exiting panel when navigating back
+  const [exitingPanelId, setExitingPanelId] = React.useState<string | null>(null);
+  const prevDepthRef = React.useRef(depth);
+  const prevStackRef = React.useRef<ReadonlyArray<string>>(stack);
+
+  // Detect when we navigate back and need to animate out
+  React.useLayoutEffect(() => {
+    const prevDepth = prevDepthRef.current;
+    const prevStack = prevStackRef.current;
+
+    // Update refs
+    prevDepthRef.current = depth;
+    prevStackRef.current = stack;
+
+    // Check if we went back (depth decreased)
+    if (depth < prevDepth) {
+      // The panel at prevDepth is exiting
+      const exitingId = prevStack[prevDepth];
+      if (exitingId != null) {
+        setExitingPanelId(exitingId);
+
+        // Clear exiting panel after animation completes
+        const timeoutId = setTimeout(() => {
+          setExitingPanelId(null);
+        }, THEME_DURATIONS[selectedTheme]);
+
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [depth, stack, selectedTheme]);
+
+  const visiblePanelIds = React.useMemo(() => {
+    const ids = [stack[depth]]; // Active panel
+    if (depth > 0) {
+      ids.unshift(stack[depth - 1]); // Behind panel
+    }
+    // Include exiting panel if not already in the list
+    if (exitingPanelId != null && !ids.includes(exitingPanelId)) {
+      ids.push(exitingPanelId);
+    }
+    return ids;
+  }, [stack, depth, exitingPanelId]);
 
   const containerClassName = `${styles.container} ${THEME_CLASSES[selectedTheme]}`;
 
@@ -386,43 +331,42 @@ export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
     <div className={containerClassName}>
       {/* Sidebar with stacking menus */}
       <aside className={styles.sidebar}>
-        <div ref={sidebarRef} className={styles.sidebarContent}>
-          {animatedPanels.map((panel) => {
-            const menu = menus[panel.id];
+        <div ref={sidebarRef} className={styles.sidebarContent} {...containerProps}>
+          {visiblePanelIds.map((panelId) => {
+            const menu = menus[panelId];
             if (menu == null) {
               return null;
             }
 
-            const isTopmost = panel.depth === topmostDepth && panel.phase !== "exiting";
-            const handleAnimEnd = () => {
-              if (panel.phase === "entering") {
-                markEnterComplete(panel.id);
-              } else if (panel.phase === "exiting") {
-                markExitComplete(panel.id);
-              }
-            };
+            const isExiting = panelId === exitingPanelId;
+            // For exiting panels, use depth + 1 since they were previously at the active position
+            const panelDepth = isExiting ? depth + 1 : stack.indexOf(panelId);
+            const isActive = panelDepth === depth && !isExiting;
 
             return (
-              <AnimatedStackPanel
-                key={panel.id}
-                id={panel.id}
-                depth={panel.depth}
-                phase={panel.phase}
-                isTopmost={isTopmost}
-                totalDepth={topmostDepth + 1}
-                onAnimationEnd={handleAnimEnd}
+              <SwipeStackContent
+                key={panelId}
+                id={panelId}
+                depth={panelDepth}
+                navigationDepth={depth}
+                isActive={isActive}
+                inputState={inputState}
+                containerSize={containerSize}
+                animateOnMount={true}
+                animationDuration={THEME_DURATIONS[selectedTheme]}
+                displayMode="stack"
               >
                 <MenuPanel
-                  id={panel.id}
+                  id={panelId}
                   title={menu.title}
                   parentTitle={menu.parentTitle}
                   items={menu.items}
                   onItemClick={handleMenuClick}
                   onBack={handleBack}
-                  canGoBack={panel.depth > 0}
+                  canGoBack={panelDepth > 0}
                   currentPanelId={currentPanelId}
                 />
-              </AnimatedStackPanel>
+              </SwipeStackContent>
             );
           })}
         </div>

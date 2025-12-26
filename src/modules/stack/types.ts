@@ -5,6 +5,7 @@
  * Similar to iOS/iPadOS navigation controllers.
  */
 import type * as React from "react";
+import type { SwipeInputState } from "../../hooks/gesture/types.js";
 
 /**
  * Display mode for stack panels.
@@ -194,6 +195,8 @@ export type UseStackSwipeInputResult = {
   isEdgeSwiping: boolean;
   /** Swipe progress (0-1) for animation */
   progress: number;
+  /** Full swipe input state for direct DOM manipulation */
+  inputState: SwipeInputState;
   /** Props to spread on the container element */
   containerProps: React.HTMLAttributes<HTMLElement> & {
     style: React.CSSProperties;

@@ -8,6 +8,7 @@ import * as React from "react";
 import { useEdgeSwipeInput } from "../../hooks/gesture/useEdgeSwipeInput.js";
 import { useNativeGestureGuard } from "../../hooks/gesture/useNativeGestureGuard.js";
 import { mergeGestureContainerProps } from "../../hooks/gesture/utils.js";
+import { IDLE_SWIPE_INPUT_STATE } from "../../hooks/gesture/types.js";
 import type { SwipeInputState } from "../../hooks/gesture/types.js";
 import type { UseStackSwipeInputOptions, UseStackSwipeInputResult } from "./types.js";
 
@@ -126,9 +127,13 @@ export function useStackSwipeInput(options: UseStackSwipeInputOptions): UseStack
     [swipeProps, guardProps],
   );
 
+  // Effective input state: only return actual state if it's an edge gesture
+  const effectiveInputState: SwipeInputState = isEdgeGesture ? inputState : IDLE_SWIPE_INPUT_STATE;
+
   return {
     isEdgeSwiping: isEdgeGesture,
     progress,
+    inputState: effectiveInputState,
     containerProps,
   };
 }

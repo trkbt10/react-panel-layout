@@ -25,15 +25,12 @@ const PivotItems: React.FC<PivotItemsProps> = ({ items, pivot, inputState, conta
   return (
     <>
       {items.map((item) => {
-        const itemIndex = items.findIndex((i) => i.id === item.id);
-        const offset = itemIndex - pivot.activeIndex;
-
-        // Only render items within ±1 of active
-        if (Math.abs(offset) > 1) {
+        // Use getVirtualPosition for loop mode support
+        const position = pivot.getVirtualPosition(item.id);
+        if (position === null) {
           return null;
         }
 
-        const position = offset < 0 ? -1 : offset > 0 ? 1 : 0;
         const canNavigate = position === 0 ? true : pivot.canGo(position);
 
         return (
@@ -72,8 +69,8 @@ const items: PivotItem[] = [
     content: (
       <div className={styles.pageContent} style={{ backgroundColor: pageColors[0] }}>
         <h2>Page 1</h2>
-        <p>Swipe left to see Page 2</p>
-        <p>This demo shows horizontal swipe navigation between content pages.</p>
+        <p>Swipe left to see Page 2, or right to loop to Page 3</p>
+        <p>This demo shows infinite loop swipe navigation.</p>
       </div>
     ),
   },
@@ -94,8 +91,8 @@ const items: PivotItem[] = [
     content: (
       <div className={styles.pageContent} style={{ backgroundColor: pageColors[2] }}>
         <h2>Page 3</h2>
-        <p>Swipe right to go back</p>
-        <p>This is the last page. Swipe right to return to previous pages.</p>
+        <p>Swipe left to loop back to Page 1</p>
+        <p>Infinite loop navigation - keep swiping to cycle through all pages.</p>
       </div>
     ),
   },
@@ -109,6 +106,7 @@ export const SwipePivot: React.FC = () => {
     items,
     defaultActiveId: "page1",
     transitionMode: "none", // We handle our own animations
+    navigationMode: "loop", // Enable infinite loop navigation
   });
 
   const { inputState, containerProps } = usePivotSwipeInput({

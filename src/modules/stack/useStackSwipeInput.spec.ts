@@ -49,6 +49,24 @@ describe("useStackSwipeInput", () => {
     },
   });
 
+  /** Create a mock pointer event with preventDefault */
+  const createMockPointerEvent = (props: {
+    clientX: number;
+    clientY: number;
+    pointerId?: number;
+    isPrimary?: boolean;
+    pointerType?: string;
+    button?: number;
+  }): React.PointerEvent<HTMLElement> => ({
+    clientX: props.clientX,
+    clientY: props.clientY,
+    pointerId: props.pointerId ?? 1,
+    isPrimary: props.isPrimary ?? true,
+    pointerType: props.pointerType ?? "touch",
+    button: props.button ?? 0,
+    preventDefault: () => {},
+  } as React.PointerEvent<HTMLElement>);
+
   describe("initialization", () => {
     it("starts with isEdgeSwiping false and progress 0", () => {
       const containerRef = createRef();
@@ -88,14 +106,7 @@ describe("useStackSwipeInput", () => {
       );
 
       // Pointer down at left edge
-      const downEvent = {
-        clientX: 10,
-        clientY: 100,
-        pointerId: 1,
-        isPrimary: true,
-        pointerType: "touch",
-        button: 0,
-      } as React.PointerEvent<HTMLElement>;
+      const downEvent = createMockPointerEvent({ clientX: 10, clientY: 100 });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(downEvent);
@@ -137,14 +148,7 @@ describe("useStackSwipeInput", () => {
       );
 
       // Pointer down at left edge
-      const downEvent = {
-        clientX: 10,
-        clientY: 100,
-        pointerId: 1,
-        isPrimary: true,
-        pointerType: "touch",
-        button: 0,
-      } as React.PointerEvent<HTMLElement>;
+      const downEvent = createMockPointerEvent({ clientX: 10, clientY: 100 });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(downEvent);
@@ -169,14 +173,7 @@ describe("useStackSwipeInput", () => {
       );
 
       // Pointer down at left edge
-      const downEvent = {
-        clientX: 10,
-        clientY: 100,
-        pointerId: 1,
-        isPrimary: true,
-        pointerType: "touch",
-        button: 0,
-      } as React.PointerEvent<HTMLElement>;
+      const downEvent = createMockPointerEvent({ clientX: 10, clientY: 100 });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(downEvent);
@@ -209,14 +206,7 @@ describe("useStackSwipeInput", () => {
       );
 
       // Pointer down at left edge
-      const downEvent = {
-        clientX: 10,
-        clientY: 100,
-        pointerId: 1,
-        isPrimary: true,
-        pointerType: "touch",
-        button: 0,
-      } as React.PointerEvent<HTMLElement>;
+      const downEvent = createMockPointerEvent({ clientX: 10, clientY: 100 });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(downEvent);
@@ -250,14 +240,7 @@ describe("useStackSwipeInput", () => {
         }),
       );
 
-      const downEvent = {
-        clientX: 10,
-        clientY: 100,
-        pointerId: 1,
-        isPrimary: true,
-        pointerType: "touch",
-        button: 0,
-      } as React.PointerEvent<HTMLElement>;
+      const downEvent = createMockPointerEvent({ clientX: 10, clientY: 100 });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(downEvent);
@@ -281,14 +264,7 @@ describe("useStackSwipeInput", () => {
       );
 
       // Pointer down within 50px edge
-      const downEvent = {
-        clientX: 40, // Within 50px, but outside default 20px
-        clientY: 100,
-        pointerId: 1,
-        isPrimary: true,
-        pointerType: "touch",
-        button: 0,
-      } as React.PointerEvent<HTMLElement>;
+      const downEvent = createMockPointerEvent({ clientX: 40, clientY: 100 });
 
       act(() => {
         result.current.containerProps.onPointerDown?.(downEvent);

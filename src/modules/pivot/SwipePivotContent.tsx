@@ -6,12 +6,15 @@
  * - During swipe: displayPx = targetPx + displacement (follows finger)
  * - After swipe: animate currentPx from finger position to targetPx
  *
- * Visibility rules:
- * - Active item is always visible
- * - Adjacent items visible when swiping towards them or animating into view
+ * Visibility modes:
+ * 1. Adjacent mode (default): Active item + adjacent items during swipe/animation
+ * 2. Viewport mode (viewportSize specified): Items visible if within viewport bounds
+ *
+ * Uses shared useSwipeContentTransform hook for DOM manipulation.
  */
 import * as React from "react";
-import { useAnimationFrame, interpolate, easings } from "../../hooks/useAnimationFrame.js";
+import { useSwipeContentTransform } from "../../hooks/useSwipeContentTransform.js";
+import type { AnimationDirection } from "../../hooks/useSwipeContentTransform.js";
 import type { SwipeInputState, GestureAxis } from "../../hooks/gesture/types.js";
 
 const DEFAULT_ANIMATION_DURATION = 300;
@@ -19,13 +22,24 @@ const DEFAULT_ANIMATION_DURATION = 300;
 export type SwipePivotContentProps = {
   id: string;
   isActive: boolean;
-  position: -1 | 0 | 1;
+  /**
+   * Position offset in number of items from center (0).
+   * Positive values are to the right/bottom, negative to the left/top.
+   */
+  position: number;
   inputState: SwipeInputState;
   axis?: GestureAxis;
+  /** Size of each item (width for horizontal, height for vertical) */
   containerSize: number;
   children: React.ReactNode;
   canNavigate?: boolean;
   animationDuration?: number;
+  /**
+   * Viewport size for viewport-based visibility mode.
+   * When specified, items are visible if they intersect with the viewport [0, viewportSize].
+   * When not specified, uses adjacent-item visibility logic (default).
+   */
+  viewportSize?: number;
 };
 
 const BASE_STYLE: React.CSSProperties = {
@@ -43,18 +57,40 @@ const getAxisDisplacement = (inputState: SwipeInputState, axis: GestureAxis): nu
   return axis === "horizontal" ? inputState.displacement.x : inputState.displacement.y;
 };
 
-/** Determine if an item should be visible based on current state */
-const computeVisibility = (
+/** Check if animating towards center (position 0) */
+const isAnimatingTowardsCenter = (animationDirection: AnimationDirection | null): boolean => {
+  if (!animationDirection) {
+    return false;
+  }
+  const { from, to } = animationDirection;
+  return Math.abs(to) < Math.abs(from);
+};
+
+/** Check if animating away from center (snap-back) */
+const isAnimatingAwayFromCenter = (animationDirection: AnimationDirection | null): boolean => {
+  if (!animationDirection) {
+    return false;
+  }
+  const { from, to } = animationDirection;
+  return Math.abs(to) > Math.abs(from);
+};
+
+/** Determine if an item should be visible based on current state (adjacent mode) */
+const computeAdjacentVisibility = (
   isActive: boolean,
-  position: -1 | 0 | 1,
+  position: number,
   inputState: SwipeInputState,
   canNavigate: boolean,
-  isAnimatingTowardsCenter: boolean,
+  animationDirection: AnimationDirection | null,
 ): boolean => {
   if (isActive) {
     return true;
   }
-  if (isAnimatingTowardsCenter) {
+  if (isAnimatingTowardsCenter(animationDirection)) {
+    return true;
+  }
+  // Keep visible during snap-back animation (moving away from center)
+  if (isAnimatingAwayFromCenter(animationDirection)) {
     return true;
   }
   if (!canNavigate) {
@@ -73,9 +109,19 @@ const computeVisibility = (
   return false;
 };
 
-/** Get CSS transform function name for axis */
-const getTransformFn = (axis: GestureAxis): "translateX" | "translateY" => {
-  return axis === "horizontal" ? "translateX" : "translateY";
+/**
+ * Determine if an item should be visible based on viewport intersection.
+ * An item is visible if any part of it intersects with the viewport [0, viewportSize].
+ */
+const computeViewportVisibility = (
+  itemPosition: number,
+  containerSize: number,
+  viewportSize: number,
+): boolean => {
+  const itemStart = itemPosition;
+  const itemEnd = itemPosition + containerSize;
+  // Item is visible if it intersects with [0, viewportSize]
+  return itemEnd > 0 && itemStart < viewportSize;
 };
 
 export const SwipePivotContent: React.FC<SwipePivotContentProps> = React.memo(({
@@ -88,103 +134,35 @@ export const SwipePivotContent: React.FC<SwipePivotContentProps> = React.memo(({
   children,
   canNavigate = true,
   animationDuration = DEFAULT_ANIMATION_DURATION,
+  viewportSize,
 }) => {
   const elementRef = React.useRef<HTMLDivElement>(null);
-  const currentPxRef = React.useRef<number>(position * containerSize);
-  const animRef = React.useRef<{ from: number; to: number } | null>(null);
-  const prevContainerSizeRef = React.useRef<number>(containerSize);
 
   const targetPx = position * containerSize;
-
-  // Only snap when containerSize changes (resize, initial measurement)
-  // Position changes should be animated, not snapped
-  if (containerSize !== prevContainerSizeRef.current && containerSize > 0) {
-    // Container was resized - snap to correct position
-    currentPxRef.current = targetPx;
-    prevContainerSizeRef.current = containerSize;
-  }
   const displacement = getAxisDisplacement(inputState, axis);
   const isSwiping = inputState.phase === "swiping" || inputState.phase === "tracking";
 
-  // Animation frame handler
-  const handleFrame = React.useCallback(
-    ({ easedProgress }: { easedProgress: number }) => {
-      const element = elementRef.current;
-      const anim = animRef.current;
-      if (!element || !anim) {
-        return;
-      }
-      const value = interpolate(anim.from, anim.to, easedProgress);
-      currentPxRef.current = value;
-      element.style.transform = `${getTransformFn(axis)}(${value}px)`;
-    },
-    [axis],
-  );
-
-  const handleComplete = React.useCallback(() => {
-    animRef.current = null;
-    currentPxRef.current = targetPx;
-  }, [targetPx]);
-
-  const { isAnimating, start, cancel } = useAnimationFrame({
-    duration: animationDuration,
-    easing: easings.easeOutExpo,
-    onFrame: handleFrame,
-    onComplete: handleComplete,
+  // Use shared transform hook for DOM manipulation
+  const { animationDirection } = useSwipeContentTransform({
+    elementRef,
+    targetPx,
+    displacement,
+    isSwiping,
+    axis,
+    animationDuration,
+    containerSize,
   });
 
-  // When swipe ends, animate to target
-  React.useLayoutEffect(() => {
-    // If swiping, don't start animation
-    if (isSwiping) {
-      cancel();
-      animRef.current = null;
-      return;
+  // Compute visibility based on mode
+  const computeVisible = (): boolean => {
+    if (viewportSize !== undefined) {
+      return computeViewportVisibility(targetPx + displacement, containerSize, viewportSize);
     }
-
-    // Check if we need to animate
-    const currentPx = currentPxRef.current;
-    const distance = Math.abs(currentPx - targetPx);
-
-    if (distance > 1) {
-      // Need to animate from current to target
-      // Set animRef BEFORE calling start() so DOM update effect can check it synchronously
-      animRef.current = { from: currentPx, to: targetPx };
-      start();
-    }
-  }, [isSwiping, targetPx, start, cancel]);
-
-  // Direct DOM update
-  React.useLayoutEffect(() => {
-    const element = elementRef.current;
-    if (!element) {
-      return;
-    }
-
-    // Skip if animation is running OR about to start (animRef is set synchronously before start())
-    if (isAnimating || animRef.current !== null) {
-      return;
-    }
-
-    const displayPx = targetPx + displacement;
-    currentPxRef.current = displayPx;
-    element.style.transform = `${getTransformFn(axis)}(${displayPx}px)`;
-  }, [targetPx, displacement, axis, isAnimating]);
-
-  // Determine if this item is animating towards the visible area (position 0)
-  // Use animRef (set synchronously) instead of isAnimating (async state)
-  const getIsAnimatingTowardsView = (): boolean => {
-    if (animRef.current === null) {
-      return false;
-    }
-    const { from, to } = animRef.current;
-    // Check if we're moving towards the center (position 0)
-    return Math.abs(to) < Math.abs(from);
+    return computeAdjacentVisibility(isActive, position, inputState, canNavigate, animationDirection);
   };
+  const visible = computeVisible();
 
-  // Visibility - compute on each render since animRef is a ref
-  const visible = computeVisibility(isActive, position, inputState, canNavigate, getIsAnimatingTowardsView());
-
+  // Update visibility via direct DOM manipulation
   React.useLayoutEffect(() => {
     const element = elementRef.current;
     if (element) {
@@ -193,7 +171,8 @@ export const SwipePivotContent: React.FC<SwipePivotContentProps> = React.memo(({
   }, [visible]);
 
   // Initial transform and visibility to prevent flash of unstyled content
-  const initialTransform = `${getTransformFn(axis)}(${targetPx}px)`;
+  const transformFn = axis === "horizontal" ? "translateX" : "translateY";
+  const initialTransform = `${transformFn}(${targetPx}px)`;
   const initialVisibility = visible ? "visible" : "hidden";
 
   const staticStyle = React.useMemo<React.CSSProperties>(() => ({

@@ -39,8 +39,7 @@ const evaluateSwipeEnd = (
   const absDisplacement = Math.abs(axisDisplacement);
   const absVelocity = Math.abs(axisVelocity);
 
-  const triggered = absDisplacement >= thresholds.distanceThreshold ||
-    absVelocity >= thresholds.velocityThreshold;
+  const triggered = absDisplacement >= thresholds.distanceThreshold || absVelocity >= thresholds.velocityThreshold;
 
   if (triggered) {
     const direction = determineDirection(axisDisplacement);
@@ -120,17 +119,26 @@ export function useSwipeInput(options: UseSwipeInputOptions): UseSwipeInputResul
     if (!container || !enabled) {
       return;
     }
-
-    const handleTouchMove = (event: TouchEvent) => {
+    const disableTouchMove = (event: TouchEvent) => {
+      event.preventDefault();
+    };
+    const handleTouchStart = (event: TouchEvent) => {
       if (isLockedToSwipeAxisRef.current) {
         event.preventDefault();
       }
+      document.addEventListener("touchmove", disableTouchMove, { passive: false });
     };
-
-    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    const handleTouchEnd = () => {
+      document.removeEventListener("touchmove", disableTouchMove);
+    };
+    document.addEventListener("touchend", handleTouchEnd);
+    document.addEventListener("touchcancel", handleTouchEnd);
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
 
     return () => {
-      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchcancel", handleTouchEnd);
     };
   }, [containerRef, enabled]);
 

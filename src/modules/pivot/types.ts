@@ -5,6 +5,13 @@
 import type * as React from "react";
 
 /**
+ * Navigation mode for pivot.
+ * - "linear": Default. Stops at first/last item.
+ * - "loop": Infinite loop. Navigation wraps around.
+ */
+export type PivotNavigationMode = "linear" | "loop";
+
+/**
  * A single content item that can be displayed in a Pivot.
  */
 export type PivotItem<TId extends string = string> = {
@@ -42,6 +49,12 @@ export type UsePivotOptions<TId extends string = string> = {
    * - "none" disables transitions (uses React.Activity for memory optimization).
    */
   transitionMode?: "css" | "none";
+  /**
+   * Navigation mode for pivot.
+   * - "linear" (default): Stops at first/last item.
+   * - "loop": Navigation wraps around (last→first, first→last).
+   */
+  navigationMode?: PivotNavigationMode;
 };
 
 /**
@@ -106,4 +119,21 @@ export type UsePivotResult<TId extends string = string> = {
   isAnimating: boolean;
   /** Call to signal that animation has completed */
   endAnimation: () => void;
+  /** Current navigation mode */
+  navigationMode: PivotNavigationMode;
+  /**
+   * Get the virtual position for an item relative to active.
+   * In loop mode, this wraps: item at index 0 can have position 1 if active is last.
+   * @param id - Item ID to check
+   * @returns -1 (prev), 0 (active), 1 (next), or null if not adjacent
+   */
+  getVirtualPosition: (id: TId) => -1 | 0 | 1 | null;
+  /**
+   * Get the position for any item relative to active.
+   * Unlike getVirtualPosition, returns positions for all items (not just adjacent).
+   * In loop mode, returns the shortest path position (e.g., last→first is +1, not -(count-1)).
+   * @param id - Item ID to check
+   * @returns Position offset from active, or null if item not found
+   */
+  getItemPosition: (id: TId) => number | null;
 };

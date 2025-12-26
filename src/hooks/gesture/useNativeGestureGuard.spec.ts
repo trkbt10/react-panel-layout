@@ -160,7 +160,9 @@ describe("useNativeGestureGuard", () => {
       expect(mockEvent.wasDefaultPrevented()).toBe(false);
     });
 
-    it("does not call preventDefault when not active", () => {
+    it("calls preventDefault even when not active (browser gesture starts immediately)", () => {
+      // Browser gesture recognition starts immediately on pointerdown,
+      // so we must preventDefault before we know if it's "our" gesture
       const containerRef = createRef({ left: 0, right: 300 });
       const { result } = renderHook(() =>
         useNativeGestureGuard({
@@ -181,7 +183,7 @@ describe("useNativeGestureGuard", () => {
         result.current.containerProps.onPointerDown?.(mockEvent);
       });
 
-      expect(mockEvent.wasDefaultPrevented()).toBe(false);
+      expect(mockEvent.wasDefaultPrevented()).toBe(true);
     });
 
     it("does not call preventDefault when preventEdgeBack is false", () => {
@@ -276,6 +278,136 @@ describe("useNativeGestureGuard", () => {
       });
 
       expect(mockEvent.wasDefaultPrevented()).toBe(false);
+    });
+  });
+
+  describe("html overscroll-behavior", () => {
+    beforeEach(() => {
+      // Reset html style before each test
+      document.documentElement.style.overscrollBehavior = "";
+    });
+
+    afterEach(() => {
+      // Clean up after each test
+      document.documentElement.style.overscrollBehavior = "";
+    });
+
+    it("applies overscroll-behavior: none to html synchronously on pointerdown in edge zone", () => {
+      const containerRef = createRef({ left: 0, right: 300 });
+      const { result } = renderHook(() =>
+        useNativeGestureGuard({
+          containerRef,
+          active: false,
+          preventEdgeBack: true,
+          preventOverscroll: true,
+          edgeWidth: 20,
+        }),
+      );
+
+      expect(document.documentElement.style.overscrollBehavior).toBe("");
+
+      const mockEvent = createFakePointerEvent({
+        clientX: 10,
+        clientY: 100,
+        pointerType: "touch",
+      });
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(mockEvent);
+      });
+
+      // Applied synchronously in onPointerDown, not waiting for useEffect
+      expect(document.documentElement.style.overscrollBehavior).toBe("none");
+    });
+
+    it("removes overscroll-behavior from html when deactivated", () => {
+      const containerRef = createRef({ left: 0, right: 300 });
+      const { result, rerender } = renderHook(
+        ({ active }) =>
+          useNativeGestureGuard({
+            containerRef,
+            active,
+            preventEdgeBack: true,
+            preventOverscroll: true,
+            edgeWidth: 20,
+          }),
+        { initialProps: { active: false } },
+      );
+
+      // Simulate pointerdown to apply style
+      const mockEvent = createFakePointerEvent({
+        clientX: 10,
+        clientY: 100,
+        pointerType: "touch",
+      });
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(mockEvent);
+      });
+
+      expect(document.documentElement.style.overscrollBehavior).toBe("none");
+
+      // Simulate gesture becoming active then inactive
+      rerender({ active: true });
+      rerender({ active: false });
+
+      expect(document.documentElement.style.overscrollBehavior).toBe("");
+    });
+
+    it("restores previous overscroll-behavior value on cleanup", () => {
+      document.documentElement.style.overscrollBehavior = "contain";
+
+      const containerRef = createRef({ left: 0, right: 300 });
+      const { result, unmount } = renderHook(() =>
+        useNativeGestureGuard({
+          containerRef,
+          active: false,
+          preventEdgeBack: true,
+          preventOverscroll: true,
+          edgeWidth: 20,
+        }),
+      );
+
+      // Simulate pointerdown to apply style
+      const mockEvent = createFakePointerEvent({
+        clientX: 10,
+        clientY: 100,
+        pointerType: "touch",
+      });
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(mockEvent);
+      });
+
+      expect(document.documentElement.style.overscrollBehavior).toBe("none");
+
+      unmount();
+      expect(document.documentElement.style.overscrollBehavior).toBe("contain");
+    });
+
+    it("does not apply to html when preventOverscroll is false", () => {
+      const containerRef = createRef({ left: 0, right: 300 });
+      const { result } = renderHook(() =>
+        useNativeGestureGuard({
+          containerRef,
+          active: false,
+          preventEdgeBack: true,
+          preventOverscroll: false,
+          edgeWidth: 20,
+        }),
+      );
+
+      const mockEvent = createFakePointerEvent({
+        clientX: 10,
+        clientY: 100,
+        pointerType: "touch",
+      });
+
+      act(() => {
+        result.current.containerProps.onPointerDown?.(mockEvent);
+      });
+
+      expect(document.documentElement.style.overscrollBehavior).toBe("");
     });
   });
 });

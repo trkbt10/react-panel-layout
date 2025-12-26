@@ -28,6 +28,7 @@ const isInLeftEdge = (clientX: number, container: HTMLElement, edgeWidth: number
  * When active, this hook:
  * - Prevents iOS/macOS edge back gesture by capturing pointerdown events in the edge zone
  * - Prevents overscroll bounce effect using CSS overscroll-behavior
+ * - Dynamically applies overscroll-behavior: none to html element during gesture
  *
  * @example
  * ```tsx
@@ -51,9 +52,48 @@ export function useNativeGestureGuard(options: UseNativeGestureGuardOptions): Us
     edgeWidth = DEFAULT_EDGE_WIDTH,
   } = options;
 
+  // Track previous html overscroll-behavior value for restoration
+  const previousHtmlOverscrollRef = React.useRef<string | null>(null);
+
+  // Apply overscroll-behavior to html synchronously (called from onPointerDown)
+  const applyHtmlOverscroll = React.useCallback(() => {
+    if (!preventOverscroll) return;
+
+    const html = document.documentElement;
+    if (previousHtmlOverscrollRef.current === null) {
+      previousHtmlOverscrollRef.current = html.style.overscrollBehavior;
+    }
+    html.style.overscrollBehavior = "none";
+  }, [preventOverscroll]);
+
+  // Remove overscroll-behavior from html when gesture ends
+  React.useEffect(() => {
+    if (active || !preventOverscroll) {
+      return;
+    }
+
+    // Cleanup: restore previous value when deactivated
+    if (previousHtmlOverscrollRef.current !== null) {
+      document.documentElement.style.overscrollBehavior = previousHtmlOverscrollRef.current;
+      previousHtmlOverscrollRef.current = null;
+    }
+  }, [active, preventOverscroll]);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (previousHtmlOverscrollRef.current !== null) {
+        document.documentElement.style.overscrollBehavior = previousHtmlOverscrollRef.current;
+        previousHtmlOverscrollRef.current = null;
+      }
+    };
+  }, []);
+
   // Pointer down handler that prevents edge back gesture
+  // Note: This must run on EVERY pointerdown in edge zone, not just when active,
+  // because browser gesture recognition starts immediately on first touch.
   const onPointerDown = React.useCallback((event: React.PointerEvent) => {
-    if (!active || !preventEdgeBack) {
+    if (!preventEdgeBack) {
       return;
     }
 
@@ -62,14 +102,15 @@ export function useNativeGestureGuard(options: UseNativeGestureGuardOptions): Us
       return;
     }
 
-    // Only prevent for touch events in the left edge zone
+    // Prevent for touch events in the left edge zone
+    // This must happen immediately, before we know if it's "our" gesture
     if (event.pointerType === "touch" && isInLeftEdge(event.clientX, container, edgeWidth)) {
+      // Apply html overscroll-behavior synchronously before browser can recognize gesture
+      applyHtmlOverscroll();
       // Prevent the browser from handling this as a back gesture
-      // This works by setting pointer capture which prevents the browser's gesture recognizer
-      // from taking over the touch
       event.preventDefault();
     }
-  }, [active, preventEdgeBack, containerRef, edgeWidth]);
+  }, [preventEdgeBack, containerRef, edgeWidth, applyHtmlOverscroll]);
 
   // Build container props
   // Styles are applied immediately (not waiting for active) to prevent browser gestures

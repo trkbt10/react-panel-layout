@@ -88,7 +88,7 @@ const PivotOutletInner: React.FC = React.memo(() => {
  * ```
  */
 export function usePivot<TId extends string = string>(options: UsePivotOptions<TId>): UsePivotResult<TId> {
-  const { items, activeId: controlledActiveId, defaultActiveId, onActiveChange, transitionMode = "css" } = options;
+  const { items, activeId: controlledActiveId, defaultActiveId, onActiveChange, transitionMode = "css", navigationMode = "linear" } = options;
 
   const isControlled = controlledActiveId !== undefined;
 
@@ -158,10 +158,27 @@ export function usePivot<TId extends string = string>(options: UsePivotOptions<T
       if (direction === 0) {
         return false;
       }
+      // In loop mode, navigation is always possible if there are 2+ items
+      if (navigationMode === "loop") {
+        return itemCount >= 2;
+      }
+      // Linear mode: check bounds
       const targetIndex = activeIndex + direction;
       return targetIndex >= 0 && targetIndex < itemCount;
     },
-    [activeIndex, itemCount],
+    [activeIndex, itemCount, navigationMode],
+  );
+
+  // Compute target index with optional wrap-around
+  const computeTargetIndex = React.useCallback(
+    (direction: number): number => {
+      const rawIndex = activeIndex + direction;
+      if (navigationMode === "loop") {
+        return ((rawIndex % itemCount) + itemCount) % itemCount;
+      }
+      return rawIndex;
+    },
+    [activeIndex, navigationMode, itemCount],
   );
 
   // Navigate in a direction
@@ -170,13 +187,70 @@ export function usePivot<TId extends string = string>(options: UsePivotOptions<T
       if (!canGo(direction)) {
         return;
       }
-      const targetIndex = activeIndex + direction;
+      const targetIndex = computeTargetIndex(direction);
       const targetItem = enabledItems[targetIndex];
       if (targetItem) {
         setActiveId(targetItem.id, options);
       }
     },
-    [canGo, activeIndex, enabledItems, setActiveId],
+    [canGo, computeTargetIndex, enabledItems, setActiveId],
+  );
+
+  // Get virtual position for an item relative to active (for loop mode support)
+  const getVirtualPosition = React.useCallback(
+    (id: TId): -1 | 0 | 1 | null => {
+      const itemIndex = enabledItems.findIndex((item) => item.id === id);
+      if (itemIndex === -1) {
+        return null;
+      }
+
+      if (navigationMode === "linear") {
+        const rawOffset = itemIndex - activeIndex;
+        if (Math.abs(rawOffset) > 1) {
+          return null;
+        }
+        return rawOffset as -1 | 0 | 1;
+      }
+
+      // Loop mode: find shortest path
+      const forwardDist = ((itemIndex - activeIndex) % itemCount + itemCount) % itemCount;
+      if (forwardDist === 0) {
+        return 0;
+      }
+      if (forwardDist === 1) {
+        return 1; // Item is next
+      }
+      if (itemCount - forwardDist === 1) {
+        return -1; // Item is previous
+      }
+      return null;
+    },
+    [enabledItems, activeIndex, navigationMode, itemCount],
+  );
+
+  // Get position for any item relative to active (for viewport mode)
+  const getItemPosition = React.useCallback(
+    (id: TId): number | null => {
+      const itemIndex = enabledItems.findIndex((item) => item.id === id);
+      if (itemIndex === -1) {
+        return null;
+      }
+
+      if (navigationMode === "linear") {
+        return itemIndex - activeIndex;
+      }
+
+      // Loop mode: find shortest path
+      const forwardDist = ((itemIndex - activeIndex) % itemCount + itemCount) % itemCount;
+      const backwardDist = itemCount - forwardDist;
+
+      // Return the shorter path (prefer forward on tie)
+      if (forwardDist <= backwardDist) {
+        return forwardDist;
+      }
+      return -backwardDist;
+    },
+    [enabledItems, activeIndex, navigationMode, itemCount],
   );
 
   const getItemProps = React.useCallback(
@@ -267,5 +341,5 @@ export function usePivot<TId extends string = string>(options: UsePivotOptions<T
     return OutletComponent;
   }, [contextValue, containerStyle]);
 
-  return { activeId, setActiveId, isActive, getItemProps, Outlet, go, canGo, activeIndex, itemCount, isAnimating, endAnimation };
+  return { activeId, setActiveId, isActive, getItemProps, Outlet, go, canGo, activeIndex, itemCount, isAnimating, endAnimation, navigationMode, getVirtualPosition, getItemPosition };
 }

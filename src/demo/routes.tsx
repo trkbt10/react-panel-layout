@@ -39,6 +39,7 @@ import PV_Sidebar from "./pages/Pivot/sidebar";
 import PV_Transitions from "./pages/Pivot/transitions";
 import PV_Swipe from "./pages/Pivot/swipe";
 import PV_SwipeDebug from "./pages/Pivot/swipe-debug";
+import PV_SwipeTabs from "./pages/Pivot/swipe-tabs";
 
 import ST_Basics from "./pages/Stack/basics";
 import ST_Tablet from "./pages/Stack/tablet";
@@ -166,6 +167,7 @@ export const demoCategories: DemoCategory[] = [
       { id: "sidebar", label: "Sidebar Navigation", path: "sidebar", element: <PV_Sidebar /> },
       { id: "transitions", label: "Transitions", path: "transitions", element: <PV_Transitions /> },
       { id: "swipe", label: "Swipe Navigation", path: "swipe", element: <PV_Swipe /> },
+      { id: "swipe-tabs", label: "Swipe Tabs", path: "swipe-tabs", element: <PV_SwipeTabs /> },
       { id: "swipe-debug", label: "Swipe Debug (iOS)", path: "swipe-debug", element: <PV_SwipeDebug /> },
     ],
   },
