@@ -64,7 +64,7 @@ export default defineConfig({
       ],
     },
     sourcemap: true,
-    // Do not emit CSS files - users should import variables.css directly
+    // Do not emit CSS files - styles use CSS variable fallbacks in TypeScript
     cssCodeSplit: false,
   },
   css: {

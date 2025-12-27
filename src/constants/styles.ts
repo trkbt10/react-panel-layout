@@ -1,12 +1,10 @@
 /**
  * @file Style constants for library components
  *
- * These constants reference CSS variables defined in variables.css.
- * This allows users to override theme values via CSS while maintaining
- * type-safe constants in TypeScript.
+ * All style values are defined here with CSS variable fallbacks.
+ * Users can override these via CSS variables (--rpl-*).
  *
  * All CSS variables use the unified prefix: --rpl- (react-panel-layout)
- * Users can override these via CSS variables (--rpl-*)
  *
  * @example
  * // In your CSS:

@@ -2,9 +2,6 @@
  * @file Main entry point for the React Panel Layout library
  */
 
-// Import CSS variables for theme system
-import "./modules/theme/variables.css";
-
 // ============================================================================
 // Core Type Definitions
 // ============================================================================

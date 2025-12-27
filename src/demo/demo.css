@@ -88,7 +88,7 @@
   --rpl-color-resize-handle-hover: rgba(33, 150, 243, 0.35);
   --rpl-color-resize-handle-active: rgba(33, 150, 243, 0.55);
 
-  /* Library theme defaults (mirrors variables.css for demo completeness) */
+  /* Library theme defaults (override CSS variables as needed) */
   --rpl-color-tab-fg: #d5d7de;
   --rpl-color-tab-active-bg: #2b2d35;
   --rpl-color-tabbar-bg: #1e1f24;
