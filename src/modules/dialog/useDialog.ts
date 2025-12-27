@@ -8,6 +8,7 @@ import type {
   PromptOptions,
   DialogQueueItem,
   UseDialogReturn,
+  UseDialogProps,
 } from "./types";
 import { AlertDialog } from "./AlertDialog";
 
@@ -74,7 +75,8 @@ const normalizePromptOptions = (options: PromptOptions | string): PromptOptions 
  * }
  * ```
  */
-export const useDialog = (): UseDialogReturn => {
+export const useDialog = (props?: UseDialogProps): UseDialogReturn => {
+  const DialogComponent = props?.alertDialogComponent ?? AlertDialog;
   const [state, setState] = React.useState<DialogState>({
     queue: [],
     current: null,
@@ -188,7 +190,7 @@ export const useDialog = (): UseDialogReturn => {
 
     const { type, options } = current;
 
-    return React.createElement(AlertDialog, {
+    return React.createElement(DialogComponent, {
       type,
       visible: true,
       title: options.title,
@@ -201,7 +203,7 @@ export const useDialog = (): UseDialogReturn => {
       onConfirm: handleConfirm,
       onCancel: handleCancel,
     });
-  }, [state.current, handleConfirm, handleCancel]);
+  }, [state.current, handleConfirm, handleCancel, DialogComponent]);
 
   return {
     alert,

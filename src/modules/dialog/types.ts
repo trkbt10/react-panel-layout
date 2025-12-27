@@ -130,6 +130,17 @@ export type UseDialogReturn = {
 };
 
 /**
+ * Props for useDialog hook
+ */
+export type UseDialogProps = {
+  /**
+   * Custom component to render alert/confirm/prompt dialogs.
+   * When provided, replaces the default AlertDialog component.
+   */
+  alertDialogComponent?: React.ComponentType<AlertDialogProps>;
+};
+
+/**
  * Props for AlertDialog component (internal)
  */
 export type AlertDialogProps = {

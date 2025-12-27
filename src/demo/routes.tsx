@@ -30,6 +30,7 @@ import DR_Animations from "./pages/Drawer/animations";
 
 import DL_Modal from "./pages/Dialog/modal";
 import DL_Alerts from "./pages/Dialog/alerts";
+import DL_CustomAlert from "./pages/Dialog/custom-alert";
 
 import PS_Preview from "./pages/PanelSystem/preview";
 import PS_Tabbar from "./pages/PanelSystem/tabbar";
@@ -98,6 +99,7 @@ export const demoCategories: DemoCategory[] = [
     pages: [
       { id: "modal", label: "Modal", path: "modal", element: <DL_Modal /> },
       { id: "alerts", label: "Alert / Confirm / Prompt", path: "alerts", element: <DL_Alerts /> },
+      { id: "custom-alert", label: "Custom Alert Component", path: "custom-alert", element: <DL_CustomAlert /> },
     ],
   },
   {
