@@ -1,6 +1,6 @@
 {
   "name": "react-panel-layout",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "license": "Unlicense",
   "type": "module",
   "main": "dist/index.cjs",
@@ -11,9 +11,6 @@
     "type": "git",
     "url": "git+https://github.com/trkbt10/react-panel-layout.git"
   },
-  "sideEffects": [
-    "**/*.css"
-  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -40,9 +37,36 @@
       "import": "./dist/sticky-header.js",
       "require": "./dist/sticky-header.cjs"
     },
+    "./stack": {
+      "types": "./dist/stack/index.d.ts",
+      "import": "./dist/stack.js",
+      "require": "./dist/stack.cjs"
+    },
+    "./resizer": {
+      "types": "./dist/resizer/index.d.ts",
+      "import": "./dist/resizer.js",
+      "require": "./dist/resizer.cjs"
+    },
+    "./grid": {
+      "types": "./dist/grid/index.d.ts",
+      "import": "./dist/grid.js",
+      "require": "./dist/grid.cjs"
+    },
+    "./window": {
+      "types": "./dist/window/index.d.ts",
+      "import": "./dist/window.js",
+      "require": "./dist/window.cjs"
+    },
+    "./panels": {
+      "types": "./dist/panels/index.d.ts",
+      "import": "./dist/panels.js",
+      "require": "./dist/panels.cjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [
+    "src",
+    "docs",
     "dist",
     "README.md"
   ],

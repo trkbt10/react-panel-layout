@@ -7,6 +7,7 @@ import * as React from "react";
 import { useStackNavigation } from "../../../../modules/stack/useStackNavigation.js";
 import { useStackSwipeInput } from "../../../../modules/stack/useStackSwipeInput.js";
 import { SwipeStackContent } from "../../../../modules/stack/SwipeStackContent.js";
+import { useResizeObserver } from "../../../../hooks/useResizeObserver.js";
 import type { StackPanel } from "../../../../modules/stack/types.js";
 import styles from "./StackTablet.module.css";
 import "../../../styles/stack-themes.css";
@@ -238,7 +239,6 @@ type StackTabletProps = {
 export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
   const sidebarRef = React.useRef<HTMLDivElement>(null);
   const [selectedTheme, setSelectedTheme] = React.useState<StackTheme>(theme);
-  const [containerSize, setContainerSize] = React.useState(0);
 
   const navigation = useStackNavigation({
     panels,
@@ -254,19 +254,8 @@ export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
   });
 
   // Track container size for SwipeStackContent
-  React.useLayoutEffect(() => {
-    const container = sidebarRef.current;
-    if (!container) return;
-
-    const updateSize = () => {
-      setContainerSize(container.clientWidth);
-    };
-    updateSize();
-
-    const observer = new ResizeObserver(updateSize);
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
+  const { rect } = useResizeObserver(sidebarRef, { box: "border-box" });
+  const containerSize = rect?.width ?? 0;
 
   const handleMenuClick = (id: string) => {
     navigation.push(id as (typeof panels)[number]["id"]);

@@ -36,6 +36,11 @@ export default defineConfig({
         floating: resolve(__dirname, "src/floating/index.ts"),
         pivot: resolve(__dirname, "src/pivot/index.ts"),
         "sticky-header": resolve(__dirname, "src/sticky-header/index.ts"),
+        stack: resolve(__dirname, "src/stack/index.ts"),
+        resizer: resolve(__dirname, "src/resizer/index.ts"),
+        grid: resolve(__dirname, "src/grid/index.ts"),
+        window: resolve(__dirname, "src/window/index.ts"),
+        panels: resolve(__dirname, "src/panels/index.ts"),
       },
     },
     rollupOptions: {
