@@ -5,6 +5,7 @@
  * Returns null if the document is the scroll container.
  */
 import * as React from "react";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 /**
  * Check if an element is a scroll container.
@@ -14,12 +15,7 @@ function isScrollContainer(element: Element): boolean {
   const overflowY = style.overflowY;
   const overflowX = style.overflowX;
 
-  return (
-    overflowY === "scroll" ||
-    overflowY === "auto" ||
-    overflowX === "scroll" ||
-    overflowX === "auto"
-  );
+  return overflowY === "scroll" || overflowY === "auto" || overflowX === "scroll" || overflowX === "auto";
 }
 
 /**
@@ -59,12 +55,10 @@ function findScrollContainer(element: Element | null): HTMLElement | null {
  * // scrollContainer is HTMLElement if in nested scroll, null if document scroll
  * ```
  */
-export function useScrollContainer<T extends HTMLElement>(
-  ref: React.RefObject<T | null>,
-): HTMLElement | null {
+export function useScrollContainer<T extends HTMLElement>(ref: React.RefObject<T | null>): HTMLElement | null {
   const [container, setContainer] = React.useState<HTMLElement | null>(null);
 
-  React.useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const element = ref.current;
     if (!element) {
       setContainer(null);

@@ -3,21 +3,19 @@
  */
 import { render } from "@testing-library/react";
 import { SwipeStackOutlet } from "./SwipeStackOutlet.js";
-import type { SwipeInputState } from "../../hooks/gesture/types.js";
+import type { ContinuousOperationState } from "../../hooks/gesture/types.js";
 import type { StackPanel, StackNavigationState } from "./types.js";
 
-const IDLE_STATE: SwipeInputState = {
+const IDLE_STATE: ContinuousOperationState = {
   phase: "idle",
   displacement: { x: 0, y: 0 },
   velocity: { x: 0, y: 0 },
-  direction: 0,
 };
 
-const createSwipingState = (displacementX: number): SwipeInputState => ({
-  phase: "swiping",
+const createOperatingState = (displacementX: number): ContinuousOperationState => ({
+  phase: "operating",
   displacement: { x: displacementX, y: 0 },
   velocity: { x: 0.5, y: 0 },
-  direction: displacementX > 0 ? 1 : displacementX < 0 ? -1 : 0,
 });
 
 const createPanels = (): StackPanel[] => [
@@ -40,7 +38,7 @@ describe("SwipeStackOutlet", () => {
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         />,
       );
@@ -61,7 +59,7 @@ describe("SwipeStackOutlet", () => {
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         />,
       );
@@ -85,7 +83,7 @@ describe("SwipeStackOutlet", () => {
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         />,
       );
@@ -109,7 +107,7 @@ describe("SwipeStackOutlet", () => {
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         />,
       );
@@ -131,13 +129,13 @@ describe("SwipeStackOutlet", () => {
         revealDepth: null,
       };
 
-      const swipeState = createSwipingState(200);
+      const swipeState = createOperatingState(200);
 
       const { container, rerender } = render(
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         />,
       );
@@ -147,7 +145,7 @@ describe("SwipeStackOutlet", () => {
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={swipeState}
+          operationState={swipeState}
           containerSize={400}
         />,
       );
@@ -185,7 +183,7 @@ describe("SwipeStackOutlet", () => {
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           getCachedContent={getCachedContent}
         />,
@@ -210,7 +208,7 @@ describe("SwipeStackOutlet", () => {
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           getCachedContent={getCachedContent}
         />,
@@ -233,7 +231,7 @@ describe("SwipeStackOutlet", () => {
         <SwipeStackOutlet
           panels={createPanels()}
           navigationState={navigationState}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         />,
       );

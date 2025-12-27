@@ -6,7 +6,9 @@
  * - Input: how to command (swipe, click, keyboard)
  * - Presentation: how to show (animation, transition)
  *
- * This file defines types for the Input layer.
+ * This file defines types for the Input layer, including the abstract
+ * ContinuousOperationState that represents any continuous state transition
+ * (whether controlled by human gesture or system animation).
  */
 import type * as React from "react";
 
@@ -16,17 +18,88 @@ import type * as React from "react";
 export type GestureAxis = "horizontal" | "vertical";
 
 /**
- * Phase of swipe input lifecycle.
- */
-export type SwipeInputPhase = "idle" | "tracking" | "swiping" | "ended";
-
-/**
  * 2D vector for displacement and velocity.
  */
 export type Vector2 = {
   x: number;
   y: number;
 };
+
+// ============================================================================
+// Continuous Operation State
+// ============================================================================
+// A continuous operation is any state transition that occurs over time,
+// where progress can be observed incrementally. The controlling agent
+// may be human (gesture) or system (animation).
+
+/**
+ * Phase of a continuous operation lifecycle.
+ * - "idle": No operation in progress
+ * - "operating": Operation is in progress (human or system controlled)
+ * - "ended": Operation has completed
+ */
+export type ContinuousOperationPhase = "idle" | "operating" | "ended";
+
+/**
+ * State of a continuous operation.
+ *
+ * This is the abstract representation of any operation that occurs over time,
+ * whether controlled by human gesture or system animation. Components that
+ * accept this state can respond to both input types uniformly.
+ */
+export type ContinuousOperationState = {
+  /** Current phase of the operation */
+  phase: ContinuousOperationPhase;
+  /** Displacement from start position in pixels */
+  displacement: Vector2;
+  /** Current velocity in pixels per millisecond */
+  velocity: Vector2;
+};
+
+/**
+ * Initial idle state for ContinuousOperationState.
+ */
+export const IDLE_CONTINUOUS_OPERATION_STATE: ContinuousOperationState = {
+  phase: "idle",
+  displacement: { x: 0, y: 0 },
+  velocity: { x: 0, y: 0 },
+};
+
+/**
+ * Convert SwipeInputPhase to ContinuousOperationPhase.
+ * - "idle" → "idle"
+ * - "tracking" | "swiping" → "operating"
+ * - "ended" → "ended"
+ */
+export function toContinuousPhase(phase: SwipeInputPhase): ContinuousOperationPhase {
+  if (phase === "idle") return "idle";
+  if (phase === "ended") return "ended";
+  return "operating";
+}
+
+/**
+ * Convert SwipeInputState to ContinuousOperationState.
+ */
+export function toContinuousOperationState(state: SwipeInputState): ContinuousOperationState {
+  return {
+    phase: toContinuousPhase(state.phase),
+    displacement: state.displacement,
+    velocity: state.velocity,
+  };
+}
+
+// ============================================================================
+// Swipe Input (concrete implementation of continuous operation)
+// ============================================================================
+
+/**
+ * Phase of swipe input lifecycle.
+ * - "idle": No swipe in progress
+ * - "tracking": Pointer down, tracking movement (direction not yet locked)
+ * - "swiping": Direction locked, actively swiping
+ * - "ended": Swipe gesture completed
+ */
+export type SwipeInputPhase = "idle" | "tracking" | "swiping" | "ended";
 
 /**
  * Point with timestamp for velocity calculation.

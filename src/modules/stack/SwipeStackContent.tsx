@@ -9,7 +9,7 @@
  */
 import * as React from "react";
 import { useSwipeContentTransform } from "../../hooks/useSwipeContentTransform.js";
-import type { SwipeInputState, GestureAxis } from "../../hooks/gesture/types.js";
+import type { ContinuousOperationState, GestureAxis } from "../../hooks/gesture/types.js";
 import type { StackDisplayMode } from "./types.js";
 import {
   computeActiveTargetPx,
@@ -28,17 +28,15 @@ const DEFAULT_ANIMATION_DURATION = 300;
 const STACK_SCALE_FACTOR = 0.05;
 
 /**
- * Offset percentage per depth level for "stack" display mode.
- */
-const STACK_OFFSET_PERCENT = 5;
-
-/**
  * Maximum dimming opacity for behind panels in iOS-style navigation.
  */
 const MAX_DIM_OPACITY = 0.1;
 
 /**
  * Props for SwipeStackContent component.
+ *
+ * This component accepts ContinuousOperationState, meaning it responds uniformly
+ * to any continuous operation (whether human gesture or system animation).
  */
 export type SwipeStackContentProps = {
   /** Panel ID */
@@ -49,8 +47,8 @@ export type SwipeStackContentProps = {
   navigationDepth: number;
   /** Whether this panel is currently active */
   isActive: boolean;
-  /** Swipe input state from useStackSwipeInput */
-  inputState: SwipeInputState;
+  /** Continuous operation state (from gesture input or animation system) */
+  operationState: ContinuousOperationState;
   /** Container size in pixels (width for horizontal, height for vertical) */
   containerSize: number;
   /** Gesture axis. @default "horizontal" */
@@ -96,13 +94,13 @@ const BASE_STYLE: React.CSSProperties = {
 };
 
 /**
- * Get displacement from input state for the given axis.
+ * Get displacement from operation state for the given axis.
  */
-const getAxisDisplacement = (inputState: SwipeInputState, axis: GestureAxis): number => {
-  if (inputState.phase === "idle") {
+const getAxisDisplacement = (state: ContinuousOperationState, axis: GestureAxis): number => {
+  if (state.phase === "idle") {
     return 0;
   }
-  return axis === "horizontal" ? inputState.displacement.x : inputState.displacement.y;
+  return axis === "horizontal" ? state.displacement.x : state.displacement.y;
 };
 
 /**
@@ -136,7 +134,7 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
     depth,
     navigationDepth,
     isActive,
-    inputState,
+    operationState,
     containerSize,
     axis = "horizontal",
     behindOffset = DEFAULT_BEHIND_OFFSET,
@@ -148,19 +146,12 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
     children,
   }) => {
     const elementRef = React.useRef<HTMLDivElement>(null);
-    const isFirstMountRef = React.useRef<boolean>(true);
 
-    const displacement = getAxisDisplacement(inputState, axis);
-    const isSwiping = inputState.phase === "swiping" || inputState.phase === "tracking";
+    const displacement = getAxisDisplacement(operationState, axis);
+    const isOperating = operationState.phase === "operating";
 
     // Determine panel role
     const role = determineSwipePanelRole(depth, navigationDepth);
-
-    // Track first mount for push animation
-    const isFirstMount = isFirstMountRef.current;
-    if (isFirstMountRef.current) {
-      isFirstMountRef.current = false;
-    }
 
     // Compute target position based on role
     const targetPx = React.useMemo(() => {
@@ -202,9 +193,11 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
     // When animateOnMount is true and panel is first mounted as "active",
     // it should animate in from off-screen
     // Root panel (depth=0) should not animate on mount
+    // Note: useSwipeContentTransform handles first-mount tracking internally,
+    // so we just declare the initial position; the hook consumes it only once.
     const initialPx = React.useMemo(() => {
-      if (!isFirstMount || !animateOnMount) {
-        return undefined; // Only relevant on first mount with animateOnMount
+      if (!animateOnMount) {
+        return undefined;
       }
       if (role === "active" && depth > 0) {
         // New active panel (not root): start from off-screen right
@@ -212,14 +205,14 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
       }
       // Root panel or other roles: start at their natural position
       return undefined;
-    }, [isFirstMount, animateOnMount, role, depth, containerSize]);
+    }, [animateOnMount, role, depth, containerSize]);
 
     // Use shared transform hook for DOM manipulation
     const { isAnimating } = useSwipeContentTransform({
       elementRef,
       targetPx,
       displacement: panelDisplacement,
-      isSwiping,
+      isOperating,
       axis,
       animationDuration,
       containerSize,
@@ -234,7 +227,7 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
       depth,
       navigationDepth,
       isActive,
-      isSwiping,
+      isOperating,
       isAnimating,
     });
 
@@ -309,7 +302,7 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
 
     // Compute shadow for active panel
     // Shadow is shown on panels at depth > 0 when they're active or animating
-    const shouldShowShadow = showShadow && depth > 0 && role === "active";
+    const shouldShowShadow = showShadow ? depth > 0 && role === "active" : false;
 
     // Static style - transform is handled entirely by useSwipeContentTransform
     // to ensure smooth animations
@@ -349,7 +342,7 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
         style={staticStyle}
       >
         {children}
-        {dimmingStyle != null && <div style={dimmingStyle} data-dimming-overlay />}
+        {dimmingStyle != null ? <div style={dimmingStyle} data-dimming-overlay /> : null}
       </div>
     );
   },

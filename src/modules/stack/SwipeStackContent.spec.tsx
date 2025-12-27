@@ -10,7 +10,7 @@
 import { render, act } from "@testing-library/react";
 import { beforeEach, afterEach, vi } from "vitest";
 import { SwipeStackContent } from "./SwipeStackContent.js";
-import type { SwipeInputState } from "../../hooks/gesture/types.js";
+import type { ContinuousOperationState } from "../../hooks/gesture/types.js";
 
 // Mock requestAnimationFrame for animation testing
 let rafCallbacks: FrameRequestCallback[] = [];
@@ -50,25 +50,16 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-const IDLE_STATE: SwipeInputState = {
+const IDLE_STATE: ContinuousOperationState = {
   phase: "idle",
   displacement: { x: 0, y: 0 },
   velocity: { x: 0, y: 0 },
-  direction: 0,
 };
 
-const createSwipingState = (displacementX: number): SwipeInputState => ({
-  phase: "swiping",
+const createOperatingState = (displacementX: number): ContinuousOperationState => ({
+  phase: "operating",
   displacement: { x: displacementX, y: 0 },
   velocity: { x: 0.5, y: 0 },
-  direction: displacementX > 0 ? 1 : displacementX < 0 ? -1 : 0,
-});
-
-const createTrackingState = (displacementX: number): SwipeInputState => ({
-  phase: "tracking",
-  displacement: { x: displacementX, y: 0 },
-  velocity: { x: 0.1, y: 0 },
-  direction: 0,
 });
 
 describe("SwipeStackContent", () => {
@@ -80,7 +71,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={0}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           <div>Test Content</div>
@@ -97,7 +88,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -118,7 +109,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -138,7 +129,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -156,7 +147,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -174,7 +165,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={createSwipingState(100)}
+          operationState={createOperatingState(100)}
           containerSize={400}
         >
           Content
@@ -194,7 +185,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -208,7 +199,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={createSwipingState(150)}
+          operationState={createOperatingState(150)}
           containerSize={400}
         >
           Content
@@ -226,7 +217,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -240,7 +231,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={createSwipingState(200)}
+          operationState={createOperatingState(200)}
           containerSize={400}
         >
           Content
@@ -261,7 +252,7 @@ describe("SwipeStackContent", () => {
           depth={3}
           navigationDepth={3}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -281,7 +272,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -299,7 +290,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -319,7 +310,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -339,7 +330,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={createTrackingState(50)}
+          operationState={createOperatingState(50)}
           containerSize={400}
         >
           Content
@@ -355,7 +346,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={createSwipingState(100)}
+          operationState={createOperatingState(100)}
           containerSize={400}
         >
           Content
@@ -370,7 +361,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={createSwipingState(250)}
+          operationState={createOperatingState(250)}
           containerSize={400}
         >
           Content
@@ -386,7 +377,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -406,7 +397,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={createSwipingState(100)}
+          operationState={createOperatingState(100)}
           containerSize={400}
         >
           Content
@@ -423,7 +414,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={createSwipingState(200)}
+          operationState={createOperatingState(200)}
           containerSize={400}
         >
           Content
@@ -438,7 +429,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={createSwipingState(400)}
+          operationState={createOperatingState(400)}
           containerSize={400}
         >
           Content
@@ -454,7 +445,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -470,7 +461,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={createSwipingState(-100)}
+          operationState={createOperatingState(-100)}
           containerSize={400}
         >
           Content
@@ -488,7 +479,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -504,7 +495,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={createSwipingState(150)}
+          operationState={createOperatingState(150)}
           containerSize={400}
         >
           Content
@@ -519,7 +510,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -543,7 +534,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -559,7 +550,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={createSwipingState(200)}
+          operationState={createOperatingState(200)}
           containerSize={400}
         >
           Content
@@ -575,7 +566,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -601,7 +592,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -619,7 +610,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={0}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -647,7 +638,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -665,7 +656,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={0}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -697,7 +688,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           animateOnMount={true}
         >
@@ -729,7 +720,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={0}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -747,7 +738,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -775,7 +766,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={0}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -793,7 +784,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -828,7 +819,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           animateOnMount={true}
         >
@@ -857,7 +848,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={0}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           animateOnMount={true}
         >
@@ -889,7 +880,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={0}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -906,7 +897,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -931,7 +922,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={0}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -959,7 +950,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -977,7 +968,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={0}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -995,7 +986,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -1013,7 +1004,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           showShadow={false}
         >
@@ -1034,7 +1025,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           displayMode="stack"
         >
@@ -1054,7 +1045,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           displayMode="stack"
         >
@@ -1074,7 +1065,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           displayMode="overlay"
         >
@@ -1096,7 +1087,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -1114,7 +1105,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -1132,7 +1123,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -1151,7 +1142,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={createSwipingState(400)}
+          operationState={createOperatingState(400)}
           containerSize={400}
         >
           Content
@@ -1170,7 +1161,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
           showDimming={false}
         >
@@ -1191,7 +1182,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={1}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -1209,7 +1200,7 @@ describe("SwipeStackContent", () => {
           depth={1}
           navigationDepth={0}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -1236,7 +1227,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={1}
           isActive={false}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content
@@ -1254,7 +1245,7 @@ describe("SwipeStackContent", () => {
           depth={0}
           navigationDepth={0}
           isActive={true}
-          inputState={IDLE_STATE}
+          operationState={IDLE_STATE}
           containerSize={400}
         >
           Content

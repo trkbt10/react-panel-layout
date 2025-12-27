@@ -5,6 +5,95 @@ import * as React from "react";
 import { renderHook, act } from "@testing-library/react";
 import { useDialogContainer } from "./useDialogContainer";
 
+/**
+ * Mock SyntheticEvent with call tracking.
+ */
+type MockSyntheticEvent = React.SyntheticEvent & {
+  preventDefault: (() => void) & { calls: number };
+};
+
+/**
+ * Creates a mock React.SyntheticEvent with preventDefault tracking.
+ */
+function createMockSyntheticEvent(): MockSyntheticEvent {
+  const noop = (): void => {};
+  const noopBool = (): boolean => false;
+  const element = document.createElement("div");
+
+  const preventDefaultFn = (): void => {
+    preventDefaultFn.calls += 1;
+  };
+  preventDefaultFn.calls = 0;
+
+  return {
+    preventDefault: preventDefaultFn,
+    target: element,
+    currentTarget: element,
+    nativeEvent: new Event("test"),
+    bubbles: true,
+    cancelable: true,
+    defaultPrevented: false,
+    eventPhase: 0,
+    isTrusted: true,
+    isDefaultPrevented: noopBool,
+    stopPropagation: noop,
+    isPropagationStopped: noopBool,
+    persist: noop,
+    timeStamp: Date.now(),
+    type: "test",
+  };
+}
+
+/**
+ * Creates a mock React.MouseEvent for dialog interactions.
+ */
+function createMockMouseEvent(
+  target: EventTarget,
+  currentTarget: EventTarget,
+): React.MouseEvent<HTMLDialogElement> {
+  const noop = (): void => {};
+  const noopBool = (): boolean => false;
+  const nativeEvent = new MouseEvent("click");
+
+  return {
+    target,
+    currentTarget,
+    nativeEvent,
+    bubbles: true,
+    cancelable: true,
+    defaultPrevented: false,
+    eventPhase: 0,
+    isTrusted: true,
+    preventDefault: noop,
+    isDefaultPrevented: noopBool,
+    stopPropagation: noop,
+    isPropagationStopped: noopBool,
+    persist: noop,
+    timeStamp: Date.now(),
+    type: "click",
+    // MouseEvent properties
+    altKey: false,
+    button: 0,
+    buttons: 1,
+    clientX: 0,
+    clientY: 0,
+    ctrlKey: false,
+    metaKey: false,
+    shiftKey: false,
+    getModifierState: noopBool,
+    movementX: 0,
+    movementY: 0,
+    pageX: 0,
+    pageY: 0,
+    relatedTarget: null,
+    screenX: 0,
+    screenY: 0,
+    // UIEvent properties
+    detail: 0,
+    view: window,
+  };
+}
+
 describe("useDialogContainer", () => {
   let mockDialog: HTMLDialogElement;
 
@@ -96,15 +185,13 @@ describe("useDialogContainer", () => {
       }),
     );
 
-    const mockEvent = {
-      preventDefault: vi.fn(),
-    } as unknown as React.SyntheticEvent;
+    const mockEvent = createMockSyntheticEvent();
 
     act(() => {
       result.current.dialogProps.onCancel(mockEvent);
     });
 
-    expect(mockEvent.preventDefault).toHaveBeenCalled();
+    expect(mockEvent.preventDefault.calls).toBeGreaterThan(0);
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -118,15 +205,13 @@ describe("useDialogContainer", () => {
       }),
     );
 
-    const mockEvent = {
-      preventDefault: vi.fn(),
-    } as unknown as React.SyntheticEvent;
+    const mockEvent = createMockSyntheticEvent();
 
     act(() => {
       result.current.dialogProps.onCancel(mockEvent);
     });
 
-    expect(mockEvent.preventDefault).toHaveBeenCalled();
+    expect(mockEvent.preventDefault.calls).toBeGreaterThan(0);
     expect(onClose).not.toHaveBeenCalled();
   });
 
@@ -141,10 +226,7 @@ describe("useDialogContainer", () => {
     );
 
     // Simulate click on dialog element itself (backdrop area)
-    const mockEvent = {
-      target: mockDialog,
-      currentTarget: mockDialog,
-    } as unknown as React.MouseEvent<HTMLDialogElement>;
+    const mockEvent = createMockMouseEvent(mockDialog, mockDialog);
 
     act(() => {
       result.current.dialogProps.onClick(mockEvent);
@@ -163,10 +245,7 @@ describe("useDialogContainer", () => {
       }),
     );
 
-    const mockEvent = {
-      target: mockDialog,
-      currentTarget: mockDialog,
-    } as unknown as React.MouseEvent<HTMLDialogElement>;
+    const mockEvent = createMockMouseEvent(mockDialog, mockDialog);
 
     act(() => {
       result.current.dialogProps.onClick(mockEvent);
@@ -188,10 +267,7 @@ describe("useDialogContainer", () => {
     const contentElement = document.createElement("div");
 
     // Click on content inside dialog
-    const mockEvent = {
-      target: contentElement,
-      currentTarget: mockDialog,
-    } as unknown as React.MouseEvent<HTMLDialogElement>;
+    const mockEvent = createMockMouseEvent(contentElement, mockDialog);
 
     act(() => {
       result.current.dialogProps.onClick(mockEvent);

@@ -6,7 +6,7 @@
  */
 import * as React from "react";
 import { SwipeStackContent } from "./SwipeStackContent.js";
-import type { SwipeInputState } from "../../hooks/gesture/types.js";
+import type { ContinuousOperationState } from "../../hooks/gesture/types.js";
 import type { StackPanel, StackNavigationState } from "./types.js";
 
 const DEFAULT_ANIMATION_DURATION = 300;
@@ -19,8 +19,8 @@ export type SwipeStackOutletProps = {
   panels: ReadonlyArray<StackPanel>;
   /** Current navigation state */
   navigationState: StackNavigationState;
-  /** Swipe input state from useStackSwipeInput */
-  inputState: SwipeInputState;
+  /** Continuous operation state (from gesture input or animation system) */
+  operationState: ContinuousOperationState;
   /** Container size in pixels (width for horizontal swipe) */
   containerSize: number;
   /** Function to get cached content for a panel */
@@ -121,7 +121,7 @@ function getVisiblePanels(
  *     <SwipeStackOutlet
  *       panels={navigation.panels}
  *       navigationState={navigation.state}
- *       inputState={swipeInput.inputState}
+ *       operationState={toContinuousOperationState(swipeInput.inputState)}
  *       containerSize={containerWidth}
  *     />
  *   </div>
@@ -132,7 +132,7 @@ export const SwipeStackOutlet: React.FC<SwipeStackOutletProps> = React.memo(
   ({
     panels,
     navigationState,
-    inputState,
+    operationState,
     containerSize,
     getCachedContent,
     behindOffset,
@@ -202,7 +202,7 @@ export const SwipeStackOutlet: React.FC<SwipeStackOutletProps> = React.memo(
               depth={depth}
               navigationDepth={navigationState.depth}
               isActive={isActive}
-              inputState={inputState}
+              operationState={operationState}
               containerSize={containerSize}
               behindOffset={behindOffset}
               animateOnMount={animateOnMount}

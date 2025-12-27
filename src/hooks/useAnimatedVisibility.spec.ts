@@ -5,8 +5,45 @@
  * 1. アニメーションなし → 即座にdisplay:none
  * 2. アニメーションあり → 完了待ってdisplay:none
  */
+import type * as React from "react";
 import { renderHook, act } from "@testing-library/react";
 import { useAnimatedVisibility } from "./useAnimatedVisibility.js";
+
+/**
+ * Create a mock AnimationEvent for testing.
+ */
+function createMockAnimationEvent(
+  target: EventTarget,
+  currentTarget: EventTarget,
+): React.AnimationEvent {
+  const noop = (): void => {};
+  const noopBool = (): boolean => false;
+  const nativeEvent = {
+    animationName: "test",
+    elapsedTime: 0,
+    pseudoElement: "",
+  } as AnimationEvent;
+  return {
+    target,
+    currentTarget,
+    nativeEvent,
+    bubbles: true,
+    cancelable: false,
+    defaultPrevented: false,
+    eventPhase: 0,
+    isTrusted: true,
+    preventDefault: noop,
+    isDefaultPrevented: noopBool,
+    stopPropagation: noop,
+    isPropagationStopped: noopBool,
+    persist: noop,
+    timeStamp: Date.now(),
+    type: "animationend",
+    animationName: "test",
+    elapsedTime: 0,
+    pseudoElement: "",
+  };
+}
 
 describe("useAnimatedVisibility", () => {
   describe("initial state", () => {
@@ -120,10 +157,7 @@ describe("useAnimatedVisibility", () => {
 
       // Simulate animationend event
       const sharedElement = document.createElement("div");
-      const mockEvent = {
-        target: sharedElement,
-        currentTarget: sharedElement,
-      } as unknown as React.AnimationEvent;
+      const mockEvent = createMockAnimationEvent(sharedElement, sharedElement);
 
       act(() => {
         result.current.props.onAnimationEnd(mockEvent);
@@ -149,10 +183,7 @@ describe("useAnimatedVisibility", () => {
       // Simulate animationend from a child element (target !== currentTarget)
       const parent = document.createElement("div");
       const child = document.createElement("div");
-      const mockEvent = {
-        target: child,
-        currentTarget: parent,
-      } as unknown as React.AnimationEvent;
+      const mockEvent = createMockAnimationEvent(child, parent);
 
       act(() => {
         result.current.props.onAnimationEnd(mockEvent);
@@ -233,10 +264,7 @@ describe("useAnimatedVisibility", () => {
 
       // Fire animationEnd before timeout
       const sharedElement = document.createElement("div");
-      const mockEvent = {
-        target: sharedElement,
-        currentTarget: sharedElement,
-      } as unknown as React.AnimationEvent;
+      const mockEvent = createMockAnimationEvent(sharedElement, sharedElement);
 
       act(() => {
         result.current.props.onAnimationEnd(mockEvent);

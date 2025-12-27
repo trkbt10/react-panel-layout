@@ -6,25 +6,56 @@ import * as React from "react";
 import { SwipePivotContent } from "./SwipePivotContent.js";
 import type { SwipeInputState } from "../../hooks/gesture/types.js";
 
-// Mock Web Animations API for JSDOM
-class MockAnimation {
-  finished: Promise<Animation>;
-  private resolveFinished!: () => void;
+/**
+ * Mock Animation that implements the full Animation interface.
+ * Used to polyfill Web Animations API for JSDOM testing.
+ */
+class MockAnimation implements Animation {
+  currentTime: number | null = 0;
+  effect: AnimationEffect | null = null;
+  id = "";
+  oncancel: ((this: Animation, ev: AnimationPlaybackEvent) => unknown) | null = null;
+  onfinish: ((this: Animation, ev: AnimationPlaybackEvent) => unknown) | null = null;
+  onremove: ((this: Animation, ev: Event) => unknown) | null = null;
+  pending = false;
   playState: AnimationPlayState = "running";
+  playbackRate = 1;
+  replaceState: AnimationReplaceState = "active";
+  startTime: number | null = 0;
+  timeline: AnimationTimeline | null = null;
+
+  finished: Promise<Animation>;
+  ready: Promise<Animation>;
+  private resolveFinished!: (value: Animation) => void;
 
   constructor() {
     this.finished = new Promise((resolve) => {
-      this.resolveFinished = () => resolve(this as unknown as Animation);
+      this.resolveFinished = resolve;
     });
+    this.ready = Promise.resolve(this);
   }
 
-  cancel() {
+  cancel(): void {
     this.playState = "idle";
   }
 
-  finish() {
+  finish(): void {
     this.playState = "finished";
-    this.resolveFinished();
+    this.resolveFinished(this);
+  }
+
+  commitStyles(): void {}
+  pause(): void {}
+  persist(): void {}
+  play(): void {}
+  reverse(): void {}
+  updatePlaybackRate(): void {}
+
+  // EventTarget methods
+  addEventListener(): void {}
+  removeEventListener(): void {}
+  dispatchEvent(): boolean {
+    return true;
   }
 }
 
@@ -33,8 +64,8 @@ describe("SwipePivotContent", () => {
 
   beforeAll(() => {
     originalAnimate = Element.prototype.animate;
-    Element.prototype.animate = function () {
-      return new MockAnimation() as unknown as Animation;
+    Element.prototype.animate = function (): Animation {
+      return new MockAnimation();
     };
   });
 

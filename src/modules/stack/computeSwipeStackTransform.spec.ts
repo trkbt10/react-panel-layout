@@ -106,7 +106,7 @@ describe("computeSwipeVisibility", () => {
         depth: 2,
         navigationDepth: 2,
         isActive: true,
-        isSwiping: false,
+        isOperating: false,
         isAnimating: false,
       }),
     ).toBe(true);
@@ -118,7 +118,7 @@ describe("computeSwipeVisibility", () => {
         depth: 1,
         navigationDepth: 2,
         isActive: false,
-        isSwiping: true,
+        isOperating: true,
         isAnimating: false,
       }),
     ).toBe(true);
@@ -130,7 +130,7 @@ describe("computeSwipeVisibility", () => {
         depth: 1,
         navigationDepth: 2,
         isActive: false,
-        isSwiping: false,
+        isOperating: false,
         isAnimating: true,
       }),
     ).toBe(true);
@@ -142,7 +142,7 @@ describe("computeSwipeVisibility", () => {
         depth: 1,
         navigationDepth: 2,
         isActive: false,
-        isSwiping: false,
+        isOperating: false,
         isAnimating: false,
       }),
     ).toBe(false);
@@ -154,7 +154,7 @@ describe("computeSwipeVisibility", () => {
         depth: 0,
         navigationDepth: 2,
         isActive: false,
-        isSwiping: true,
+        isOperating: true,
         isAnimating: false,
       }),
     ).toBe(false);

@@ -1,10 +1,90 @@
 /**
  * @file Tests for useNativeGestureGuard hook.
  */
-/* eslint-disable custom/no-as-outside-guard -- test requires overrides */
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { useNativeGestureGuard } from "./useNativeGestureGuard.js";
+
+/**
+ * Extended PointerEvent type with test utility method.
+ */
+type TestPointerEvent = React.PointerEvent<HTMLElement> & {
+  wasDefaultPrevented: () => boolean;
+};
+
+/**
+ * Creates a mock PointerEvent that satisfies the React.PointerEvent interface.
+ */
+function createMockPointerEvent(props: {
+  clientX: number;
+  clientY: number;
+  pointerType: string;
+}): TestPointerEvent {
+  const noop = (): void => {};
+  const noopBool = (): boolean => false;
+  const state = { preventDefaultCalled: false };
+
+  const element = document.createElement("div");
+  const nativeEvent = new PointerEvent("pointerdown", {
+    clientX: props.clientX,
+    clientY: props.clientY,
+    pointerType: props.pointerType,
+  });
+
+  return {
+    ...props,
+    // Test utility
+    wasDefaultPrevented: () => state.preventDefaultCalled,
+    // Event target
+    target: element,
+    currentTarget: element,
+    // Native event
+    nativeEvent,
+    // SyntheticEvent properties
+    bubbles: true,
+    cancelable: true,
+    defaultPrevented: false,
+    eventPhase: 0,
+    isTrusted: true,
+    preventDefault: () => {
+      state.preventDefaultCalled = true;
+    },
+    isDefaultPrevented: () => state.preventDefaultCalled,
+    stopPropagation: noop,
+    isPropagationStopped: noopBool,
+    persist: noop,
+    timeStamp: Date.now(),
+    type: "pointerdown",
+    // MouseEvent properties
+    altKey: false,
+    button: 0,
+    buttons: 1,
+    ctrlKey: false,
+    metaKey: false,
+    shiftKey: false,
+    getModifierState: noopBool,
+    movementX: 0,
+    movementY: 0,
+    pageX: props.clientX,
+    pageY: props.clientY,
+    relatedTarget: null,
+    screenX: props.clientX,
+    screenY: props.clientY,
+    // PointerEvent properties
+    height: 1,
+    isPrimary: true,
+    pointerId: 1,
+    pressure: 0.5,
+    tangentialPressure: 0,
+    tiltX: 0,
+    tiltY: 0,
+    twist: 0,
+    width: 1,
+    // UIEvent properties
+    detail: 0,
+    view: window,
+  };
+}
 
 describe("useNativeGestureGuard", () => {
   const createRef = (rect: Partial<DOMRect> = {}): React.RefObject<HTMLDivElement> => {
@@ -23,26 +103,6 @@ describe("useNativeGestureGuard", () => {
     // Override getBoundingClientRect directly instead of using vi.spyOn
     element.getBoundingClientRect = () => ({ ...defaultRect, ...rect });
     return { current: element };
-  };
-
-  /**
-   * Creates a fake pointer event with preventDefault tracking.
-   * Uses an object to track state instead of let variable.
-   */
-  const createFakePointerEvent = (props: {
-    clientX: number;
-    clientY: number;
-    pointerType: string;
-  }) => {
-    const state = { preventDefaultCalled: false };
-    const event = {
-      ...props,
-      preventDefault: () => {
-        state.preventDefaultCalled = true;
-      },
-      wasDefaultPrevented: () => state.preventDefaultCalled,
-    };
-    return event as unknown as React.PointerEvent<HTMLElement> & { wasDefaultPrevented: () => boolean };
   };
 
   describe("overscroll behavior", () => {
@@ -99,7 +159,7 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 10, // Within 20px edge zone
         clientY: 100,
         pointerType: "touch",
@@ -123,7 +183,7 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 50, // Outside 20px edge zone
         clientY: 100,
         pointerType: "touch",
@@ -147,7 +207,7 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 10, // Within edge zone
         clientY: 100,
         pointerType: "mouse", // Not touch
@@ -173,7 +233,7 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 10,
         clientY: 100,
         pointerType: "touch",
@@ -227,7 +287,7 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEventInCustomEdge = createFakePointerEvent({
+      const mockEventInCustomEdge = createMockPointerEvent({
         clientX: 40, // Within 50px edge, but outside default 20px
         clientY: 100,
         pointerType: "touch",
@@ -266,7 +326,7 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 10,
         clientY: 100,
         pointerType: "touch",
@@ -306,7 +366,7 @@ describe("useNativeGestureGuard", () => {
 
       expect(document.documentElement.style.overscrollBehavior).toBe("");
 
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 10,
         clientY: 100,
         pointerType: "touch",
@@ -335,7 +395,7 @@ describe("useNativeGestureGuard", () => {
       );
 
       // Simulate pointerdown to apply style
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 10,
         clientY: 100,
         pointerType: "touch",
@@ -369,7 +429,7 @@ describe("useNativeGestureGuard", () => {
       );
 
       // Simulate pointerdown to apply style
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 10,
         clientY: 100,
         pointerType: "touch",
@@ -397,7 +457,7 @@ describe("useNativeGestureGuard", () => {
         }),
       );
 
-      const mockEvent = createFakePointerEvent({
+      const mockEvent = createMockPointerEvent({
         clientX: 10,
         clientY: 100,
         pointerType: "touch",

@@ -85,7 +85,7 @@ export type ComputeSwipeVisibilityInput = {
   /** Whether this panel is currently active */
   isActive: boolean;
   /** Whether swipe gesture is active */
-  isSwiping: boolean;
+  isOperating: boolean;
   /** Whether snap-back animation is running */
   isAnimating: boolean;
 };
@@ -100,7 +100,7 @@ export type ComputeSwipeVisibilityInput = {
  * @returns true if panel should be visible
  */
 export function computeSwipeVisibility(input: ComputeSwipeVisibilityInput): boolean {
-  const { depth, navigationDepth, isActive, isSwiping, isAnimating } = input;
+  const { depth, navigationDepth, isActive, isOperating, isAnimating } = input;
 
   // Active panel is always visible
   if (isActive) {
@@ -110,7 +110,7 @@ export function computeSwipeVisibility(input: ComputeSwipeVisibilityInput): bool
   // Behind panel (one level back) is visible during swipe or animation
   const isBehindPanel = depth === navigationDepth - 1;
   if (isBehindPanel) {
-    if (isSwiping) {
+    if (isOperating) {
       return true;
     }
     if (isAnimating) {

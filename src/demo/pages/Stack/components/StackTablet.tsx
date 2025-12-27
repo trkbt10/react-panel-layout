@@ -8,6 +8,7 @@ import { useStackNavigation } from "../../../../modules/stack/useStackNavigation
 import { useStackSwipeInput } from "../../../../modules/stack/useStackSwipeInput.js";
 import { SwipeStackContent } from "../../../../modules/stack/SwipeStackContent.js";
 import { useResizeObserver } from "../../../../hooks/useResizeObserver.js";
+import { toContinuousOperationState } from "../../../../hooks/gesture/types.js";
 import type { StackPanel } from "../../../../modules/stack/types.js";
 import styles from "./StackTablet.module.css";
 import "../../../styles/stack-themes.css";
@@ -339,7 +340,7 @@ export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
                 depth={panelDepth}
                 navigationDepth={depth}
                 isActive={isActive}
-                inputState={inputState}
+                operationState={toContinuousOperationState(inputState)}
                 containerSize={containerSize}
                 animateOnMount={true}
                 animationDuration={THEME_DURATIONS[selectedTheme]}

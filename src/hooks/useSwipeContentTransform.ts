@@ -23,7 +23,7 @@ export type UseSwipeContentTransformOptions = {
   /** Current swipe displacement in pixels */
   displacement: number;
   /** Whether swipe gesture is active */
-  isSwiping: boolean;
+  isOperating: boolean;
   /** Axis of transformation */
   axis?: GestureAxis;
   /** Duration of snap animation in ms */
@@ -74,6 +74,100 @@ const getTransformFn = (axis: GestureAxis): "translateX" | "translateY" => {
 };
 
 /**
+ * Check if initial mount animation should be scheduled.
+ * Returns animation info if conditions are met, null otherwise.
+ *
+ * Conditions for scheduling:
+ * 1. Animation not already consumed
+ * 2. containerSize is valid (> 0) - handles React effect execution order
+ * 3. initialPx is provided
+ * 4. initialPx differs from targetPx
+ */
+const computeInitialMountAnimation = (
+  hasConsumed: boolean,
+  containerSize: number | undefined,
+  initialPx: number | undefined,
+  targetPx: number,
+): { from: number; to: number } | null => {
+  if (hasConsumed) {
+    return null;
+  }
+  if (containerSize === undefined) {
+    return null;
+  }
+  if (containerSize <= 0) {
+    return null;
+  }
+  if (initialPx === undefined) {
+    return null;
+  }
+  if (initialPx === targetPx) {
+    return null;
+  }
+  return { from: initialPx, to: targetPx };
+};
+
+/**
+ * Result type for target change handling.
+ */
+type TargetChangeResult =
+  | { type: "animate"; animation: { from: number; to: number } }
+  | { type: "snap"; position: number }
+  | { type: "none" };
+
+/**
+ * Compute action for target position change when not swiping.
+ * Returns the appropriate action: animate, snap, or none.
+ */
+const computeTargetChangeAction = (
+  targetPx: number,
+  prevTargetPx: number,
+  currentPx: number,
+  isOperating: boolean,
+  isAnimating: boolean,
+  animateOnTargetChange: boolean,
+): TargetChangeResult => {
+  if (targetPx === prevTargetPx) {
+    return { type: "none" };
+  }
+  if (isOperating) {
+    return { type: "none" };
+  }
+  if (isAnimating) {
+    return { type: "none" };
+  }
+  if (!animateOnTargetChange) {
+    return { type: "snap", position: targetPx };
+  }
+  const distance = Math.abs(currentPx - targetPx);
+  if (distance <= 1) {
+    return { type: "snap", position: targetPx };
+  }
+  return { type: "animate", animation: { from: currentPx, to: targetPx } };
+};
+
+/**
+ * Check if container size change requires position snap.
+ * Returns the new position to snap to, or null if no snap needed.
+ */
+const computeContainerResizeSnap = (
+  containerSize: number | undefined,
+  prevContainerSize: number | undefined,
+  targetPx: number,
+): number | null => {
+  if (containerSize === undefined) {
+    return null;
+  }
+  if (containerSize === prevContainerSize) {
+    return null;
+  }
+  if (containerSize <= 0) {
+    return null;
+  }
+  return targetPx;
+};
+
+/**
  * Hook for DOM-based swipe content transform.
  *
  * During swipe: immediately updates element.style.transform to follow finger.
@@ -86,7 +180,7 @@ const getTransformFn = (axis: GestureAxis): "translateX" | "translateY" => {
  *   elementRef: containerRef,
  *   targetPx: 0,
  *   displacement: inputState.displacement.x,
- *   isSwiping: inputState.phase === "swiping",
+ *   isOperating: inputState.phase === "swiping",
  * });
  * ```
  */
@@ -97,7 +191,7 @@ export function useSwipeContentTransform(
     elementRef,
     targetPx,
     displacement,
-    isSwiping,
+    isOperating,
     axis = "horizontal",
     animationDuration = DEFAULT_ANIMATION_DURATION,
     containerSize,
@@ -112,36 +206,46 @@ export function useSwipeContentTransform(
   const prevTargetPxRef = React.useRef<number>(targetPx);
   const prevContainerSizeRef = React.useRef<number | undefined>(containerSize);
   const pendingAnimationRef = React.useRef<{ from: number; to: number } | null>(null);
-  const isFirstMountRef = React.useRef<boolean>(true);
+  // Track if initial mount animation has been consumed
+  const hasConsumedInitialMountRef = React.useRef<boolean>(false);
 
-  // Schedule animation on first mount if initialPx differs from targetPx
-  if (isFirstMountRef.current && initialPx !== undefined && initialPx !== targetPx) {
-    pendingAnimationRef.current = { from: initialPx, to: targetPx };
-    isFirstMountRef.current = false;
-  } else if (isFirstMountRef.current) {
-    isFirstMountRef.current = false;
+  // Schedule animation on first mount if initialPx differs from targetPx.
+  const initialMountAnimation = computeInitialMountAnimation(
+    hasConsumedInitialMountRef.current,
+    containerSize,
+    initialPx,
+    targetPx,
+  );
+  if (initialMountAnimation !== null) {
+    pendingAnimationRef.current = initialMountAnimation;
+    hasConsumedInitialMountRef.current = true;
   }
 
   // Handle target changes when not swiping
-  if (targetPx !== prevTargetPxRef.current && !isSwiping && animRef.current === null) {
-    if (animateOnTargetChange) {
-      // Schedule animation from current position to new target
-      const distance = Math.abs(currentPxRef.current - targetPx);
-      if (distance > 1) {
-        pendingAnimationRef.current = { from: currentPxRef.current, to: targetPx };
-      } else {
-        currentPxRef.current = targetPx;
-      }
-    } else {
-      // Snap immediately (default behavior for resize, etc.)
-      currentPxRef.current = targetPx;
-    }
+  const targetChangeAction = computeTargetChangeAction(
+    targetPx,
+    prevTargetPxRef.current,
+    currentPxRef.current,
+    isOperating,
+    animRef.current !== null,
+    animateOnTargetChange,
+  );
+  if (targetChangeAction.type === "animate") {
+    pendingAnimationRef.current = targetChangeAction.animation;
+    prevTargetPxRef.current = targetPx;
+  } else if (targetChangeAction.type === "snap") {
+    currentPxRef.current = targetChangeAction.position;
     prevTargetPxRef.current = targetPx;
   }
 
   // Snap when container size changes (resize)
-  if (containerSize !== undefined && containerSize !== prevContainerSizeRef.current && containerSize > 0) {
-    currentPxRef.current = targetPx;
+  const resizeSnapPosition = computeContainerResizeSnap(
+    containerSize,
+    prevContainerSizeRef.current,
+    targetPx,
+  );
+  if (resizeSnapPosition !== null) {
+    currentPxRef.current = resizeSnapPosition;
     prevContainerSizeRef.current = containerSize;
   }
 
@@ -175,7 +279,7 @@ export function useSwipeContentTransform(
 
   // When swipe ends or target changes with animateOnTargetChange, animate to target
   React.useLayoutEffect(() => {
-    if (isSwiping) {
+    if (isOperating) {
       cancel();
       animRef.current = null;
       pendingAnimationRef.current = null;
@@ -208,7 +312,7 @@ export function useSwipeContentTransform(
       currentPxRef.current = targetPx;
       prevTargetPxRef.current = targetPx;
     }
-  }, [isSwiping, targetPx, start, cancel]);
+  }, [isOperating, targetPx, start, cancel]);
 
   // Direct DOM update during swipe
   React.useLayoutEffect(() => {
@@ -218,7 +322,13 @@ export function useSwipeContentTransform(
     }
 
     // Skip if animation is running, about to start, or pending
-    if (isAnimating || animRef.current !== null || pendingAnimationRef.current !== null) {
+    if (isAnimating) {
+      return;
+    }
+    if (animRef.current !== null) {
+      return;
+    }
+    if (pendingAnimationRef.current !== null) {
       return;
     }
 

@@ -1,12 +1,17 @@
 /**
  * @file Stack Navigation demo - iOS-style hierarchical navigation
+ * Uses SwipeStackContent for direct DOM manipulation during swipe gestures.
  */
 import * as React from "react";
 import { useStackNavigation } from "../../../../modules/stack/useStackNavigation.js";
 import { useStackSwipeInput } from "../../../../modules/stack/useStackSwipeInput.js";
-import { StackContent } from "../../../../modules/stack/StackContent.js";
+import { SwipeStackContent } from "../../../../modules/stack/SwipeStackContent.js";
+import { useResizeObserver } from "../../../../hooks/useResizeObserver.js";
+import { toContinuousOperationState } from "../../../../hooks/gesture/types.js";
 import type { StackPanel } from "../../../../modules/stack/types.js";
 import styles from "./Stack.module.css";
+
+const ANIMATION_DURATION = 300;
 
 const panels: StackPanel[] = [
   {
@@ -61,15 +66,68 @@ export const StackBasics: React.FC = () => {
   const navigation = useStackNavigation({
     panels,
     displayMode: "overlay",
-    transitionMode: "css",
+    transitionMode: "none", // Using direct DOM manipulation
   });
 
-  const { isEdgeSwiping, progress, containerProps } = useStackSwipeInput({
+  const { isEdgeSwiping, progress, inputState, containerProps } = useStackSwipeInput({
     containerRef,
     navigation,
     edge: "left",
     edgeWidth: 30,
   });
+
+  // Track container size for SwipeStackContent
+  const { rect } = useResizeObserver(containerRef, { box: "border-box" });
+  const containerSize = rect?.width ?? 0;
+
+  const { stack, depth } = navigation.state;
+
+  // Track exiting panel when navigating back
+  const [exitingPanelId, setExitingPanelId] = React.useState<string | null>(null);
+  const prevDepthRef = React.useRef(depth);
+  const prevStackRef = React.useRef<ReadonlyArray<string>>(stack);
+
+  // Detect when we navigate back and need to animate out
+  React.useLayoutEffect(() => {
+    const prevDepth = prevDepthRef.current;
+    const prevStack = prevStackRef.current;
+
+    // Update refs
+    prevDepthRef.current = depth;
+    prevStackRef.current = stack;
+
+    // Check if we went back (depth decreased)
+    if (depth < prevDepth) {
+      // The panel at prevDepth is exiting
+      const exitingId = prevStack[prevDepth];
+      if (exitingId != null) {
+        setExitingPanelId(exitingId);
+
+        // Clear exiting panel after animation completes
+        const timeoutId = setTimeout(() => {
+          setExitingPanelId(null);
+        }, ANIMATION_DURATION);
+
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [depth, stack]);
+
+  // Get visible panel IDs: active + behind (for swipe reveal) + exiting (for back animation)
+  const visiblePanelIds = React.useMemo(() => {
+    const ids: string[] = [];
+    // Behind panel (if exists)
+    if (depth > 0) {
+      ids.push(stack[depth - 1]);
+    }
+    // Active panel
+    ids.push(stack[depth]);
+    // Include exiting panel if not already in the list
+    if (exitingPanelId != null && !ids.includes(exitingPanelId)) {
+      ids.push(exitingPanelId);
+    }
+    return ids;
+  }, [stack, depth, exitingPanelId]);
 
   const handleItemClick = (item: typeof listItems[0]) => {
     setSelectedItem(item);
@@ -113,97 +171,90 @@ export const StackBasics: React.FC = () => {
         className={styles.stackContainer}
         {...containerProps}
       >
-        {/* List Panel */}
-        <StackContent
-          id="list"
-          depth={0}
-          isActive={navigation.currentPanelId === "list"}
-          displayMode="overlay"
-          transitionMode="css"
-          navigationState={navigation.state}
-          swipeProgress={navigation.currentPanelId === "list" ? progress : undefined}
-        >
-          <div className={styles.panel}>
-            <ul className={styles.list}>
-              {listItems.map((item) => (
-                <li key={item.id} className={styles.listItem}>
-                  <button
-                    className={styles.listItemButton}
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <span className={styles.listItemName}>{item.name}</span>
-                    <span className={styles.listItemDesc}>{item.description}</span>
-                    <span className={styles.chevron}>→</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </StackContent>
+        {visiblePanelIds.map((panelId) => {
+          const isExiting = panelId === exitingPanelId;
+          // For exiting panels, use depth + 1 since they were previously at the active position
+          const panelDepth = isExiting ? depth + 1 : stack.indexOf(panelId);
+          const isActive = panelDepth === depth && !isExiting;
 
-        {/* Detail Panel */}
-        <StackContent
-          id="detail"
-          depth={1}
-          isActive={navigation.currentPanelId === "detail"}
-          displayMode="overlay"
-          transitionMode="css"
-          navigationState={navigation.state}
-          swipeProgress={navigation.currentPanelId === "detail" ? progress : undefined}
-        >
-          <div className={styles.panel}>
-            <div className={styles.detailContent}>
-              <h2>{selectedItem?.name}</h2>
-              <p>{selectedItem?.description}</p>
-              <div className={styles.detailMeta}>
-                <span>ID: {selectedItem?.id}</span>
-              </div>
-              <p className={styles.hint}>
-                Swipe from the left edge to go back, or tap the Back button.
-              </p>
-            </div>
-          </div>
-        </StackContent>
-
-        {/* Edit Panel */}
-        <StackContent
-          id="edit"
-          depth={2}
-          isActive={navigation.currentPanelId === "edit"}
-          displayMode="overlay"
-          transitionMode="css"
-          navigationState={navigation.state}
-          swipeProgress={navigation.currentPanelId === "edit" ? progress : undefined}
-        >
-          <div className={styles.panel}>
-            <div className={styles.editContent}>
-              <h2>Edit {selectedItem?.name}</h2>
-              <div className={styles.form}>
-                <label className={styles.label}>
-                  Name
-                  <input
-                    type="text"
-                    className={styles.input}
-                    defaultValue={selectedItem?.name}
-                  />
-                </label>
-                <label className={styles.label}>
-                  Description
-                  <textarea
-                    className={styles.textarea}
-                    defaultValue={selectedItem?.description}
-                  />
-                </label>
-              </div>
-              <button
-                className={styles.saveButton}
-                onClick={() => navigation.go(-1)}
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </StackContent>
+          return (
+            <SwipeStackContent
+              key={panelId}
+              id={panelId}
+              depth={panelDepth}
+              navigationDepth={depth}
+              isActive={isActive}
+              operationState={toContinuousOperationState(inputState)}
+              containerSize={containerSize}
+              animateOnMount={true}
+              animationDuration={ANIMATION_DURATION}
+              displayMode="overlay"
+            >
+              {panelId === "list" && (
+                <div className={styles.panel}>
+                  <ul className={styles.list}>
+                    {listItems.map((item) => (
+                      <li key={item.id} className={styles.listItem}>
+                        <button
+                          className={styles.listItemButton}
+                          onClick={() => handleItemClick(item)}
+                        >
+                          <span className={styles.listItemName}>{item.name}</span>
+                          <span className={styles.listItemDesc}>{item.description}</span>
+                          <span className={styles.chevron}>→</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {panelId === "detail" && (
+                <div className={styles.panel}>
+                  <div className={styles.detailContent}>
+                    <h2>{selectedItem?.name}</h2>
+                    <p>{selectedItem?.description}</p>
+                    <div className={styles.detailMeta}>
+                      <span>ID: {selectedItem?.id}</span>
+                    </div>
+                    <p className={styles.hint}>
+                      Swipe from the left edge to go back, or tap the Back button.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {panelId === "edit" && (
+                <div className={styles.panel}>
+                  <div className={styles.editContent}>
+                    <h2>Edit {selectedItem?.name}</h2>
+                    <div className={styles.form}>
+                      <label className={styles.label}>
+                        Name
+                        <input
+                          type="text"
+                          className={styles.input}
+                          defaultValue={selectedItem?.name}
+                        />
+                      </label>
+                      <label className={styles.label}>
+                        Description
+                        <textarea
+                          className={styles.textarea}
+                          defaultValue={selectedItem?.description}
+                        />
+                      </label>
+                    </div>
+                    <button
+                      className={styles.saveButton}
+                      onClick={() => navigation.go(-1)}
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              )}
+            </SwipeStackContent>
+          );
+        })}
       </div>
 
       {/* Debug info */}

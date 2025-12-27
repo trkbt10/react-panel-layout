@@ -140,14 +140,14 @@ export const SwipePivotContent: React.FC<SwipePivotContentProps> = React.memo(({
 
   const targetPx = position * containerSize;
   const displacement = getAxisDisplacement(inputState, axis);
-  const isSwiping = inputState.phase === "swiping" || inputState.phase === "tracking";
+  const isOperating = inputState.phase === "swiping" || inputState.phase === "tracking";
 
   // Use shared transform hook for DOM manipulation
   const { animationDirection } = useSwipeContentTransform({
     elementRef,
     targetPx,
     displacement,
-    isSwiping,
+    isOperating,
     axis,
     animationDuration,
     containerSize,

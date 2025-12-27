@@ -4,7 +4,82 @@
  * Provides a fluent API for simulating pointer events in tests,
  * making it easier to test swipe and drag gestures.
  */
+import type * as React from "react";
 import { act } from "@testing-library/react";
+
+/**
+ * Creates a complete mock React.PointerEvent with all required properties.
+ */
+function createFullPointerEvent(
+  type: string,
+  x: number,
+  y: number,
+  pointerId: number,
+  pointerType: string,
+): React.PointerEvent {
+  const noop = (): void => {};
+  const noopBool = (): boolean => false;
+
+  const element = document.createElement("div");
+  const nativeEvent = new PointerEvent(type, {
+    clientX: x,
+    clientY: y,
+    pointerId,
+    pointerType,
+  });
+
+  return {
+    clientX: x,
+    clientY: y,
+    pointerId,
+    pointerType,
+    isPrimary: true,
+    button: 0,
+    preventDefault: noop,
+    stopPropagation: noop,
+    // Event target
+    target: element,
+    currentTarget: element,
+    // Native event
+    nativeEvent,
+    // SyntheticEvent properties
+    bubbles: true,
+    cancelable: true,
+    defaultPrevented: false,
+    eventPhase: 0,
+    isTrusted: true,
+    isDefaultPrevented: noopBool,
+    isPropagationStopped: noopBool,
+    persist: noop,
+    timeStamp: Date.now(),
+    type,
+    // MouseEvent properties
+    altKey: false,
+    buttons: 1,
+    ctrlKey: false,
+    metaKey: false,
+    shiftKey: false,
+    getModifierState: noopBool,
+    movementX: 0,
+    movementY: 0,
+    pageX: x,
+    pageY: y,
+    relatedTarget: null,
+    screenX: x,
+    screenY: y,
+    // PointerEvent properties
+    height: 1,
+    pressure: 0.5,
+    tangentialPressure: 0,
+    tiltX: 0,
+    tiltY: 0,
+    twist: 0,
+    width: 1,
+    // UIEvent properties
+    detail: 0,
+    view: window,
+  };
+}
 
 /**
  * 2D point for gesture coordinates.
@@ -219,16 +294,7 @@ export function createGestureSimulator(options: GestureSimulatorOptions = {}): G
     x: number,
     y: number,
   ): React.PointerEvent => {
-    return {
-      clientX: x,
-      clientY: y,
-      pointerId,
-      pointerType,
-      isPrimary: true,
-      button: 0,
-      preventDefault: () => {},
-      stopPropagation: () => {},
-    } as unknown as React.PointerEvent;
+    return createFullPointerEvent(type, x, y, pointerId, pointerType);
   };
 
   return {

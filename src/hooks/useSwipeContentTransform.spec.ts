@@ -17,7 +17,7 @@ describe("useSwipeContentTransform", () => {
         elementRef: ref,
         targetPx: 0,
         displacement: 0,
-        isSwiping: false,
+        isOperating: false,
       }),
     );
 
@@ -28,20 +28,20 @@ describe("useSwipeContentTransform", () => {
   it("updates element transform during swipe", () => {
     const { element, ref } = createMockElementRef();
     const { rerender } = renderHook(
-      ({ displacement, isSwiping }) =>
+      ({ displacement, isOperating }) =>
         useSwipeContentTransform({
           elementRef: ref,
           targetPx: 0,
           displacement,
-          isSwiping,
+          isOperating,
         }),
       {
-        initialProps: { displacement: 0, isSwiping: true },
+        initialProps: { displacement: 0, isOperating: true },
       },
     );
 
     // Simulate swipe movement
-    rerender({ displacement: 100, isSwiping: true });
+    rerender({ displacement: 100, isOperating: true });
 
     expect(element.style.transform).toBe("translateX(100px)");
   });
@@ -49,20 +49,20 @@ describe("useSwipeContentTransform", () => {
   it("uses correct transform function for vertical axis", () => {
     const { element, ref } = createMockElementRef();
     const { rerender } = renderHook(
-      ({ displacement, isSwiping }) =>
+      ({ displacement, isOperating }) =>
         useSwipeContentTransform({
           elementRef: ref,
           targetPx: 0,
           displacement,
-          isSwiping,
+          isOperating,
           axis: "vertical",
         }),
       {
-        initialProps: { displacement: 0, isSwiping: true },
+        initialProps: { displacement: 0, isOperating: true },
       },
     );
 
-    rerender({ displacement: 50, isSwiping: true });
+    rerender({ displacement: 50, isOperating: true });
 
     expect(element.style.transform).toBe("translateY(50px)");
   });
@@ -70,20 +70,20 @@ describe("useSwipeContentTransform", () => {
   it("applies target position with displacement", () => {
     const { element, ref } = createMockElementRef();
     const { rerender } = renderHook(
-      ({ displacement, isSwiping }) =>
+      ({ displacement, isOperating }) =>
         useSwipeContentTransform({
           elementRef: ref,
           targetPx: -300, // target is off-screen left
           displacement,
-          isSwiping,
+          isOperating,
         }),
       {
-        initialProps: { displacement: 0, isSwiping: true },
+        initialProps: { displacement: 0, isOperating: true },
       },
     );
 
     // During swipe, position = targetPx + displacement
-    rerender({ displacement: 100, isSwiping: true });
+    rerender({ displacement: 100, isOperating: true });
 
     expect(element.style.transform).toBe("translateX(-200px)");
   });
@@ -92,21 +92,21 @@ describe("useSwipeContentTransform", () => {
     const nullRef: React.RefObject<HTMLElement | null> = { current: null };
 
     const { rerender } = renderHook(
-      ({ displacement, isSwiping }) =>
+      ({ displacement, isOperating }) =>
         useSwipeContentTransform({
           elementRef: nullRef,
           targetPx: 0,
           displacement,
-          isSwiping,
+          isOperating,
         }),
       {
-        initialProps: { displacement: 0, isSwiping: true },
+        initialProps: { displacement: 0, isOperating: true },
       },
     );
 
     // Should not throw
     expect(() => {
-      rerender({ displacement: 100, isSwiping: true });
+      rerender({ displacement: 100, isOperating: true });
     }).not.toThrow();
   });
 
@@ -118,7 +118,7 @@ describe("useSwipeContentTransform", () => {
           elementRef: ref,
           targetPx,
           displacement: 0,
-          isSwiping: false,
+          isOperating: false,
         }),
       {
         initialProps: { targetPx: 0 },
