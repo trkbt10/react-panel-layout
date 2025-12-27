@@ -259,3 +259,22 @@ export const SPLIT_HANDLE_THICKNESS = SIZE_SPLIT_HANDLE_THICKNESS;
  */
 export const HORIZONTAL_DIVIDER_WIDTH = "var(--rpl-size-horizontal-divider-width, 4px)";
 export const HORIZONTAL_DIVIDER_HIT_AREA_OFFSET = "var(--rpl-space-horizontal-divider-hit-area-offset, 4px)";
+
+/**
+ * Modal
+ */
+export const COLOR_MODAL_BACKDROP = "var(--rpl-color-modal-backdrop, rgba(0, 0, 0, 0.5))";
+export const MODAL_TRANSITION_DURATION = "var(--rpl-modal-transition-duration, 200ms)";
+export const MODAL_TRANSITION_EASING = "var(--rpl-modal-transition-easing, ease-out)";
+export const MODAL_MIN_WIDTH = "var(--rpl-modal-min-width, 280px)";
+export const MODAL_MAX_WIDTH = "var(--rpl-modal-max-width, 90vw)";
+export const MODAL_MAX_HEIGHT = "var(--rpl-modal-max-height, 85vh)";
+
+/**
+ * Alert Dialog
+ */
+export const ALERT_DIALOG_WIDTH = "var(--rpl-alert-dialog-width, 320px)";
+export const ALERT_DIALOG_BUTTON_GAP = "var(--rpl-alert-dialog-button-gap, 8px)";
+export const ALERT_DIALOG_ACTIONS_PADDING = "var(--rpl-alert-dialog-actions-padding, 12px)";
+export const ALERT_DIALOG_MESSAGE_PADDING = "var(--rpl-alert-dialog-message-padding, 16px)";
+export const ALERT_DIALOG_INPUT_MARGIN_TOP = "var(--rpl-alert-dialog-input-margin-top, 12px)";

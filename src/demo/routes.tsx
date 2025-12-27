@@ -28,6 +28,9 @@ import DR_Basics from "./pages/Drawer/basics";
 import DR_Menu from "./pages/Drawer/menu";
 import DR_Animations from "./pages/Drawer/animations";
 
+import DL_Modal from "./pages/Dialog/modal";
+import DL_Alerts from "./pages/Dialog/alerts";
+
 import PS_Preview from "./pages/PanelSystem/preview";
 import PS_Tabbar from "./pages/PanelSystem/tabbar";
 import { ResizableFloatingPanelsPreview } from "./pages/FloatingPanelFrame/ResizableFloatingPanelsPreview";
@@ -46,7 +49,7 @@ import ST_Tablet from "./pages/Stack/tablet";
 
 import SH_Basics from "./pages/StickyHeader/basics";
 
-import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone, FiSidebar, FiNavigation, FiImage } from "react-icons/fi";
+import { FiGrid, FiLayers, FiColumns, FiMaximize2, FiBox, FiCpu, FiSmartphone, FiSidebar, FiNavigation, FiImage, FiMessageSquare } from "react-icons/fi";
 
 export type DemoPage = {
   id: string;
@@ -85,6 +88,16 @@ export const demoCategories: DemoCategory[] = [
       { id: "basics", label: "Basics", path: "basics", element: <DR_Basics /> },
       { id: "menu", label: "Menu", path: "menu", element: <DR_Menu /> },
       { id: "animations", label: "Animations", path: "animations", element: <DR_Animations /> },
+    ],
+  },
+  {
+    id: "dialog",
+    label: "Dialog",
+    icon: <FiMessageSquare />,
+    base: "/components/dialog",
+    pages: [
+      { id: "modal", label: "Modal", path: "modal", element: <DL_Modal /> },
+      { id: "alerts", label: "Alert / Confirm / Prompt", path: "alerts", element: <DL_Alerts /> },
     ],
   },
   {

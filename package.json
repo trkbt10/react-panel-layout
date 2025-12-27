@@ -62,6 +62,11 @@
       "import": "./dist/panels.js",
       "require": "./dist/panels.cjs"
     },
+    "./dialog": {
+      "types": "./dist/dialog/index.d.ts",
+      "import": "./dist/dialog.js",
+      "require": "./dist/dialog.cjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [
