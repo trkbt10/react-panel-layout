@@ -272,36 +272,53 @@ export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
   // Get visible panels: active + behind (for swipe reveal) + exiting (for back animation)
   const { stack, depth } = navigation.state;
 
-  // Track exiting panel when navigating back
-  const [exitingPanelId, setExitingPanelId] = React.useState<string | null>(null);
+  // Track exiting panel when navigating back.
+  // CRITICAL: exitingPanelId must be computed synchronously during render
+  // to prevent the exiting panel from being unmounted for a frame.
+  // If the panel unmounts, it loses its position state and causes a visual jump.
   const prevDepthRef = React.useRef(depth);
   const prevStackRef = React.useRef<ReadonlyArray<string>>(stack);
+  const exitingPanelClearTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [exitingPanelState, setExitingPanelState] = React.useState<string | null>(null);
 
-  // Detect when we navigate back and need to animate out
+  // Compute exiting panel ID synchronously during render
+  // This ensures the panel stays in the render tree even on the navigation change render
+  const prevDepth = prevDepthRef.current;
+  const prevStack = prevStackRef.current;
+  const isNavigatingBack = depth < prevDepth;
+  const computedExitingId = isNavigatingBack ? (prevStack[prevDepth] ?? null) : null;
+
+  // Use computed value if navigating back, otherwise use state (for timeout-based cleanup)
+  const exitingPanelId = computedExitingId ?? exitingPanelState;
+
+  // Update refs and state in effect
   React.useLayoutEffect(() => {
-    const prevDepth = prevDepthRef.current;
-    const prevStack = prevStackRef.current;
-
     // Update refs
     prevDepthRef.current = depth;
     prevStackRef.current = stack;
 
-    // Check if we went back (depth decreased)
-    if (depth < prevDepth) {
-      // The panel at prevDepth is exiting
-      const exitingId = prevStack[prevDepth];
-      if (exitingId != null) {
-        setExitingPanelId(exitingId);
+    // If we just started navigating back, update state and schedule cleanup
+    if (computedExitingId != null) {
+      setExitingPanelState(computedExitingId);
 
-        // Clear exiting panel after animation completes
-        const timeoutId = setTimeout(() => {
-          setExitingPanelId(null);
-        }, THEME_DURATIONS[selectedTheme]);
-
-        return () => clearTimeout(timeoutId);
+      // Clear any existing timeout
+      if (exitingPanelClearTimeoutRef.current != null) {
+        clearTimeout(exitingPanelClearTimeoutRef.current);
       }
+
+      // Clear exiting panel after animation completes
+      exitingPanelClearTimeoutRef.current = setTimeout(() => {
+        setExitingPanelState(null);
+        exitingPanelClearTimeoutRef.current = null;
+      }, THEME_DURATIONS[selectedTheme]);
     }
-  }, [depth, stack, selectedTheme]);
+
+    return () => {
+      if (exitingPanelClearTimeoutRef.current != null) {
+        clearTimeout(exitingPanelClearTimeoutRef.current);
+      }
+    };
+  }, [depth, stack, selectedTheme, computedExitingId]);
 
   const visiblePanelIds = React.useMemo(() => {
     const ids = [stack[depth]]; // Active panel
@@ -328,7 +345,10 @@ export const StackTablet: React.FC<StackTabletProps> = ({ theme = "ios" }) => {
               return null;
             }
 
-            const isExiting = panelId === exitingPanelId;
+            // Panel is only "exiting" if it matches exitingPanelId AND is not in current stack
+            // This prevents the bug where a re-pushed panel is incorrectly treated as exiting
+            const isInCurrentStack = stack.includes(panelId);
+            const isExiting = panelId === exitingPanelId && !isInCurrentStack;
             // For exiting panels, use depth + 1 since they were previously at the active position
             const panelDepth = isExiting ? depth + 1 : stack.indexOf(panelId);
             const isActive = panelDepth === depth && !isExiting;

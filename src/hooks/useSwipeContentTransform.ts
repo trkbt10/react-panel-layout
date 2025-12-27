@@ -151,16 +151,24 @@ const computeTargetChangeAction = (
     return { type: "snap", position: targetPx };
   }
 
-  // Skip animation if requested (e.g., role changed during operation)
-  // This prevents unwanted animations after an operation ends
-  if (skipAnimation) {
-    return { type: "snap", position: targetPx };
-  }
-
   const distance = Math.abs(currentPx - targetPx);
   if (distance <= 1) {
     return { type: "snap", position: targetPx };
   }
+
+  // Skip animation if requested (e.g., role changed during operation)
+  // This prevents unwanted animations after an operation ends.
+  // However, allow forward animations (currentPx < targetPx) for normal swipe-to-complete.
+  // Only skip backward animations (currentPx > targetPx) which occur during over-swipe.
+  if (skipAnimation) {
+    // Backward direction (over-swipe): snap, don't animate backward
+    if (currentPx > targetPx) {
+      return { type: "snap", position: targetPx };
+    }
+    // Forward direction (normal swipe-to-complete): animate from current position
+    return { type: "animate", animation: { from: currentPx, to: targetPx } };
+  }
+
   return { type: "animate", animation: { from: currentPx, to: targetPx } };
 };
 

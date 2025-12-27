@@ -6,8 +6,17 @@ import type { Position } from "../../types";
 
 /**
  * Transition mode for dialog animations
+ * - "none": No animation
+ * - "css": CSS-based fade/scale animation
+ * - "swipe": Swipeable with multi-phase animation
  */
-export type DialogTransitionMode = "none" | "css";
+export type DialogTransitionMode = "none" | "css" | "swipe";
+
+/**
+ * Direction from which the dialog opens.
+ * The close animation uses the same direction (swipe down to close if opened from bottom).
+ */
+export type DialogOpenDirection = "center" | "top" | "bottom" | "left" | "right";
 
 /**
  * Base props for DialogContainer component
@@ -41,6 +50,12 @@ export type DialogContainerProps = {
   transitionDuration?: string;
   /** Transition easing (CSS value, e.g. 'ease-out') */
   transitionEasing?: string;
+  /** Whether the dialog can be dismissed by swiping. @default false for "css", true for "swipe" */
+  swipeDismissible?: boolean;
+  /** Direction the dialog opens from (used for swipe mode). @default "center" */
+  openDirection?: DialogOpenDirection;
+  /** Whether to use viewTransition API for close animation (when available). @default false */
+  useViewTransition?: boolean;
 };
 
 /**
@@ -166,4 +181,6 @@ export type AlertDialogProps = {
   onConfirm: (value?: string) => void;
   /** Callback for cancel action */
   onCancel: () => void;
+  /** Whether the dialog can be dismissed by swiping. @default false for alert, true for confirm/prompt */
+  swipeDismissible?: boolean;
 };

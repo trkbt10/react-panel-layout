@@ -82,36 +82,45 @@ export const StackBasics: React.FC = () => {
 
   const { stack, depth } = navigation.state;
 
-  // Track exiting panel when navigating back
-  const [exitingPanelId, setExitingPanelId] = React.useState<string | null>(null);
+  // Track exiting panel when navigating back.
+  // CRITICAL: exitingPanelId must be computed synchronously during render
+  // to prevent the exiting panel from being unmounted for a frame.
   const prevDepthRef = React.useRef(depth);
   const prevStackRef = React.useRef<ReadonlyArray<string>>(stack);
+  const exitingPanelClearTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [exitingPanelState, setExitingPanelState] = React.useState<string | null>(null);
 
-  // Detect when we navigate back and need to animate out
+  // Compute exiting panel ID synchronously during render
+  const prevDepth = prevDepthRef.current;
+  const prevStack = prevStackRef.current;
+  const isNavigatingBack = depth < prevDepth;
+  const computedExitingId = isNavigatingBack ? (prevStack[prevDepth] ?? null) : null;
+  const exitingPanelId = computedExitingId ?? exitingPanelState;
+
+  // Update refs and state in effect
   React.useLayoutEffect(() => {
-    const prevDepth = prevDepthRef.current;
-    const prevStack = prevStackRef.current;
-
-    // Update refs
     prevDepthRef.current = depth;
     prevStackRef.current = stack;
 
-    // Check if we went back (depth decreased)
-    if (depth < prevDepth) {
-      // The panel at prevDepth is exiting
-      const exitingId = prevStack[prevDepth];
-      if (exitingId != null) {
-        setExitingPanelId(exitingId);
+    if (computedExitingId != null) {
+      setExitingPanelState(computedExitingId);
 
-        // Clear exiting panel after animation completes
-        const timeoutId = setTimeout(() => {
-          setExitingPanelId(null);
-        }, ANIMATION_DURATION);
-
-        return () => clearTimeout(timeoutId);
+      if (exitingPanelClearTimeoutRef.current != null) {
+        clearTimeout(exitingPanelClearTimeoutRef.current);
       }
+
+      exitingPanelClearTimeoutRef.current = setTimeout(() => {
+        setExitingPanelState(null);
+        exitingPanelClearTimeoutRef.current = null;
+      }, ANIMATION_DURATION);
     }
-  }, [depth, stack]);
+
+    return () => {
+      if (exitingPanelClearTimeoutRef.current != null) {
+        clearTimeout(exitingPanelClearTimeoutRef.current);
+      }
+    };
+  }, [depth, stack, computedExitingId]);
 
   // Get visible panel IDs: active + behind (for swipe reveal) + exiting (for back animation)
   const visiblePanelIds = React.useMemo(() => {
@@ -254,7 +263,10 @@ export const StackBasics: React.FC = () => {
         {...containerProps}
       >
         {visiblePanelIds.map((panelId) => {
-          const isExiting = panelId === exitingPanelId;
+          // Panel is only "exiting" if it matches exitingPanelId AND is not in current stack
+          // This prevents the bug where a re-pushed panel is incorrectly treated as exiting
+          const isInCurrentStack = stack.includes(panelId);
+          const isExiting = panelId === exitingPanelId && !isInCurrentStack;
           // For exiting panels, use depth + 1 since they were previously at the active position
           const panelDepth = isExiting ? depth + 1 : stack.indexOf(panelId);
           const isActive = panelDepth === depth && !isExiting;

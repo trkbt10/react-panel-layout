@@ -2,13 +2,14 @@
  * @file Base dialog container component using native <dialog> element
  */
 import * as React from "react";
-import type { DialogContainerProps } from "./types";
-import { useDialogContainer } from "./useDialogContainer";
+import type { DialogContainerProps } from "./types.js";
+import { useDialogContainer } from "./useDialogContainer.js";
+import { SwipeDialogContainer } from "./SwipeDialogContainer.js";
 import {
   COLOR_MODAL_BACKDROP,
   MODAL_TRANSITION_DURATION,
   MODAL_TRANSITION_EASING,
-} from "../../constants/styles";
+} from "../../constants/styles.js";
 
 const dialogBaseStyle: React.CSSProperties = {
   border: "none",
@@ -144,6 +145,11 @@ const DialogContainerImpl: React.FC<DialogContainerImplProps> = ({
  * Base container for dialog-based overlays using native <dialog> element.
  * Opens in the browser's top layer, ensuring it appears above all other content.
  *
+ * Supports three transition modes:
+ * - "none": No animation
+ * - "css": CSS-based fade/scale animation (default)
+ * - "swipe": Swipeable with multi-phase animation
+ *
  * @example
  * ```tsx
  * <DialogContainer
@@ -153,11 +159,29 @@ const DialogContainerImpl: React.FC<DialogContainerImplProps> = ({
  *   <div>Dialog content</div>
  * </DialogContainer>
  * ```
+ *
+ * @example Swipeable dialog
+ * ```tsx
+ * <DialogContainer
+ *   visible={isOpen}
+ *   onClose={() => setIsOpen(false)}
+ *   transitionMode="swipe"
+ *   openDirection="bottom"
+ * >
+ *   <div>Swipe down to close</div>
+ * </DialogContainer>
+ * ```
  */
 export const DialogContainer: React.FC<DialogContainerProps> = (props) => {
   if (!isBrowser) {
     return null;
   }
+
+  // Use SwipeDialogContainer for swipe mode
+  if (props.transitionMode === "swipe") {
+    return <SwipeDialogContainer {...props} />;
+  }
+
   return <DialogContainerImpl {...props} />;
 };
 

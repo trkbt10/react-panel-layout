@@ -17,6 +17,56 @@ import { StackContent } from "./StackContent.js";
 import { useContentCache } from "../../hooks/useContentCache.js";
 
 /**
+ * Navigation action types for centralized state management.
+ * All navigation operations go through the reducer to avoid stale closure issues.
+ */
+type StackAction<TId extends string> =
+  | { type: "push"; id: TId }
+  | { type: "go"; direction: number }
+  | { type: "move"; targetDepth: number }
+  | { type: "replace"; id: TId };
+
+/**
+ * Reducer for stack navigation state.
+ * Centralizes all state transitions to ensure consistent behavior during rapid navigation.
+ */
+function stackReducer<TId extends string>(
+  state: ReadonlyArray<TId>,
+  action: StackAction<TId>,
+): ReadonlyArray<TId> {
+  switch (action.type) {
+    case "push":
+      return [...state, action.id];
+
+    case "go": {
+      if (action.direction >= 0) {
+        return state;
+      }
+      const currentDepth = state.length - 1;
+      const targetDepth = currentDepth + action.direction;
+      if (targetDepth < 0) {
+        return state;
+      }
+      return state.slice(0, targetDepth + 1);
+    }
+
+    case "move": {
+      if (action.targetDepth < 0 || action.targetDepth >= state.length) {
+        return state;
+      }
+      return state.slice(0, action.targetDepth + 1);
+    }
+
+    case "replace": {
+      if (state.length === 0) {
+        return [action.id];
+      }
+      return [...state.slice(0, -1), action.id];
+    }
+  }
+}
+
+/**
  * Context for sharing stack state with Outlet component.
  */
 type StackOutletContextValue = {
@@ -108,14 +158,35 @@ export function useStackNavigation<TId extends string = string>(
     onPanelChange,
   } = options;
 
-  // Initialize stack with initial panel
-  const [stack, setStack] = React.useState<ReadonlyArray<TId>>(() => {
-    const initialId = initialPanelId ?? (panels[0]?.id as TId);
-    if (!initialId) {
-      throw new Error("useStackNavigation: No panels provided");
+  // Initialize stack with reducer for centralized state management
+  const initialId = initialPanelId ?? (panels[0]?.id as TId);
+  if (!initialId) {
+    throw new Error("useStackNavigation: No panels provided");
+  }
+
+  const [stack, dispatch] = React.useReducer(
+    stackReducer<TId>,
+    [initialId] as ReadonlyArray<TId>,
+  );
+
+  // Ref for accessing current stack in callbacks without stale closure
+  const stackRef = React.useRef(stack);
+  stackRef.current = stack;
+
+  // Track previous stack for onPanelChange callback
+  const prevStackRef = React.useRef(stack);
+  React.useEffect(() => {
+    const prevStack = prevStackRef.current;
+    prevStackRef.current = stack;
+
+    if (onPanelChange && stack !== prevStack) {
+      const newDepth = stack.length - 1;
+      const newPanelId = stack[newDepth];
+      if (newPanelId !== undefined) {
+        onPanelChange(newPanelId, newDepth);
+      }
     }
-    return [initialId];
-  });
+  }, [stack, onPanelChange]);
 
   // Reveal state for parent peeking
   const [revealState, setRevealState] = React.useState<{
@@ -138,85 +209,68 @@ export function useStackNavigation<TId extends string = string>(
   const currentPanelId = stack[depth] as TId;
   const previousPanelId = depth > 0 ? stack[depth - 1] as TId : null;
 
-  // Push a new panel onto the stack
+  // All navigation functions dispatch to reducer - no stale closure issues
   const push = React.useCallback((id: TId) => {
     const panel = panels.find((p) => p.id === id);
     if (!panel) {
       return;
     }
-    setStack((prev) => [...prev, id]);
-    onPanelChange?.(id, depth + 1);
-  }, [panels, depth, onPanelChange]);
+    dispatch({ type: "push", id });
+  }, [panels]);
 
-  // Navigate in a direction
   const go = React.useCallback((direction: number) => {
-    if (direction >= 0) {
-      return; // go is only for going back in stack navigation
-    }
-    const targetDepth = depth + direction;
-    if (targetDepth < 0) {
-      return;
-    }
-    setStack((prev) => prev.slice(0, targetDepth + 1));
-    const targetId = stack[targetDepth] as TId;
-    onPanelChange?.(targetId, targetDepth);
-  }, [depth, stack, onPanelChange]);
+    dispatch({ type: "go", direction });
+  }, []);
 
-  // Move to absolute depth
   const move = React.useCallback((targetDepth: number) => {
-    if (targetDepth < 0 || targetDepth >= stack.length) {
-      return;
-    }
-    setStack((prev) => prev.slice(0, targetDepth + 1));
-    const targetId = stack[targetDepth] as TId;
-    onPanelChange?.(targetId, targetDepth);
-  }, [stack, onPanelChange]);
+    dispatch({ type: "move", targetDepth });
+  }, []);
 
-  // Replace current panel
   const replace = React.useCallback((id: TId) => {
     const panel = panels.find((p) => p.id === id);
     if (!panel) {
       return;
     }
-    setStack((prev) => [...prev.slice(0, -1), id]);
-    onPanelChange?.(id, depth);
-  }, [panels, depth, onPanelChange]);
+    dispatch({ type: "replace", id });
+  }, [panels]);
 
-  // Check if navigation is possible
+  // canGo uses stackRef for current state
   const canGo = React.useCallback((direction: number): boolean => {
     if (direction >= 0) {
-      return false; // canGo only checks backward navigation for stacks
+      return false;
     }
-    const targetDepth = depth + direction;
-    return targetDepth >= 0;
-  }, [depth]);
+    const currentDepth = stackRef.current.length - 1;
+    return currentDepth + direction >= 0;
+  }, []);
 
-  // Reveal parent panel
+  // Reveal functions use stackRef for current depth
   const revealParent = React.useCallback((targetDepth?: number) => {
-    const revealTo = targetDepth ?? depth - 1;
-    if (revealTo < 0 || revealTo >= depth) {
+    const currentDepth = stackRef.current.length - 1;
+    const revealTo = targetDepth ?? currentDepth - 1;
+    if (revealTo < 0 || revealTo >= currentDepth) {
       return;
     }
     setRevealState({ isRevealing: true, revealDepth: revealTo });
-  }, [depth]);
+  }, []);
 
-  // Reveal root panel
   const revealRoot = React.useCallback(() => {
-    if (depth === 0) {
+    const currentDepth = stackRef.current.length - 1;
+    if (currentDepth === 0) {
       return;
     }
     setRevealState({ isRevealing: true, revealDepth: 0 });
-  }, [depth]);
+  }, []);
 
-  // Dismiss reveal
   const dismissReveal = React.useCallback(() => {
     setRevealState({ isRevealing: false, revealDepth: null });
   }, []);
 
-  // Get props for a panel element
+  // getPanelProps uses stackRef for current state
   const getPanelProps = React.useCallback((id: TId): StackPanelProps => {
-    const panelIndex = stack.indexOf(id);
-    const isActive = panelIndex === depth;
+    const currentStack = stackRef.current;
+    const panelIndex = currentStack.indexOf(id);
+    const currentDepth = currentStack.length - 1;
+    const isActive = panelIndex === currentDepth;
 
     return {
       "data-stack-panel": id,
@@ -224,12 +278,15 @@ export function useStackNavigation<TId extends string = string>(
       "data-active": isActive ? "true" : "false",
       "aria-hidden": !isActive,
     };
-  }, [stack, depth]);
+  }, []);
 
-  // Get props for back button
+  // getBackButtonProps uses stackRef for current state
   const getBackButtonProps = React.useCallback((): StackBackButtonProps => {
-    const canGoBack = depth > 0;
-    const prevPanel = previousPanelId ? panels.find((p) => p.id === previousPanelId) : null;
+    const currentStack = stackRef.current;
+    const currentDepth = currentStack.length - 1;
+    const canGoBack = currentDepth > 0;
+    const prevPanelId = currentDepth > 0 ? currentStack[currentDepth - 1] : null;
+    const prevPanel = prevPanelId ? panels.find((p) => p.id === prevPanelId) : null;
     const label = prevPanel?.title ? `Back to ${prevPanel.title}` : "Go back";
 
     return {
@@ -237,7 +294,7 @@ export function useStackNavigation<TId extends string = string>(
       disabled: !canGoBack,
       "aria-label": label,
     };
-  }, [depth, previousPanelId, panels, go]);
+  }, [panels, go]);
 
   // Container style
   const containerStyle: React.CSSProperties = React.useMemo(

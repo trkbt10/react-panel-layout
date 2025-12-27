@@ -159,7 +159,7 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
     // "behind" to "active"), we keep using the previous role for position
     // calculations to prevent visual jumps.
     // changedDuringOperation tells us if the role changed during the operation,
-    // which we use to skip target change animation.
+    // which we use to skip backward target change animation (over-swipe case).
     const { value: effectiveRole, changedDuringOperation } = useOperationContinuity(
       role,
       displacement > 0,
@@ -232,9 +232,10 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
       animateOnTargetChange: true,
       // For push animation: start from off-screen
       initialPx,
-      // Skip target change animation if role changed during the operation.
-      // This handles cases like over-swipe where the panel's role changes
-      // before the gesture ends - we don't want to animate the target change.
+      // Skip backward animation if role changed during the operation.
+      // This handles over-swipe where panel moves beyond 100% and needs to snap back.
+      // useSwipeContentTransform allows forward animations (normal swipe-to-complete)
+      // but skips backward animations (over-swipe snap).
       skipTargetChangeAnimation: changedDuringOperation,
     });
 

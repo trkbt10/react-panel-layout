@@ -1,8 +1,13 @@
 /**
  * @file Tests for useOperationContinuity hook.
  */
+import * as React from "react";
 import { renderHook } from "@testing-library/react";
 import { useOperationContinuity } from "./useOperationContinuity.js";
+
+const StrictModeWrapper = ({ children }: { children: React.ReactNode }): React.ReactNode => {
+  return React.createElement(React.StrictMode, null, children);
+};
 
 describe("useOperationContinuity", () => {
   describe("value continuity", () => {
@@ -138,6 +143,78 @@ describe("useOperationContinuity", () => {
     });
   });
 
+  describe("simultaneous value and retention change", () => {
+    /**
+     * CRITICAL: This tests the over-swipe bug scenario.
+     *
+     * In the real app, when user releases after over-swipe:
+     * - displacement becomes 0 (shouldRetainPrevious becomes false)
+     * - role changes from "active" to "hidden"
+     * Both happen in the same render!
+     *
+     * The hook should detect that the value changed even though
+     * the change happened at the exact moment retention ended.
+     */
+    it("detects value change when it happens simultaneously with retention ending", () => {
+      const { result, rerender } = renderHook(
+        ({ role, displacement }) => useOperationContinuity(role, displacement > 0),
+        { initialProps: { role: "active" as const, displacement: 500 } },
+      );
+
+      // During swipe: role="active", retaining
+      expect(result.current.value).toBe("active");
+      expect(result.current.changedDuringOperation).toBe(false);
+
+      // Simulate release: BOTH displacement becomes 0 AND role changes to "hidden"
+      // This is what happens in the real app during over-swipe
+      rerender({ role: "hidden" as const, displacement: 0 });
+
+      // value should now be "hidden" (retention ended)
+      expect(result.current.value).toBe("hidden");
+      // CRITICAL: changedDuringOperation should be TRUE because the value
+      // changed from "active" to "hidden" at the moment retention ended
+      expect(result.current.changedDuringOperation).toBe(true);
+    });
+
+    it("does not report change when value stays the same at retention end", () => {
+      const { result, rerender } = renderHook(
+        ({ role, displacement }) => useOperationContinuity(role, displacement > 0),
+        { initialProps: { role: "active" as const, displacement: 500 } },
+      );
+
+      expect(result.current.value).toBe("active");
+      expect(result.current.changedDuringOperation).toBe(false);
+
+      // Release but role stays "active" (e.g., partial swipe that didn't trigger navigation)
+      rerender({ role: "active" as const, displacement: 0 });
+
+      expect(result.current.value).toBe("active");
+      // No change occurred
+      expect(result.current.changedDuringOperation).toBe(false);
+    });
+
+    it("does NOT report change during button navigation (no operation)", () => {
+      // This is the button navigation case: value changes but there was never
+      // any retention (no swipe operation). We should NOT report changedDuringOperation
+      // because this is normal navigation, not an operation-related change.
+      const { result, rerender } = renderHook(
+        ({ role, displacement }) => useOperationContinuity(role, displacement > 0),
+        { initialProps: { role: "active" as const, displacement: 0 } },
+      );
+
+      expect(result.current.value).toBe("active");
+      expect(result.current.changedDuringOperation).toBe(false);
+
+      // Button navigation: role changes but there's no operation (displacement is always 0)
+      rerender({ role: "behind" as const, displacement: 0 });
+
+      expect(result.current.value).toBe("behind");
+      // CRITICAL: changedDuringOperation should be FALSE because there was no operation
+      // This allows the animation to happen normally for button navigation
+      expect(result.current.changedDuringOperation).toBe(false);
+    });
+  });
+
   describe("role transition scenarios", () => {
     it("maintains role continuity during swipe (behind -> active)", () => {
       // Simulates: behind panel becomes active during swipe
@@ -227,6 +304,84 @@ describe("useOperationContinuity", () => {
 
       rerender({ value: obj2, retain: false });
       expect(result.current.value).toBe(obj2);
+    });
+  });
+
+  describe("React StrictMode compatibility", () => {
+    /**
+     * CRITICAL: These tests verify the hook works correctly in StrictMode.
+     *
+     * In StrictMode, React calls the render function twice. Hooks that mutate
+     * refs during render will see the mutated value on the second call, which
+     * can cause bugs.
+     *
+     * This hook uses useLayoutEffect for ref mutations to avoid this issue.
+     */
+    it("operationJustEnded is correct in StrictMode", () => {
+      const { result, rerender } = renderHook(
+        ({ value, retain }) => useOperationContinuity(value, retain),
+        {
+          initialProps: { value: "active", retain: true },
+          wrapper: StrictModeWrapper,
+        },
+      );
+
+      // During retention
+      expect(result.current.operationJustEnded).toBe(false);
+
+      // End retention - operationJustEnded should be true
+      rerender({ value: "active", retain: false });
+      expect(result.current.operationJustEnded).toBe(true);
+
+      // Next render - should be false again
+      rerender({ value: "active", retain: false });
+      expect(result.current.operationJustEnded).toBe(false);
+    });
+
+    it("over-swipe scenario works in StrictMode", () => {
+      // This is the exact scenario that was broken before the fix:
+      // User swipes beyond 100%, releases, and we need operationJustEnded=true
+      // to prevent the visual jump.
+      const { result, rerender } = renderHook(
+        ({ role, displacement }) => useOperationContinuity(role, displacement > 0),
+        {
+          initialProps: { role: "active" as const, displacement: 500 },
+          wrapper: StrictModeWrapper,
+        },
+      );
+
+      // During over-swipe
+      expect(result.current.value).toBe("active");
+      expect(result.current.operationJustEnded).toBe(false);
+
+      // Release (displacement becomes 0)
+      rerender({ role: "active" as const, displacement: 0 });
+
+      // CRITICAL: operationJustEnded must be true even in StrictMode
+      // This is what was broken before the fix
+      expect(result.current.operationJustEnded).toBe(true);
+      expect(result.current.value).toBe("active");
+    });
+
+    it("changedDuringOperation is tracked correctly in StrictMode", () => {
+      const { result, rerender } = renderHook(
+        ({ value, retain }) => useOperationContinuity(value, retain),
+        {
+          initialProps: { value: "behind", retain: true },
+          wrapper: StrictModeWrapper,
+        },
+      );
+
+      expect(result.current.changedDuringOperation).toBe(false);
+
+      // Value changes during retention
+      rerender({ value: "active", retain: true });
+      expect(result.current.changedDuringOperation).toBe(true);
+
+      // End retention
+      rerender({ value: "active", retain: false });
+      expect(result.current.changedDuringOperation).toBe(true);
+      expect(result.current.operationJustEnded).toBe(true);
     });
   });
 });

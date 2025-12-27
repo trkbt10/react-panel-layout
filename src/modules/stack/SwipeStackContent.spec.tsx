@@ -1179,6 +1179,297 @@ describe("SwipeStackContent", () => {
     });
   });
 
+  describe("navigation during animation", () => {
+    it("handles push during back animation", () => {
+      // Scenario: Panel is animating back (going from active to hidden)
+      // User quickly clicks to push forward again
+      const { container, rerender } = render(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={1}
+          isActive={true}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      const element = container.firstChild as HTMLElement;
+      expect(element.style.transform).toBe("translateX(0px)");
+
+      // Step 1: Go back - panel becomes hidden, starts animating to off-screen
+      rerender(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={0}
+          isActive={false}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      // Start animation but don't complete it
+      act(() => {
+        flushRAF(0);
+        flushRAF(100); // Partial animation
+      });
+
+      // Panel should be somewhere between 0 and 400
+      const midAnimationTransform = element.style.transform;
+      expect(midAnimationTransform).not.toBe("translateX(0px)");
+      expect(midAnimationTransform).not.toBe("translateX(400px)");
+
+      // Step 2: Push again - panel becomes active again DURING animation
+      rerender(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={1}
+          isActive={true}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      // Complete all pending animations
+      act(() => {
+        flushRAF(0);
+        flushRAF(400);
+      });
+
+      // Panel should end up at center (0), visible
+      expect(element.style.transform).toBe("translateX(0px)");
+      expect(element.style.visibility).toBe("visible");
+    });
+
+    it("handles back during push animation", () => {
+      // Scenario: New panel is animating in from off-screen
+      // User quickly clicks back before animation completes
+      const { container, rerender } = render(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={1}
+          isActive={true}
+          operationState={IDLE_STATE}
+          containerSize={400}
+          animateOnMount={true}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      const element = container.firstChild as HTMLElement;
+
+      // Panel starts off-screen
+      expect(element.style.transform).toBe("translateX(400px)");
+
+      // Start animation but don't complete it
+      act(() => {
+        flushRAF(0);
+        flushRAF(100); // Partial animation
+      });
+
+      // Panel should be somewhere between 400 and 0
+      const midAnimationTransform = element.style.transform;
+      expect(midAnimationTransform).not.toBe("translateX(400px)");
+      expect(midAnimationTransform).not.toBe("translateX(0px)");
+
+      // Go back during animation
+      rerender(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={0}
+          isActive={false}
+          operationState={IDLE_STATE}
+          containerSize={400}
+          animateOnMount={true}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      // Complete all pending animations
+      act(() => {
+        flushRAF(0);
+        flushRAF(400);
+      });
+
+      // Panel should end up off-screen (400), hidden
+      expect(element.style.transform).toBe("translateX(400px)");
+    });
+
+    it("handles rapid back-push-back sequence during animations", () => {
+      const { container, rerender } = render(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={1}
+          isActive={true}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      const element = container.firstChild as HTMLElement;
+      expect(element.style.transform).toBe("translateX(0px)");
+
+      // Back
+      rerender(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={0}
+          isActive={false}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      act(() => {
+        flushRAF(0);
+        flushRAF(50);
+      });
+
+      // Push (before back animation completes)
+      rerender(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={1}
+          isActive={true}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      act(() => {
+        flushRAF(0);
+        flushRAF(50);
+      });
+
+      // Back again (before push animation completes)
+      rerender(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={0}
+          isActive={false}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      // Complete all animations
+      act(() => {
+        flushRAF(0);
+        flushRAF(400);
+      });
+
+      // Final state: should be off-screen (hidden)
+      expect(element.style.transform).toBe("translateX(400px)");
+    });
+
+    it("panel remains visible and usable after rapid navigation", () => {
+      // This is the bug scenario: after rapid back-and-forth, panel becomes permanently hidden
+      const { container, rerender } = render(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={1}
+          isActive={true}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      const element = container.firstChild as HTMLElement;
+
+      // Rapid sequence without waiting for animations
+      for (let i = 0; i < 5; i++) {
+        // Go back
+        rerender(
+          <SwipeStackContent
+            id="panel1"
+            depth={1}
+            navigationDepth={0}
+            isActive={false}
+            operationState={IDLE_STATE}
+            containerSize={400}
+          >
+            Content
+          </SwipeStackContent>,
+        );
+
+        act(() => {
+          flushRAF(0);
+          flushRAF(30);
+        });
+
+        // Push forward
+        rerender(
+          <SwipeStackContent
+            id="panel1"
+            depth={1}
+            navigationDepth={1}
+            isActive={true}
+            operationState={IDLE_STATE}
+            containerSize={400}
+          >
+            Content
+          </SwipeStackContent>,
+        );
+
+        act(() => {
+          flushRAF(0);
+          flushRAF(30);
+        });
+      }
+
+      // Final state: panel should be active
+      rerender(
+        <SwipeStackContent
+          id="panel1"
+          depth={1}
+          navigationDepth={1}
+          isActive={true}
+          operationState={IDLE_STATE}
+          containerSize={400}
+        >
+          Content
+        </SwipeStackContent>,
+      );
+
+      // Complete all animations
+      act(() => {
+        flushRAF(0);
+        flushRAF(400);
+      });
+
+      // Panel should be visible at center
+      expect(element.style.transform).toBe("translateX(0px)");
+      expect(element.style.visibility).toBe("visible");
+    });
+  });
+
   describe("swipe commit (navigation changes)", () => {
     it("active panel moves off-screen when navigation depth decreases", () => {
       const { container, rerender } = render(

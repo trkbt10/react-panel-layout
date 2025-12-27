@@ -120,6 +120,9 @@ export const Modal: React.FC<ModalProps> = ({
   transitionDuration,
   transitionEasing,
   contentStyle: propContentStyle,
+  swipeDismissible,
+  openDirection = "center",
+  useViewTransition = false,
 }) => {
   const computedStyle = React.useMemo((): React.CSSProperties => {
     const style: React.CSSProperties = { ...modalContentStyle };
@@ -157,6 +160,9 @@ export const Modal: React.FC<ModalProps> = ({
       transitionMode={transitionMode}
       transitionDuration={transitionDuration}
       transitionEasing={transitionEasing}
+      swipeDismissible={swipeDismissible}
+      openDirection={openDirection}
+      useViewTransition={useViewTransition}
     >
       <div style={computedStyle}>
         <ModalContentRenderer

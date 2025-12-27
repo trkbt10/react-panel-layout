@@ -40,6 +40,14 @@ export const easings = {
     }
     return 1 - Math.pow(-2 * t + 2, 3) / 2;
   },
+
+  /** Ease in expo (accelerating, for "suck in" effect) */
+  easeInExpo: (t: number): number => {
+    if (t === 0) {
+      return 0;
+    }
+    return Math.pow(2, 10 * t - 10);
+  },
 } as const;
 
 /**

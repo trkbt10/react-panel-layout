@@ -489,4 +489,184 @@ describe("useStackNavigation", () => {
       expect(result.current.state.depth).toBe(0);
     });
   });
+
+  describe("rapid navigation stress tests", () => {
+    it("handles rapid push-go-push-go cycles correctly", () => {
+      const panels = createPanels();
+      const { result } = renderHook(() =>
+        useStackNavigation({ panels, displayMode: "overlay" }),
+      );
+
+      // Simulate rapid clicks: push -> go back -> push -> go back (all in single act)
+      act(() => {
+        result.current.push("list");
+        result.current.go(-1);
+        result.current.push("detail");
+        result.current.go(-1);
+        result.current.push("edit");
+        result.current.go(-1);
+      });
+
+      // Should end at root after all back navigations
+      expect(result.current.state.stack).toEqual(["root"]);
+      expect(result.current.state.depth).toBe(0);
+      expect(result.current.currentPanelId).toBe("root");
+    });
+
+    it("handles deep nesting then rapid back to root", () => {
+      const panels = createPanels();
+      const { result } = renderHook(() =>
+        useStackNavigation({ panels, displayMode: "overlay" }),
+      );
+
+      // Push to max depth
+      act(() => {
+        result.current.push("list");
+        result.current.push("detail");
+        result.current.push("edit");
+      });
+
+      expect(result.current.state.depth).toBe(3);
+
+      // Rapidly go back to root in single act
+      act(() => {
+        result.current.go(-1);
+        result.current.go(-1);
+        result.current.go(-1);
+      });
+
+      expect(result.current.state.stack).toEqual(["root"]);
+      expect(result.current.state.depth).toBe(0);
+    });
+
+    it("handles alternating push-go-push pattern", () => {
+      const panels = createPanels();
+      const { result } = renderHook(() =>
+        useStackNavigation({ panels, displayMode: "overlay" }),
+      );
+
+      act(() => {
+        result.current.push("list");    // depth 1
+        result.current.go(-1);          // depth 0
+        result.current.push("list");    // depth 1
+        result.current.push("detail");  // depth 2
+        result.current.go(-1);          // depth 1
+        result.current.go(-1);          // depth 0
+        result.current.push("edit");    // depth 1
+      });
+
+      expect(result.current.state.stack).toEqual(["root", "edit"]);
+      expect(result.current.state.depth).toBe(1);
+    });
+
+    it("handles excessive back navigation attempts gracefully", () => {
+      const panels = createPanels();
+      const { result } = renderHook(() =>
+        useStackNavigation({ panels, displayMode: "overlay" }),
+      );
+
+      act(() => {
+        result.current.push("list");
+      });
+
+      // Try to go back more times than possible
+      act(() => {
+        result.current.go(-1);
+        result.current.go(-1); // Already at root, should be ignored
+        result.current.go(-1); // Should be ignored
+        result.current.go(-1); // Should be ignored
+      });
+
+      expect(result.current.state.stack).toEqual(["root"]);
+      expect(result.current.state.depth).toBe(0);
+    });
+
+    it("handles interleaved push/go/replace operations", () => {
+      const panels = createPanels();
+      const { result } = renderHook(() =>
+        useStackNavigation({ panels, displayMode: "overlay" }),
+      );
+
+      act(() => {
+        result.current.push("list");
+        result.current.replace("detail");
+        result.current.push("edit");
+        result.current.go(-1);
+        result.current.replace("list");
+      });
+
+      expect(result.current.state.stack).toEqual(["root", "list"]);
+      expect(result.current.currentPanelId).toBe("list");
+    });
+
+    it("maintains correct onPanelChange calls during rapid navigation", () => {
+      const panels = createPanels();
+      const onPanelChange = createCallTracker();
+      const { result } = renderHook(() =>
+        useStackNavigation({
+          panels,
+          displayMode: "overlay",
+          onPanelChange: onPanelChange.fn,
+        }),
+      );
+
+      act(() => {
+        result.current.push("list");
+        result.current.push("detail");
+        result.current.go(-1);
+        result.current.go(-1);
+      });
+
+      // Should have called onPanelChange for each navigation
+      // Final state should be at root
+      expect(result.current.state.depth).toBe(0);
+      expect(result.current.currentPanelId).toBe("root");
+    });
+
+    it("handles move(0) after deep navigation", () => {
+      const panels = createPanels();
+      const { result } = renderHook(() =>
+        useStackNavigation({ panels, displayMode: "overlay" }),
+      );
+
+      act(() => {
+        result.current.push("list");
+        result.current.push("detail");
+        result.current.push("edit");
+        result.current.move(0); // Jump directly to root
+      });
+
+      expect(result.current.state.stack).toEqual(["root"]);
+      expect(result.current.state.depth).toBe(0);
+    });
+
+    it("canGo returns correct value during rapid state changes", () => {
+      const panels = createPanels();
+      const { result } = renderHook(() =>
+        useStackNavigation({ panels, displayMode: "overlay" }),
+      );
+
+      act(() => {
+        result.current.push("list");
+        result.current.push("detail");
+      });
+
+      expect(result.current.canGo(-1)).toBe(true);
+      expect(result.current.canGo(-2)).toBe(true);
+      expect(result.current.canGo(-3)).toBe(false);
+
+      act(() => {
+        result.current.go(-1);
+      });
+
+      expect(result.current.canGo(-1)).toBe(true);
+      expect(result.current.canGo(-2)).toBe(false);
+
+      act(() => {
+        result.current.go(-1);
+      });
+
+      expect(result.current.canGo(-1)).toBe(false);
+    });
+  });
 });

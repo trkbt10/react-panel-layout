@@ -295,7 +295,7 @@ describe("usePivotSwipeInput", () => {
   describe("vertical axis", () => {
     it("supports vertical swipe when axis is vertical", () => {
       const containerRef = createRef();
-      const { pivot } = createMockPivot();
+      const { pivot, calls } = createMockPivot();
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({
@@ -370,53 +370,66 @@ describe("usePivotSwipeInput", () => {
       const containerWidth = 400;
       const smallDisplacement = containerWidth * 0.2; // 80px = 20%
 
-      const { result } = renderHook(() =>
-        usePivotSwipeInput({
-          containerRef,
-          pivot,
-          // 推奨閾値: コンテナ幅の25%程度
-          thresholds: {
-            distanceThreshold: containerWidth * 0.25, // 100px
-            velocityThreshold: 0.5, // より高い閾値
-            lockThreshold: 10,
-          },
-        }),
-      );
+      // Mock performance.now() to control velocity calculation
+      // 80px / 200ms = 0.4 px/ms (under 0.5 threshold)
+      let mockTime = 0;
+      const originalPerformanceNow = performance.now;
+      performance.now = () => mockTime;
 
-      // Pointer down
-      const downEvent = {
-        clientX: 200,
-        clientY: 100,
-        pointerId: 1,
-        isPrimary: true,
-        pointerType: "touch",
-        button: 0,
-      } as React.PointerEvent<HTMLElement>;
+      try {
+        const { result } = renderHook(() =>
+          usePivotSwipeInput({
+            containerRef,
+            pivot,
+            // 推奨閾値: コンテナ幅の25%程度
+            thresholds: {
+              distanceThreshold: containerWidth * 0.25, // 100px
+              velocityThreshold: 0.5, // より高い閾値
+              lockThreshold: 10,
+            },
+          }),
+        );
 
-      act(() => {
-        result.current.containerProps.onPointerDown?.(downEvent);
-      });
+        // Pointer down at time 0
+        mockTime = 0;
+        const downEvent = {
+          clientX: 200,
+          clientY: 100,
+          pointerId: 1,
+          isPrimary: true,
+          pointerType: "touch",
+          button: 0,
+        } as React.PointerEvent<HTMLElement>;
 
-      // 小さな移動 (80px left)
-      const moveEvent = new PointerEvent("pointermove", {
-        clientX: 200 - smallDisplacement,
-        clientY: 102,
-        pointerId: 1,
-      });
+        act(() => {
+          result.current.containerProps.onPointerDown?.(downEvent);
+        });
 
-      act(() => {
-        document.dispatchEvent(moveEvent);
-      });
+        // 小さな移動 (80px left) at time 200ms
+        // velocity = 80px / 200ms = 0.4 px/ms (under 0.5 threshold)
+        mockTime = 200;
+        const moveEvent = new PointerEvent("pointermove", {
+          clientX: 200 - smallDisplacement,
+          clientY: 102,
+          pointerId: 1,
+        });
 
-      // Pointer up
-      const upEvent = new PointerEvent("pointerup", { pointerId: 1 });
+        act(() => {
+          document.dispatchEvent(moveEvent);
+        });
 
-      act(() => {
-        document.dispatchEvent(upEvent);
-      });
+        // Pointer up
+        const upEvent = new PointerEvent("pointerup", { pointerId: 1 });
 
-      // 閾値未満の移動ではナビゲーションされないべき
-      expect(calls.go.calls).toHaveLength(0);
+        act(() => {
+          document.dispatchEvent(upEvent);
+        });
+
+        // 閾値未満の移動ではナビゲーションされないべき
+        expect(calls.go.calls).toHaveLength(0);
+      } finally {
+        performance.now = originalPerformanceNow;
+      }
     });
 
     it("should trigger navigation with significant displacement (over 25% of container)", () => {
@@ -477,47 +490,60 @@ describe("usePivotSwipeInput", () => {
       const containerRef = createRef();
       const { pivot, calls } = createMockPivot();
 
-      // デフォルト閾値: distanceThreshold: 100px, velocityThreshold: 0.5 px/ms
-      const { result } = renderHook(() =>
-        usePivotSwipeInput({
-          containerRef,
-          pivot,
-          // デフォルト値を使用
-        }),
-      );
+      // Mock performance.now() to control velocity calculation
+      // 60px / 200ms = 0.3 px/ms (under 0.5 threshold)
+      let mockTime = 0;
+      const originalPerformanceNow = performance.now;
+      performance.now = () => mockTime;
 
-      const downEvent = {
-        clientX: 200,
-        clientY: 100,
-        pointerId: 1,
-        isPrimary: true,
-        pointerType: "touch",
-        button: 0,
-      } as React.PointerEvent<HTMLElement>;
+      try {
+        // デフォルト閾値: distanceThreshold: 100px, velocityThreshold: 0.5 px/ms
+        const { result } = renderHook(() =>
+          usePivotSwipeInput({
+            containerRef,
+            pivot,
+            // デフォルト値を使用
+          }),
+        );
 
-      act(() => {
-        result.current.containerProps.onPointerDown?.(downEvent);
-      });
+        mockTime = 0;
+        const downEvent = {
+          clientX: 200,
+          clientY: 100,
+          pointerId: 1,
+          isPrimary: true,
+          pointerType: "touch",
+          button: 0,
+        } as React.PointerEvent<HTMLElement>;
 
-      // 60pxは新しいデフォルト閾値(100px)未満
-      const moveEvent = new PointerEvent("pointermove", {
-        clientX: 140, // -60px (< 100px threshold)
-        clientY: 102,
-        pointerId: 1,
-      });
+        act(() => {
+          result.current.containerProps.onPointerDown?.(downEvent);
+        });
 
-      act(() => {
-        document.dispatchEvent(moveEvent);
-      });
+        // 60pxは新しいデフォルト閾値(100px)未満
+        // velocity = 60px / 200ms = 0.3 px/ms (under 0.5 threshold)
+        mockTime = 200;
+        const moveEvent = new PointerEvent("pointermove", {
+          clientX: 140, // -60px (< 100px threshold)
+          clientY: 102,
+          pointerId: 1,
+        });
 
-      const upEvent = new PointerEvent("pointerup", { pointerId: 1 });
+        act(() => {
+          document.dispatchEvent(moveEvent);
+        });
 
-      act(() => {
-        document.dispatchEvent(upEvent);
-      });
+        const upEvent = new PointerEvent("pointerup", { pointerId: 1 });
 
-      // 閾値未満なのでトリガーされない
-      expect(calls.go.calls).toHaveLength(0);
+        act(() => {
+          document.dispatchEvent(upEvent);
+        });
+
+        // 閾値未満なのでトリガーされない
+        expect(calls.go.calls).toHaveLength(0);
+      } finally {
+        performance.now = originalPerformanceNow;
+      }
     });
 
     it("triggers with displacement over default threshold (100px)", () => {

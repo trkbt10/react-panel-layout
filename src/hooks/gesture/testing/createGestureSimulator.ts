@@ -224,7 +224,7 @@ export function createGestureSimulator(options: GestureSimulatorOptions = {}): G
   };
 
   const pointerUp = (): void => {
-    if (!isDown) {
+    if (!pointerState.isDown) {
       return;
     }
 

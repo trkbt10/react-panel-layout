@@ -89,7 +89,10 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
   inputType = "text",
   onConfirm,
   onCancel,
+  swipeDismissible,
 }) => {
+  // Default swipeDismissible: false for alert (shouldn't be accidentally dismissed), true otherwise
+  const effectiveSwipeDismissible = swipeDismissible ?? (type !== "alert");
   const [inputValue, setInputValue] = React.useState(defaultValue);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -168,6 +171,7 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
       dismissible={type !== "alert"}
       closeOnEscape={true}
       ariaLabel={dialogLabel}
+      swipeDismissible={effectiveSwipeDismissible}
     >
       <div style={alertDialogStyle}>
         <FloatingPanelFrame>
