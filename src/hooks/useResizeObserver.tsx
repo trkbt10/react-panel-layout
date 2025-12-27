@@ -2,6 +2,7 @@
  * @file Shared useResizeObserver hook with cached observer instances.
  */
 import * as React from "react";
+import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect.js";
 
 type Unobserve = () => void;
 type Callback = (entry: ResizeObserverEntry, observer: ResizeObserver) => void;
@@ -53,10 +54,25 @@ export function useResizeObserver<T extends HTMLElement>(
   const [entry, setEntry] = React.useState<ResizeObserverEntry | null>(null);
   const target = ref.current;
 
-  React.useEffect(() => {
+  // Use useIsomorphicLayoutEffect for synchronous execution before paint.
+  // This ensures containerSize is available before first animation frame.
+  // SSR-safe: falls back to useEffect on server to avoid warnings.
+  useIsomorphicLayoutEffect(() => {
     if (!target) {
       return;
     }
+
+    // Immediately measure initial size before ResizeObserver callback fires.
+    // This matches the previous inline implementation behavior.
+    const initialRect = target.getBoundingClientRect();
+    const initialEntry: ResizeObserverEntry = {
+      target,
+      contentRect: initialRect,
+      borderBoxSize: [{ inlineSize: initialRect.width, blockSize: initialRect.height }],
+      contentBoxSize: [{ inlineSize: initialRect.width, blockSize: initialRect.height }],
+      devicePixelContentBoxSize: [],
+    };
+    setEntry(initialEntry);
 
     const observer = getSharedObserver({ box });
     return observer.observe(target, (nextEntry) => {
