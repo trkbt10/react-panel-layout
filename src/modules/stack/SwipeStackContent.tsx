@@ -9,6 +9,7 @@
  */
 import * as React from "react";
 import { useSwipeContentTransform } from "../../hooks/useSwipeContentTransform.js";
+import { useOperationContinuity } from "../../hooks/useOperationContinuity.js";
 import type { ContinuousOperationState, GestureAxis } from "../../hooks/gesture/types.js";
 import type { StackDisplayMode } from "./types.js";
 import {
@@ -153,9 +154,20 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
     // Determine panel role
     const role = determineSwipePanelRole(depth, navigationDepth);
 
-    // Compute target position based on role
+    // Maintain role continuity during swipe operations.
+    // When navigation changes before the gesture ends (e.g., role changes from
+    // "behind" to "active"), we keep using the previous role for position
+    // calculations to prevent visual jumps.
+    // changedDuringOperation tells us if the role changed during the operation,
+    // which we use to skip target change animation.
+    const { value: effectiveRole, changedDuringOperation } = useOperationContinuity(
+      role,
+      displacement > 0,
+    );
+
+    // Compute target position based on effective role
     const targetPx = React.useMemo(() => {
-      switch (role) {
+      switch (effectiveRole) {
         case "active":
           // Active panel rests at 0
           return 0;
@@ -166,7 +178,7 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
           // Hidden panels are off-screen
           return containerSize;
       }
-    }, [role, behindOffset, containerSize]);
+    }, [effectiveRole, behindOffset, containerSize]);
 
     // Compute displacement for this panel
     const panelDisplacement = React.useMemo(() => {
@@ -174,7 +186,7 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
         return 0;
       }
 
-      switch (role) {
+      switch (effectiveRole) {
         case "active":
           // Active panel follows finger directly
           return computeActiveTargetPx(displacement);
@@ -187,7 +199,7 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
         case "hidden":
           return 0;
       }
-    }, [role, displacement, containerSize, behindOffset]);
+    }, [effectiveRole, displacement, containerSize, behindOffset]);
 
     // Compute initial position for push animation
     // When animateOnMount is true and panel is first mounted as "active",
@@ -220,6 +232,10 @@ export const SwipeStackContent: React.FC<SwipeStackContentProps> = React.memo(
       animateOnTargetChange: true,
       // For push animation: start from off-screen
       initialPx,
+      // Skip target change animation if role changed during the operation.
+      // This handles cases like over-swipe where the panel's role changes
+      // before the gesture ends - we don't want to animate the target change.
+      skipTargetChangeAnimation: changedDuringOperation,
     });
 
     // Compute visibility

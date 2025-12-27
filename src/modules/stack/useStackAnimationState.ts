@@ -39,6 +39,22 @@ export function computeAnimatedPanels(
   prevStack: ReadonlyArray<string>,
   currentStack: ReadonlyArray<string>,
 ): ReadonlyArray<AnimatedPanel> {
+  const getPanelPhase = (
+    wasInPrevStack: boolean,
+    prevStackLength: number,
+    prevPhase: PanelAnimationPhase | undefined,
+  ): PanelAnimationPhase => {
+    if (!wasInPrevStack && prevStackLength > 0) {
+      // New panel pushed onto stack
+      return "entering";
+    }
+    if (prevPhase === "entering") {
+      // Was entering, keep entering until animation completes
+      return "entering";
+    }
+    return "active";
+  };
+
   const result: AnimatedPanel[] = [];
   const currentStackSet = new Set(currentStack);
 
@@ -47,17 +63,7 @@ export function computeAnimatedPanels(
     const id = currentStack[i];
     const wasInPrevStack = prevStack.includes(id);
     const prevPanel = prevPanels.find((p) => p.id === id);
-
-    let phase: PanelAnimationPhase;
-    if (!wasInPrevStack && prevStack.length > 0) {
-      // New panel pushed onto stack
-      phase = "entering";
-    } else if (prevPanel?.phase === "entering") {
-      // Was entering, keep entering until animation completes
-      phase = "entering";
-    } else {
-      phase = "active";
-    }
+    const phase = getPanelPhase(wasInPrevStack, prevStack.length, prevPanel?.phase);
 
     result.push({ id, depth: i, phase });
   }
@@ -103,8 +109,7 @@ export function useStackAnimationState(
 
   // Compute panels synchronously during render
   const prevStack = prevStackRef.current;
-  const stackChanged =
-    prevStack.length !== stack.length || prevStack.some((id, i) => stack[i] !== id);
+  const stackChanged = prevStack.length !== stack.length ? true : prevStack.some((id, i) => stack[i] !== id);
 
   if (stackChanged) {
     panelsRef.current = computeAnimatedPanels(panelsRef.current, prevStack, stack);

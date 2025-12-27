@@ -71,7 +71,7 @@ export function useStackSwipeInput(options: UseStackSwipeInputOptions): UseStack
     containerRef,
     edge,
     edgeWidth,
-    enabled: enabled && navigation.canGo(-1), // Only enable if can go back
+    enabled: enabled ? navigation.canGo(-1) : false, // Only enable if can go back
     onSwipeEnd: handleSwipeEnd,
   });
 

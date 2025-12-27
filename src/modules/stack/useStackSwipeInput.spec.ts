@@ -4,16 +4,31 @@
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { useStackSwipeInput } from "./useStackSwipeInput.js";
-import type { UseStackNavigationResult, StackNavigationState } from "./types.js";
+import type { UseStackNavigationResult } from "./types.js";
 
 describe("useStackSwipeInput", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
+  type CallTracker = {
+    calls: ReadonlyArray<ReadonlyArray<unknown>>;
+    fn: (...args: ReadonlyArray<unknown>) => void;
+  };
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
+  const createCallTracker = (): CallTracker => {
+    const calls: Array<ReadonlyArray<unknown>> = [];
+    const fn = (...args: ReadonlyArray<unknown>): void => {
+      calls.push(args);
+    };
+    return { calls, fn };
+  };
+
+  type MockNavigationState = {
+    navigation: Pick<UseStackNavigationResult, "go" | "canGo" | "revealParent" | "dismissReveal" | "state">;
+    calls: {
+      go: CallTracker;
+      canGo: CallTracker;
+      revealParent: CallTracker;
+      dismissReveal: CallTracker;
+    };
+  };
 
   const createRef = (width = 300): React.RefObject<HTMLDivElement> => {
     const element = document.createElement("div");
@@ -29,25 +44,42 @@ describe("useStackSwipeInput", () => {
       y: 0,
       toJSON: () => ({}),
     };
-    vi.spyOn(element, "getBoundingClientRect").mockReturnValue(defaultRect);
+    Object.defineProperty(element, "getBoundingClientRect", {
+      value: () => defaultRect,
+    });
     return { current: element };
   };
 
-  const createMockNavigation = (canGoBack = true): Pick<
-    UseStackNavigationResult,
-    "go" | "canGo" | "revealParent" | "dismissReveal" | "state"
-  > => ({
-    go: vi.fn(),
-    canGo: vi.fn().mockReturnValue(canGoBack),
-    revealParent: vi.fn(),
-    dismissReveal: vi.fn(),
-    state: {
-      stack: ["root", "detail"],
-      depth: 1,
-      isRevealing: false,
-      revealDepth: null,
-    },
-  });
+  const createMockNavigation = (canGoBack = true): MockNavigationState => {
+    const go = createCallTracker();
+    const canGo = createCallTracker();
+    const revealParent = createCallTracker();
+    const dismissReveal = createCallTracker();
+    const canGoFn = (direction: number): boolean => {
+      canGo.fn(direction);
+      return canGoBack;
+    };
+    return {
+      navigation: {
+        go: go.fn,
+        canGo: canGoFn,
+        revealParent: revealParent.fn,
+        dismissReveal: dismissReveal.fn,
+        state: {
+          stack: ["root", "detail"],
+          depth: 1,
+          isRevealing: false,
+          revealDepth: null,
+        },
+      },
+      calls: {
+        go,
+        canGo,
+        revealParent,
+        dismissReveal,
+      },
+    };
+  };
 
   /** Create a mock pointer event with preventDefault */
   const createMockPointerEvent = (props: {
@@ -70,7 +102,7 @@ describe("useStackSwipeInput", () => {
   describe("initialization", () => {
     it("starts with isEdgeSwiping false and progress 0", () => {
       const containerRef = createRef();
-      const navigation = createMockNavigation();
+      const { navigation } = createMockNavigation();
 
       const { result } = renderHook(() =>
         useStackSwipeInput({ containerRef, navigation }),
@@ -82,7 +114,7 @@ describe("useStackSwipeInput", () => {
 
     it("provides container props with style", () => {
       const containerRef = createRef();
-      const navigation = createMockNavigation();
+      const { navigation } = createMockNavigation();
 
       const { result } = renderHook(() =>
         useStackSwipeInput({ containerRef, navigation }),
@@ -95,7 +127,7 @@ describe("useStackSwipeInput", () => {
   describe("edge swipe to go back", () => {
     it("calls go(-1) when swiping from left edge", () => {
       const containerRef = createRef();
-      const navigation = createMockNavigation();
+      const { navigation, calls } = createMockNavigation();
 
       const { result } = renderHook(() =>
         useStackSwipeInput({
@@ -132,12 +164,13 @@ describe("useStackSwipeInput", () => {
         document.dispatchEvent(upEvent);
       });
 
-      expect(navigation.go).toHaveBeenCalledWith(-1);
+      expect(calls.go.calls).toHaveLength(1);
+      expect(calls.go.calls[0]?.[0]).toBe(-1);
     });
 
     it("does not activate when canGo returns false", () => {
       const containerRef = createRef();
-      const navigation = createMockNavigation(false);
+      const { navigation } = createMockNavigation(false);
 
       const { result } = renderHook(() =>
         useStackSwipeInput({
@@ -162,7 +195,7 @@ describe("useStackSwipeInput", () => {
   describe("progress tracking", () => {
     it("calculates progress based on displacement", () => {
       const containerRef = createRef(300);
-      const navigation = createMockNavigation();
+      const { navigation } = createMockNavigation();
 
       const { result } = renderHook(() =>
         useStackSwipeInput({
@@ -195,7 +228,7 @@ describe("useStackSwipeInput", () => {
 
     it("caps progress at 1.0", () => {
       const containerRef = createRef(300);
-      const navigation = createMockNavigation();
+      const { navigation } = createMockNavigation();
 
       const { result } = renderHook(() =>
         useStackSwipeInput({
@@ -230,7 +263,7 @@ describe("useStackSwipeInput", () => {
   describe("disabled state", () => {
     it("does not track when disabled", () => {
       const containerRef = createRef();
-      const navigation = createMockNavigation();
+      const { navigation } = createMockNavigation();
 
       const { result } = renderHook(() =>
         useStackSwipeInput({
@@ -253,7 +286,7 @@ describe("useStackSwipeInput", () => {
   describe("edge configuration", () => {
     it("respects custom edge width", () => {
       const containerRef = createRef();
-      const navigation = createMockNavigation();
+      const { navigation } = createMockNavigation();
 
       const { result } = renderHook(() =>
         useStackSwipeInput({

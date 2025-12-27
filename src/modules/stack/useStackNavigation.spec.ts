@@ -5,6 +5,19 @@ import { renderHook, act } from "@testing-library/react";
 import { useStackNavigation } from "./useStackNavigation.js";
 import type { StackPanel } from "./types.js";
 
+type CallTracker = {
+  calls: ReadonlyArray<ReadonlyArray<unknown>>;
+  fn: (...args: ReadonlyArray<unknown>) => void;
+};
+
+const createCallTracker = (): CallTracker => {
+  const calls: Array<ReadonlyArray<unknown>> = [];
+  const fn = (...args: ReadonlyArray<unknown>): void => {
+    calls.push(args);
+  };
+  return { calls, fn };
+};
+
 describe("useStackNavigation", () => {
   const createPanels = (): ReadonlyArray<StackPanel<"root" | "list" | "detail" | "edit">> => [
     { id: "root", title: "Root", content: "Root Content" },
@@ -94,16 +107,18 @@ describe("useStackNavigation", () => {
 
     it("calls onPanelChange when pushing", () => {
       const panels = createPanels();
-      const onPanelChange = vi.fn();
+      const onPanelChange = createCallTracker();
       const { result } = renderHook(() =>
-        useStackNavigation({ panels, displayMode: "overlay", onPanelChange }),
+        useStackNavigation({ panels, displayMode: "overlay", onPanelChange: onPanelChange.fn }),
       );
 
       act(() => {
         result.current.push("list");
       });
 
-      expect(onPanelChange).toHaveBeenCalledWith("list", 1);
+      expect(onPanelChange.calls).toHaveLength(1);
+      expect(onPanelChange.calls[0]?.[0]).toBe("list");
+      expect(onPanelChange.calls[0]?.[1]).toBe(1);
     });
   });
 

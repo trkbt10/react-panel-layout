@@ -1,4 +1,6 @@
-import { describe, it, expect } from "vitest";
+/**
+ * @file Tests for computeAnimatedPanels helper.
+ */
 import { computeAnimatedPanels, type AnimatedPanel } from "./useStackAnimationState.js";
 
 describe("computeAnimatedPanels", () => {

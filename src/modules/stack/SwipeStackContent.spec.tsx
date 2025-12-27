@@ -8,46 +8,52 @@
  * 4. Button navigation: when navigationDepth changes without swipe, panels should animate
  */
 import { render, act } from "@testing-library/react";
-import { beforeEach, afterEach, vi } from "vitest";
 import { SwipeStackContent } from "./SwipeStackContent.js";
 import type { ContinuousOperationState } from "../../hooks/gesture/types.js";
 
 // Mock requestAnimationFrame for animation testing
-let rafCallbacks: FrameRequestCallback[] = [];
-let rafId = 0;
-let mockTimestamp = 0;
+const rafState = {
+  callbacks: [] as FrameRequestCallback[],
+  id: 0,
+  mockTimestamp: 0,
+  originalRAF: globalThis.requestAnimationFrame,
+  originalCAF: globalThis.cancelAnimationFrame,
+};
 
-const mockRAF = vi.fn((callback: FrameRequestCallback) => {
-  rafCallbacks.push(callback);
-  return ++rafId;
-});
+const resetRafState = (): void => {
+  rafState.callbacks = [];
+  rafState.id = 0;
+  rafState.mockTimestamp = 0;
+};
 
-const mockCAF = vi.fn(() => {
-  // Cancel callback if needed
-});
+const mockRAF = (callback: FrameRequestCallback): number => {
+  rafState.callbacks = [...rafState.callbacks, callback];
+  rafState.id += 1;
+  return rafState.id;
+};
+
+const mockCAF = (): void => {};
 
 /**
  * Flush all pending RAF callbacks.
  * @param advanceMs - How much to advance the mock timestamp (default: 400ms to complete 300ms animation)
  */
-const flushRAF = (advanceMs = 400) => {
-  mockTimestamp += advanceMs;
-  const callbacks = rafCallbacks;
-  rafCallbacks = [];
-  callbacks.forEach(cb => cb(mockTimestamp));
+const flushRAF = (advanceMs = 400): void => {
+  rafState.mockTimestamp += advanceMs;
+  const callbacks = rafState.callbacks;
+  rafState.callbacks = [];
+  callbacks.forEach((cb) => cb(rafState.mockTimestamp));
 };
 
 beforeEach(() => {
-  rafCallbacks = [];
-  rafId = 0;
-  mockTimestamp = 0;
-  vi.stubGlobal("requestAnimationFrame", mockRAF);
-  vi.stubGlobal("cancelAnimationFrame", mockCAF);
+  resetRafState();
+  globalThis.requestAnimationFrame = mockRAF;
+  globalThis.cancelAnimationFrame = mockCAF;
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
-  vi.clearAllMocks();
+  globalThis.requestAnimationFrame = rafState.originalRAF;
+  globalThis.cancelAnimationFrame = rafState.originalCAF;
 });
 
 const IDLE_STATE: ContinuousOperationState = {
@@ -1131,9 +1137,8 @@ describe("SwipeStackContent", () => {
       );
 
       // At rest, should have dimming
-      let overlay = container.querySelector("[data-dimming-overlay]") as HTMLElement;
-      expect(overlay).toBeInTheDocument();
-      const initialOpacity = overlay.style.backgroundColor;
+      const initialOverlay = container.querySelector("[data-dimming-overlay]") as HTMLElement;
+      expect(initialOverlay).toBeInTheDocument();
 
       // During swipe at 100% progress, dimming should be gone
       rerender(
@@ -1149,9 +1154,9 @@ describe("SwipeStackContent", () => {
         </SwipeStackContent>,
       );
 
-      overlay = container.querySelector("[data-dimming-overlay]") as HTMLElement;
+      const overlayAfter = container.querySelector("[data-dimming-overlay]") as HTMLElement;
       // At 100% swipe, opacity should be 0 (no overlay)
-      expect(overlay).not.toBeInTheDocument();
+      expect(overlayAfter).not.toBeInTheDocument();
     });
 
     it("can disable dimming with showDimming=false", () => {
