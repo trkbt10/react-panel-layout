@@ -219,14 +219,12 @@ describe("useAnimatedVisibility", () => {
 
   describe("timeout fallback", () => {
     it("hides after timeout if animationEnd never fires", async () => {
-      vi.useFakeTimers();
-
       const { result, rerender } = renderHook(
         ({ isVisible }) =>
           useAnimatedVisibility({
             isVisible,
             leaveAnimation: "fadeOut 200ms ease-out",
-            animationTimeout: 500,
+            animationTimeout: 10,
           }),
         { initialProps: { isVisible: true } },
       );
@@ -237,25 +235,21 @@ describe("useAnimatedVisibility", () => {
 
       // Advance time past timeout
       await act(async () => {
-        vi.advanceTimersByTime(600);
+        await new Promise((resolve) => setTimeout(resolve, 20));
       });
 
       // Should be hidden now (fallback triggered)
       expect(result.current.style.display).toBe("none");
       expect(result.current.state.isAnimatingOut).toBe(false);
-
-      vi.useRealTimers();
     });
 
     it("clears timeout when animationEnd fires before timeout", async () => {
-      vi.useFakeTimers();
-
       const { result, rerender } = renderHook(
         ({ isVisible }) =>
           useAnimatedVisibility({
             isVisible,
             leaveAnimation: "fadeOut 200ms ease-out",
-            animationTimeout: 500,
+            animationTimeout: 10,
           }),
         { initialProps: { isVisible: true } },
       );
@@ -274,12 +268,10 @@ describe("useAnimatedVisibility", () => {
 
       // Advance past timeout - should not affect state
       await act(async () => {
-        vi.advanceTimersByTime(600);
+        await new Promise((resolve) => setTimeout(resolve, 20));
       });
 
       expect(result.current.style.display).toBe("none");
-
-      vi.useRealTimers();
     });
   });
 });

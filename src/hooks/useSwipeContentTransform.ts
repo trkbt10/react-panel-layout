@@ -42,6 +42,13 @@ export type UseSwipeContentTransformOptions = {
    * Use this for push animations where new panel comes from off-screen.
    */
   initialPx?: number;
+  /**
+   * Skip animation when targetPx changes.
+   * Use this when the target changed during an operation (from useOperationContinuity).
+   * When true, target changes will snap instead of animate.
+   * @default false
+   */
+  skipTargetChangeAnimation?: boolean;
 };
 
 /**
@@ -118,6 +125,9 @@ type TargetChangeResult =
 /**
  * Compute action for target position change when not swiping.
  * Returns the appropriate action: animate, snap, or none.
+ *
+ * @param skipAnimation - If true, skip animation and snap directly.
+ *   Use this when the target changed during an operation (from useOperationContinuity).
  */
 const computeTargetChangeAction = (
   targetPx: number,
@@ -126,6 +136,7 @@ const computeTargetChangeAction = (
   isOperating: boolean,
   isAnimating: boolean,
   animateOnTargetChange: boolean,
+  skipAnimation: boolean,
 ): TargetChangeResult => {
   if (targetPx === prevTargetPx) {
     return { type: "none" };
@@ -139,6 +150,13 @@ const computeTargetChangeAction = (
   if (!animateOnTargetChange) {
     return { type: "snap", position: targetPx };
   }
+
+  // Skip animation if requested (e.g., role changed during operation)
+  // This prevents unwanted animations after an operation ends
+  if (skipAnimation) {
+    return { type: "snap", position: targetPx };
+  }
+
   const distance = Math.abs(currentPx - targetPx);
   if (distance <= 1) {
     return { type: "snap", position: targetPx };
@@ -197,6 +215,7 @@ export function useSwipeContentTransform(
     containerSize,
     animateOnTargetChange = false,
     initialPx,
+    skipTargetChangeAnimation = false,
   } = options;
 
   // Use initialPx if provided, otherwise use targetPx
@@ -229,6 +248,7 @@ export function useSwipeContentTransform(
     isOperating,
     animRef.current !== null,
     animateOnTargetChange,
+    skipTargetChangeAnimation,
   );
   if (targetChangeAction.type === "animate") {
     pendingAnimationRef.current = targetChangeAction.animation;

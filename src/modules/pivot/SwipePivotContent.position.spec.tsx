@@ -31,8 +31,12 @@ const shouldRenderItem = (offset: number): boolean => {
  * Helper to convert offset to display position
  */
 const toDisplayPosition = (offset: number): -1 | 0 | 1 => {
-  if (offset < 0) return -1;
-  if (offset > 0) return 1;
+  if (offset < 0) {
+    return -1;
+  }
+  if (offset > 0) {
+    return 1;
+  }
   return 0;
 };
 
@@ -76,9 +80,9 @@ describe("SwipePivotContent position handling", () => {
       const activeIndex = 0;
 
       // Filter to only adjacent items BEFORE rendering
-      const itemsToRender = items.filter(item =>
-        shouldRenderItem(getPositionOffset(item.index, activeIndex))
-      );
+      const itemsToRender = items.filter((item) => {
+        return shouldRenderItem(getPositionOffset(item.index, activeIndex));
+      });
 
       render(
         <>
@@ -114,9 +118,9 @@ describe("SwipePivotContent position handling", () => {
       ];
       const activeIndex = 1; // On Page 2
 
-      const itemsToRender = items.filter(item =>
-        shouldRenderItem(getPositionOffset(item.index, activeIndex))
-      );
+      const itemsToRender = items.filter((item) => {
+        return shouldRenderItem(getPositionOffset(item.index, activeIndex));
+      });
 
       render(
         <>

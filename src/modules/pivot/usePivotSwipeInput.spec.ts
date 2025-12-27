@@ -6,29 +6,57 @@ import * as React from "react";
 import { usePivotSwipeInput } from "./usePivotSwipeInput.js";
 import type { UsePivotResult } from "./types.js";
 
-describe("usePivotSwipeInput", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
+type CallTracker = {
+  calls: ReadonlyArray<ReadonlyArray<unknown>>;
+  fn: (...args: ReadonlyArray<unknown>) => void;
+};
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
+const createCallTracker = (): CallTracker => {
+  const calls: Array<ReadonlyArray<unknown>> = [];
+  const fn = (...args: ReadonlyArray<unknown>): void => {
+    calls.push(args);
+  };
+  return { calls, fn };
+};
+
+type MockPivotState = {
+  pivot: Pick<UsePivotResult, "go" | "canGo">;
+  calls: {
+    go: CallTracker;
+    canGo: CallTracker;
+  };
+};
+
+describe("usePivotSwipeInput", () => {
 
   const createRef = (): React.RefObject<HTMLDivElement> => {
     const element = document.createElement("div");
     return { current: element };
   };
 
-  const createMockPivot = (): Pick<UsePivotResult, "go" | "canGo"> => ({
-    go: vi.fn(),
-    canGo: vi.fn().mockReturnValue(true),
-  });
+  const createMockPivot = (canGoResult: boolean = true): MockPivotState => {
+    const go = createCallTracker();
+    const canGo = createCallTracker();
+    const canGoFn = (direction: number): boolean => {
+      canGo.fn(direction);
+      return canGoResult;
+    };
+    return {
+      pivot: {
+        go: go.fn,
+        canGo: canGoFn,
+      },
+      calls: {
+        go,
+        canGo,
+      },
+    };
+  };
 
   describe("initialization", () => {
     it("starts with idle state", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot } = createMockPivot(true);
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({ containerRef, pivot }),
@@ -39,7 +67,7 @@ describe("usePivotSwipeInput", () => {
 
     it("provides container props with style", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot } = createMockPivot(true);
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({ containerRef, pivot }),
@@ -53,7 +81,7 @@ describe("usePivotSwipeInput", () => {
   describe("swipe to navigate", () => {
     it("calls go(1) when swiping left (to see next)", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot, calls } = createMockPivot(true);
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({
@@ -96,12 +124,13 @@ describe("usePivotSwipeInput", () => {
       });
 
       // Swipe left (-1 direction) should call go(1) to show next
-      expect(pivot.go).toHaveBeenCalledWith(1);
+      expect(calls.go.calls).toHaveLength(1);
+      expect(calls.go.calls[0]?.[0]).toBe(1);
     });
 
     it("calls go(-1) when swiping right (to see previous)", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot, calls } = createMockPivot(true);
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({
@@ -144,13 +173,13 @@ describe("usePivotSwipeInput", () => {
       });
 
       // Swipe right (1 direction) should call go(-1) to show previous
-      expect(pivot.go).toHaveBeenCalledWith(-1);
+      expect(calls.go.calls).toHaveLength(1);
+      expect(calls.go.calls[0]?.[0]).toBe(-1);
     });
 
     it("does not call go when canGo returns false", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
-      (pivot.canGo as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      const { pivot, calls } = createMockPivot(false);
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({
@@ -192,14 +221,14 @@ describe("usePivotSwipeInput", () => {
         document.dispatchEvent(upEvent);
       });
 
-      expect(pivot.go).not.toHaveBeenCalled();
+      expect(calls.go.calls).toHaveLength(0);
     });
   });
 
   describe("input state tracking", () => {
     it("updates inputState during swipe", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot } = createMockPivot();
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({ containerRef, pivot }),
@@ -240,7 +269,7 @@ describe("usePivotSwipeInput", () => {
   describe("disabled state", () => {
     it("does not track when disabled", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot } = createMockPivot();
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({ containerRef, pivot, enabled: false }),
@@ -266,7 +295,7 @@ describe("usePivotSwipeInput", () => {
   describe("vertical axis", () => {
     it("supports vertical swipe when axis is vertical", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot } = createMockPivot();
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({
@@ -312,7 +341,8 @@ describe("usePivotSwipeInput", () => {
       });
 
       // Swipe up (-1 direction) should call go(1) to show next
-      expect(pivot.go).toHaveBeenCalledWith(1);
+      expect(calls.go.calls).toHaveLength(1);
+      expect(calls.go.calls[0]?.[0]).toBe(1);
     });
   });
 
@@ -334,7 +364,7 @@ describe("usePivotSwipeInput", () => {
 
     it("should NOT trigger navigation with small displacement (under 25% of container)", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot, calls } = createMockPivot();
 
       // コンテナ幅が400pxの場合、25%=100px未満はトリガーしないべき
       const containerWidth = 400;
@@ -386,12 +416,12 @@ describe("usePivotSwipeInput", () => {
       });
 
       // 閾値未満の移動ではナビゲーションされないべき
-      expect(pivot.go).not.toHaveBeenCalled();
+      expect(calls.go.calls).toHaveLength(0);
     });
 
     it("should trigger navigation with significant displacement (over 25% of container)", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot, calls } = createMockPivot();
 
       const containerWidth = 400;
       const significantDisplacement = containerWidth * 0.3; // 120px = 30%
@@ -439,12 +469,13 @@ describe("usePivotSwipeInput", () => {
       });
 
       // 閾値を超えた移動ではナビゲーションされる
-      expect(pivot.go).toHaveBeenCalledWith(1);
+      expect(calls.go.calls).toHaveLength(1);
+      expect(calls.go.calls[0]?.[0]).toBe(1);
     });
 
     it("does NOT trigger with displacement under default threshold (100px)", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot, calls } = createMockPivot();
 
       // デフォルト閾値: distanceThreshold: 100px, velocityThreshold: 0.5 px/ms
       const { result } = renderHook(() =>
@@ -486,12 +517,12 @@ describe("usePivotSwipeInput", () => {
       });
 
       // 閾値未満なのでトリガーされない
-      expect(pivot.go).not.toHaveBeenCalled();
+      expect(calls.go.calls).toHaveLength(0);
     });
 
     it("triggers with displacement over default threshold (100px)", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot, calls } = createMockPivot();
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({
@@ -530,7 +561,8 @@ describe("usePivotSwipeInput", () => {
         document.dispatchEvent(upEvent);
       });
 
-      expect(pivot.go).toHaveBeenCalledWith(1);
+      expect(calls.go.calls).toHaveLength(1);
+      expect(calls.go.calls[0]?.[0]).toBe(1);
     });
   });
 
@@ -551,7 +583,7 @@ describe("usePivotSwipeInput", () => {
 
     it("should NOT trigger navigation when pointercancel fires (finger still down)", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot, calls } = createMockPivot();
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({
@@ -595,12 +627,12 @@ describe("usePivotSwipeInput", () => {
       });
 
       // Navigation should NOT be triggered - the swipe was canceled, not completed
-      expect(pivot.go).not.toHaveBeenCalled();
+      expect(calls.go.calls).toHaveLength(0);
     });
 
     it("should trigger navigation normally on pointerup", () => {
       const containerRef = createRef();
-      const pivot = createMockPivot();
+      const { pivot, calls } = createMockPivot();
 
       const { result } = renderHook(() =>
         usePivotSwipeInput({
@@ -643,7 +675,8 @@ describe("usePivotSwipeInput", () => {
       });
 
       // Navigation SHOULD be triggered
-      expect(pivot.go).toHaveBeenCalledWith(1);
+      expect(calls.go.calls).toHaveLength(1);
+      expect(calls.go.calls[0]?.[0]).toBe(1);
     });
   });
 });

@@ -5,19 +5,44 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { DialogContainer } from "./DialogContainer";
 import * as React from "react";
 
+type CallTracker = {
+  calls: ReadonlyArray<ReadonlyArray<unknown>>;
+  fn: (...args: ReadonlyArray<unknown>) => void;
+};
+
+const createCallTracker = (): CallTracker => {
+  const calls: Array<ReadonlyArray<unknown>> = [];
+  const fn = (...args: ReadonlyArray<unknown>): void => {
+    calls.push(args);
+  };
+  return { calls, fn };
+};
+
 describe("DialogContainer", () => {
+  const originalShowModal = HTMLDialogElement.prototype.showModal;
+  const originalClose = HTMLDialogElement.prototype.close;
+  const dialogCallState = {
+    showModal: createCallTracker(),
+    close: createCallTracker(),
+  };
+
   beforeEach(() => {
     // Mock showModal and close for dialog element
-    HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
+    dialogCallState.showModal = createCallTracker();
+    dialogCallState.close = createCallTracker();
+    HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+      dialogCallState.showModal.fn();
       this.setAttribute("open", "");
-    });
-    HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+    };
+    HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
+      dialogCallState.close.fn();
       this.removeAttribute("open");
-    });
+    };
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    HTMLDialogElement.prototype.showModal = originalShowModal;
+    HTMLDialogElement.prototype.close = originalClose;
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
   });
@@ -40,7 +65,7 @@ describe("DialogContainer", () => {
       </DialogContainer>,
     );
 
-    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();
+    expect(dialogCallState.showModal.calls).toHaveLength(1);
   });
 
   it("should call close when visible changes from true to false", () => {
@@ -56,13 +81,13 @@ describe("DialogContainer", () => {
       </DialogContainer>,
     );
 
-    expect(HTMLDialogElement.prototype.close).toHaveBeenCalled();
+    expect(dialogCallState.close.calls).toHaveLength(1);
   });
 
   it("should call onClose when Escape is pressed", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <DialogContainer visible={true} onClose={onClose}>
+      <DialogContainer visible={true} onClose={onClose.fn}>
         <div>Content</div>
       </DialogContainer>,
     );
@@ -73,13 +98,13 @@ describe("DialogContainer", () => {
     // Simulate cancel event (triggered by Escape key)
     fireEvent(dialog!, new Event("cancel", { bubbles: true, cancelable: true }));
 
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(1);
   });
 
   it("should NOT call onClose when Escape is pressed and closeOnEscape is false", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <DialogContainer visible={true} onClose={onClose} closeOnEscape={false}>
+      <DialogContainer visible={true} onClose={onClose.fn} closeOnEscape={false}>
         <div>Content</div>
       </DialogContainer>,
     );
@@ -87,13 +112,13 @@ describe("DialogContainer", () => {
     const dialog = document.querySelector("dialog");
     fireEvent(dialog!, new Event("cancel", { bubbles: true, cancelable: true }));
 
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(0);
   });
 
   it("should call onClose when backdrop is clicked", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <DialogContainer visible={true} onClose={onClose}>
+      <DialogContainer visible={true} onClose={onClose.fn}>
         <div data-testid="content">Content</div>
       </DialogContainer>,
     );
@@ -102,13 +127,13 @@ describe("DialogContainer", () => {
     // Click directly on dialog (backdrop area)
     fireEvent.click(dialog!);
 
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(1);
   });
 
   it("should NOT call onClose when content is clicked", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <DialogContainer visible={true} onClose={onClose}>
+      <DialogContainer visible={true} onClose={onClose.fn}>
         <div data-testid="content">Content</div>
       </DialogContainer>,
     );
@@ -116,13 +141,13 @@ describe("DialogContainer", () => {
     const content = screen.getByTestId("content");
     fireEvent.click(content);
 
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(0);
   });
 
   it("should NOT call onClose when backdrop is clicked and dismissible is false", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <DialogContainer visible={true} onClose={onClose} dismissible={false}>
+      <DialogContainer visible={true} onClose={onClose.fn} dismissible={false}>
         <div>Content</div>
       </DialogContainer>,
     );
@@ -130,7 +155,7 @@ describe("DialogContainer", () => {
     const dialog = document.querySelector("dialog");
     fireEvent.click(dialog!);
 
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(0);
   });
 
   it("should apply aria attributes", () => {
@@ -187,9 +212,9 @@ describe("DialogContainer", () => {
   });
 
   it("should stop propagation on content pointer down to prevent backdrop detection", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <DialogContainer visible={true} onClose={onClose}>
+      <DialogContainer visible={true} onClose={onClose.fn}>
         <button data-testid="button">Click me</button>
       </DialogContainer>,
     );
@@ -198,6 +223,6 @@ describe("DialogContainer", () => {
     fireEvent.pointerDown(button);
 
     // The click should not close the dialog because propagation is stopped
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(0);
   });
 });

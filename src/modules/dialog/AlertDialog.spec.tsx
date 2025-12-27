@@ -4,18 +4,35 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AlertDialog } from "./AlertDialog";
 
+type CallTracker = {
+  calls: ReadonlyArray<ReadonlyArray<unknown>>;
+  fn: (...args: ReadonlyArray<unknown>) => void;
+};
+
+const createCallTracker = (): CallTracker => {
+  const calls: Array<ReadonlyArray<unknown>> = [];
+  const fn = (...args: ReadonlyArray<unknown>): void => {
+    calls.push(args);
+  };
+  return { calls, fn };
+};
+
 describe("AlertDialog", () => {
+  const originalShowModal = HTMLDialogElement.prototype.showModal;
+  const originalClose = HTMLDialogElement.prototype.close;
+
   beforeEach(() => {
-    HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
+    HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
       this.setAttribute("open", "");
-    });
-    HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+    };
+    HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
       this.removeAttribute("open");
-    });
+    };
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    HTMLDialogElement.prototype.showModal = originalShowModal;
+    HTMLDialogElement.prototype.close = originalClose;
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
   });
@@ -60,14 +77,14 @@ describe("AlertDialog", () => {
     });
 
     it("should call onConfirm when OK is clicked", () => {
-      const onConfirm = vi.fn();
+      const onConfirm = createCallTracker();
       render(
-        <AlertDialog type="alert" visible={true} message="Message" onConfirm={onConfirm} onCancel={() => {}} />,
+        <AlertDialog type="alert" visible={true} message="Message" onConfirm={onConfirm.fn} onCancel={() => {}} />,
       );
 
       fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
-      expect(onConfirm).toHaveBeenCalled();
+      expect(onConfirm.calls).toHaveLength(1);
     });
 
     it("should use custom confirmLabel", () => {
@@ -97,37 +114,43 @@ describe("AlertDialog", () => {
     });
 
     it("should call onConfirm when OK is clicked", () => {
-      const onConfirm = vi.fn();
+      const onConfirm = createCallTracker();
       render(
-        <AlertDialog type="confirm" visible={true} message="Are you sure?" onConfirm={onConfirm} onCancel={() => {}} />,
+        <AlertDialog type="confirm" visible={true} message="Are you sure?" onConfirm={onConfirm.fn} onCancel={() => {}} />,
       );
 
       fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
-      expect(onConfirm).toHaveBeenCalled();
+      expect(onConfirm.calls).toHaveLength(1);
     });
 
     it("should call onCancel when Cancel is clicked", () => {
-      const onCancel = vi.fn();
+      const onCancel = createCallTracker();
       render(
-        <AlertDialog type="confirm" visible={true} message="Are you sure?" onConfirm={() => {}} onCancel={onCancel} />,
+        <AlertDialog type="confirm" visible={true} message="Are you sure?" onConfirm={() => {}} onCancel={onCancel.fn} />,
       );
 
       fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
-      expect(onCancel).toHaveBeenCalled();
+      expect(onCancel.calls).toHaveLength(1);
     });
 
     it("should call onCancel when backdrop is clicked", () => {
-      const onCancel = vi.fn();
+      const onCancel = createCallTracker();
       render(
-        <AlertDialog type="confirm" visible={true} message="Are you sure?" onConfirm={() => {}} onCancel={onCancel} />,
+        <AlertDialog
+          type="confirm"
+          visible={true}
+          message="Are you sure?"
+          onConfirm={() => {}}
+          onCancel={onCancel.fn}
+        />,
       );
 
       const dialog = document.querySelector("dialog");
       fireEvent.click(dialog!);
 
-      expect(onCancel).toHaveBeenCalled();
+      expect(onCancel.calls).toHaveLength(1);
     });
 
     it("should use custom button labels", () => {
@@ -211,31 +234,32 @@ describe("AlertDialog", () => {
     });
 
     it("should call onConfirm with input value when OK is clicked", () => {
-      const onConfirm = vi.fn();
+      const onConfirm = createCallTracker();
       render(
         <AlertDialog
           type="prompt"
           visible={true}
           message="Enter your name:"
           defaultValue="Hello"
-          onConfirm={onConfirm}
+          onConfirm={onConfirm.fn}
           onCancel={() => {}}
         />,
       );
 
       fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
-      expect(onConfirm).toHaveBeenCalledWith("Hello");
+      expect(onConfirm.calls).toHaveLength(1);
+      expect(onConfirm.calls[0]?.[0]).toBe("Hello");
     });
 
     it("should call onConfirm with changed input value", () => {
-      const onConfirm = vi.fn();
+      const onConfirm = createCallTracker();
       render(
         <AlertDialog
           type="prompt"
           visible={true}
           message="Enter your name:"
-          onConfirm={onConfirm}
+          onConfirm={onConfirm.fn}
           onCancel={() => {}}
         />,
       );
@@ -244,18 +268,19 @@ describe("AlertDialog", () => {
       fireEvent.change(input, { target: { value: "Changed Value" } });
       fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
-      expect(onConfirm).toHaveBeenCalledWith("Changed Value");
+      expect(onConfirm.calls).toHaveLength(1);
+      expect(onConfirm.calls[0]?.[0]).toBe("Changed Value");
     });
 
     it("should call onConfirm when Enter is pressed in input", () => {
-      const onConfirm = vi.fn();
+      const onConfirm = createCallTracker();
       render(
         <AlertDialog
           type="prompt"
           visible={true}
           message="Enter your name:"
           defaultValue="Test"
-          onConfirm={onConfirm}
+          onConfirm={onConfirm.fn}
           onCancel={() => {}}
         />,
       );
@@ -263,24 +288,25 @@ describe("AlertDialog", () => {
       const input = screen.getByRole("textbox");
       fireEvent.keyDown(input, { key: "Enter" });
 
-      expect(onConfirm).toHaveBeenCalledWith("Test");
+      expect(onConfirm.calls).toHaveLength(1);
+      expect(onConfirm.calls[0]?.[0]).toBe("Test");
     });
 
     it("should call onCancel when Cancel is clicked", () => {
-      const onCancel = vi.fn();
+      const onCancel = createCallTracker();
       render(
         <AlertDialog
           type="prompt"
           visible={true}
           message="Enter your name:"
           onConfirm={() => {}}
-          onCancel={onCancel}
+          onCancel={onCancel.fn}
         />,
       );
 
       fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
-      expect(onCancel).toHaveBeenCalled();
+      expect(onCancel.calls).toHaveLength(1);
     });
 
     it("should support password input type", () => {

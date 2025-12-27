@@ -4,18 +4,35 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Modal } from "./Modal";
 
+type CallTracker = {
+  calls: ReadonlyArray<ReadonlyArray<unknown>>;
+  fn: (...args: ReadonlyArray<unknown>) => void;
+};
+
+const createCallTracker = (): CallTracker => {
+  const calls: Array<ReadonlyArray<unknown>> = [];
+  const fn = (...args: ReadonlyArray<unknown>): void => {
+    calls.push(args);
+  };
+  return { calls, fn };
+};
+
 describe("Modal", () => {
+  const originalShowModal = HTMLDialogElement.prototype.showModal;
+  const originalClose = HTMLDialogElement.prototype.close;
+
   beforeEach(() => {
-    HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
+    HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
       this.setAttribute("open", "");
-    });
-    HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+    };
+    HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
       this.removeAttribute("open");
-    });
+    };
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    HTMLDialogElement.prototype.showModal = originalShowModal;
+    HTMLDialogElement.prototype.close = originalClose;
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
   });
@@ -72,9 +89,9 @@ describe("Modal", () => {
   });
 
   it("should call onClose when close button is clicked", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <Modal visible={true} onClose={onClose} header={{ title: "Title" }}>
+      <Modal visible={true} onClose={onClose.fn} header={{ title: "Title" }}>
         <div>Content</div>
       </Modal>,
     );
@@ -82,13 +99,13 @@ describe("Modal", () => {
     const closeButton = screen.getByRole("button", { name: "Close modal" });
     fireEvent.click(closeButton);
 
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(1);
   });
 
   it("should call onClose when Escape is pressed", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <Modal visible={true} onClose={onClose}>
+      <Modal visible={true} onClose={onClose.fn}>
         <div>Content</div>
       </Modal>,
     );
@@ -96,13 +113,13 @@ describe("Modal", () => {
     const dialog = document.querySelector("dialog");
     fireEvent(dialog!, new Event("cancel", { bubbles: true, cancelable: true }));
 
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(1);
   });
 
   it("should call onClose when backdrop is clicked", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <Modal visible={true} onClose={onClose}>
+      <Modal visible={true} onClose={onClose.fn}>
         <div data-testid="content">Content</div>
       </Modal>,
     );
@@ -110,13 +127,13 @@ describe("Modal", () => {
     const dialog = document.querySelector("dialog");
     fireEvent.click(dialog!);
 
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(1);
   });
 
   it("should NOT call onClose when content is clicked", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     render(
-      <Modal visible={true} onClose={onClose}>
+      <Modal visible={true} onClose={onClose.fn}>
         <div data-testid="content">Content</div>
       </Modal>,
     );
@@ -124,7 +141,7 @@ describe("Modal", () => {
     const content = screen.getByTestId("content");
     fireEvent.click(content);
 
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(0);
   });
 
   it("should NOT render chrome when chrome is false", () => {

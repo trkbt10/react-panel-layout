@@ -5,18 +5,35 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { useDialog } from "./useDialog";
 
+type CallTracker = {
+  calls: ReadonlyArray<ReadonlyArray<unknown>>;
+  fn: (...args: ReadonlyArray<unknown>) => void;
+};
+
+const createCallTracker = (): CallTracker => {
+  const calls: Array<ReadonlyArray<unknown>> = [];
+  const fn = (...args: ReadonlyArray<unknown>): void => {
+    calls.push(args);
+  };
+  return { calls, fn };
+};
+
 describe("useDialog", () => {
+  const originalShowModal = HTMLDialogElement.prototype.showModal;
+  const originalClose = HTMLDialogElement.prototype.close;
+
   beforeEach(() => {
-    HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
+    HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
       this.setAttribute("open", "");
-    });
-    HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+    };
+    HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
       this.removeAttribute("open");
-    });
+    };
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    HTMLDialogElement.prototype.showModal = originalShowModal;
+    HTMLDialogElement.prototype.close = originalClose;
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
   });
@@ -71,8 +88,8 @@ describe("useDialog", () => {
     });
 
     it("should resolve when OK is clicked", async () => {
-      const onAlert = vi.fn();
-      render(<TestComponent onAlert={onAlert} />);
+      const onAlert = createCallTracker();
+      render(<TestComponent onAlert={onAlert.fn} />);
 
       fireEvent.click(screen.getByTestId("alert-btn"));
 
@@ -83,7 +100,7 @@ describe("useDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
       await waitFor(() => {
-        expect(onAlert).toHaveBeenCalled();
+        expect(onAlert.calls).toHaveLength(1);
       });
     });
 
@@ -119,8 +136,8 @@ describe("useDialog", () => {
     });
 
     it("should resolve with true when OK is clicked", async () => {
-      const onConfirm = vi.fn();
-      render(<TestComponent onConfirm={onConfirm} />);
+      const onConfirm = createCallTracker();
+      render(<TestComponent onConfirm={onConfirm.fn} />);
 
       fireEvent.click(screen.getByTestId("confirm-btn"));
 
@@ -131,13 +148,14 @@ describe("useDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
       await waitFor(() => {
-        expect(onConfirm).toHaveBeenCalledWith(true);
+        expect(onConfirm.calls).toHaveLength(1);
+        expect(onConfirm.calls[0]?.[0]).toBe(true);
       });
     });
 
     it("should resolve with false when Cancel is clicked", async () => {
-      const onConfirm = vi.fn();
-      render(<TestComponent onConfirm={onConfirm} />);
+      const onConfirm = createCallTracker();
+      render(<TestComponent onConfirm={onConfirm.fn} />);
 
       fireEvent.click(screen.getByTestId("confirm-btn"));
 
@@ -148,13 +166,14 @@ describe("useDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
       await waitFor(() => {
-        expect(onConfirm).toHaveBeenCalledWith(false);
+        expect(onConfirm.calls).toHaveLength(1);
+        expect(onConfirm.calls[0]?.[0]).toBe(false);
       });
     });
 
     it("should resolve with false when backdrop is clicked", async () => {
-      const onConfirm = vi.fn();
-      render(<TestComponent onConfirm={onConfirm} />);
+      const onConfirm = createCallTracker();
+      render(<TestComponent onConfirm={onConfirm.fn} />);
 
       fireEvent.click(screen.getByTestId("confirm-btn"));
 
@@ -166,7 +185,8 @@ describe("useDialog", () => {
       fireEvent.click(dialog!);
 
       await waitFor(() => {
-        expect(onConfirm).toHaveBeenCalledWith(false);
+        expect(onConfirm.calls).toHaveLength(1);
+        expect(onConfirm.calls[0]?.[0]).toBe(false);
       });
     });
   });
@@ -184,8 +204,8 @@ describe("useDialog", () => {
     });
 
     it("should resolve with input value when OK is clicked", async () => {
-      const onPrompt = vi.fn();
-      render(<TestComponent onPrompt={onPrompt} />);
+      const onPrompt = createCallTracker();
+      render(<TestComponent onPrompt={onPrompt.fn} />);
 
       fireEvent.click(screen.getByTestId("prompt-btn"));
 
@@ -198,13 +218,14 @@ describe("useDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: "OK" }));
 
       await waitFor(() => {
-        expect(onPrompt).toHaveBeenCalledWith("Test input");
+        expect(onPrompt.calls).toHaveLength(1);
+        expect(onPrompt.calls[0]?.[0]).toBe("Test input");
       });
     });
 
     it("should resolve with null when Cancel is clicked", async () => {
-      const onPrompt = vi.fn();
-      render(<TestComponent onPrompt={onPrompt} />);
+      const onPrompt = createCallTracker();
+      render(<TestComponent onPrompt={onPrompt.fn} />);
 
       fireEvent.click(screen.getByTestId("prompt-btn"));
 
@@ -215,13 +236,14 @@ describe("useDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
       await waitFor(() => {
-        expect(onPrompt).toHaveBeenCalledWith(null);
+        expect(onPrompt.calls).toHaveLength(1);
+        expect(onPrompt.calls[0]?.[0]).toBe(null);
       });
     });
 
     it("should resolve with null when backdrop is clicked", async () => {
-      const onPrompt = vi.fn();
-      render(<TestComponent onPrompt={onPrompt} />);
+      const onPrompt = createCallTracker();
+      render(<TestComponent onPrompt={onPrompt.fn} />);
 
       fireEvent.click(screen.getByTestId("prompt-btn"));
 
@@ -233,7 +255,8 @@ describe("useDialog", () => {
       fireEvent.click(dialog!);
 
       await waitFor(() => {
-        expect(onPrompt).toHaveBeenCalledWith(null);
+        expect(onPrompt.calls).toHaveLength(1);
+        expect(onPrompt.calls[0]?.[0]).toBe(null);
       });
     });
   });

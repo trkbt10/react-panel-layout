@@ -7,7 +7,6 @@
  * - Same tab may appear at multiple slots (clones for infinite loop)
  * - Query by data-slot attribute for unique identification
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import * as React from "react";
 import { SwipePivotTabBar } from "./SwipePivotTabBar";
@@ -15,34 +14,59 @@ import type { IndicatorRenderProps } from "./SwipePivotTabBar";
 import type { SwipeInputState } from "../../hooks/gesture/types";
 
 // Mock requestAnimationFrame for animation testing
-let rafCallbacks: FrameRequestCallback[] = [];
-let rafId = 0;
+const rafState = {
+  callbacks: [] as FrameRequestCallback[],
+  id: 0,
+  originalRAF: globalThis.requestAnimationFrame,
+  originalCAF: globalThis.cancelAnimationFrame,
+};
 
-const mockRAF = vi.fn((callback: FrameRequestCallback) => {
-  rafCallbacks.push(callback);
-  return ++rafId;
-});
+const resetRafState = (): void => {
+  rafState.callbacks = [];
+  rafState.id = 0;
+};
 
-const mockCAF = vi.fn((id: number) => {
-  // Remove callback if needed
-});
+const mockRAF = (callback: FrameRequestCallback): number => {
+  rafState.callbacks = [...rafState.callbacks, callback];
+  rafState.id += 1;
+  return rafState.id;
+};
 
-const flushRAF = () => {
-  const callbacks = rafCallbacks;
-  rafCallbacks = [];
-  callbacks.forEach(cb => cb(performance.now()));
+const mockCAF = (id: number): void => {
+  void id;
+};
+
+const flushRAF = (): void => {
+  const callbacks = rafState.callbacks;
+  rafState.callbacks = [];
+  callbacks.forEach((cb) => cb(performance.now()));
+};
+
+type RenderTracker<TArgs extends ReadonlyArray<unknown>, TResult> = {
+  calls: ReadonlyArray<TArgs>;
+  fn: (...args: TArgs) => TResult;
+};
+
+const createRenderTracker = <TArgs extends ReadonlyArray<unknown>, TResult>(
+  implementation: (...args: TArgs) => TResult,
+): RenderTracker<TArgs, TResult> => {
+  const calls: Array<TArgs> = [];
+  const fn = (...args: TArgs): TResult => {
+    calls.push(args);
+    return implementation(...args);
+  };
+  return { calls, fn };
 };
 
 beforeEach(() => {
-  rafCallbacks = [];
-  rafId = 0;
-  vi.stubGlobal("requestAnimationFrame", mockRAF);
-  vi.stubGlobal("cancelAnimationFrame", mockCAF);
+  resetRafState();
+  globalThis.requestAnimationFrame = mockRAF;
+  globalThis.cancelAnimationFrame = mockCAF;
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
-  vi.clearAllMocks();
+  globalThis.requestAnimationFrame = rafState.originalRAF;
+  globalThis.cancelAnimationFrame = rafState.originalCAF;
 });
 
 const createItems = () => [
@@ -65,13 +89,6 @@ const swipingLeftState = (displacement: number): SwipeInputState => ({
   displacement: { x: displacement, y: 0 },
   velocity: { x: -0.5, y: 0 },
   direction: -1,
-});
-
-const swipingRightState = (displacement: number): SwipeInputState => ({
-  phase: "swiping",
-  displacement: { x: displacement, y: 0 },
-  velocity: { x: 0.5, y: 0 },
-  direction: 1,
 });
 
 const endedState = (direction: -1 | 0 | 1): SwipeInputState => ({
@@ -102,10 +119,6 @@ const getSlot = (container: HTMLElement, slotPosition: number): HTMLElement | nu
 };
 
 // Helper to get all visible slots
-const getVisibleSlots = (container: HTMLElement): HTMLElement[] => {
-  return Array.from(container.querySelectorAll('[data-slot][style*="visibility: visible"]'));
-};
-
 describe("SwipePivotTabBar", () => {
   describe("Initial render", () => {
     it("renders tabs at slot positions", () => {
@@ -609,7 +622,9 @@ describe("SwipePivotTabBar", () => {
 
   describe("Sliding indicator (iOS-style)", () => {
     it("renders indicator with correct offset props", () => {
-      const indicatorFn = vi.fn(() => <div data-testid="indicator" />);
+      const indicatorTracker = createRenderTracker<readonly [IndicatorRenderProps], React.ReactNode>(() => (
+        <div data-testid="indicator" />
+      ));
 
       render(
         <SwipePivotTabBar
@@ -618,11 +633,12 @@ describe("SwipePivotTabBar", () => {
           activeIndex={0}
           itemCount={5}
           inputState={idleState}
-          renderIndicator={indicatorFn}
+          renderIndicator={indicatorTracker.fn}
         />
       );
 
-      expect(indicatorFn).toHaveBeenCalledWith({
+      expect(indicatorTracker.calls).toHaveLength(1);
+      expect(indicatorTracker.calls[0]?.[0]).toEqual({
         offsetPx: 0,
         tabWidth: 100,
         centerX: 200,
@@ -634,7 +650,9 @@ describe("SwipePivotTabBar", () => {
     });
 
     it("passes swipe displacement to indicator", () => {
-      const indicatorFn = vi.fn((_props: IndicatorRenderProps) => <div data-testid="indicator" />);
+      const indicatorTracker = createRenderTracker<readonly [IndicatorRenderProps], React.ReactNode>(() => (
+        <div data-testid="indicator" />
+      ));
 
       const { rerender } = render(
         <SwipePivotTabBar
@@ -643,7 +661,7 @@ describe("SwipePivotTabBar", () => {
           activeIndex={0}
           itemCount={5}
           inputState={idleState}
-          renderIndicator={indicatorFn}
+          renderIndicator={indicatorTracker.fn}
         />
       );
 
@@ -654,20 +672,19 @@ describe("SwipePivotTabBar", () => {
           activeIndex={0}
           itemCount={5}
           inputState={swipingLeftState(-60)}
-          renderIndicator={indicatorFn}
+          renderIndicator={indicatorTracker.fn}
         />
       );
 
       // Last call should have the swipe offset
-      const calls = indicatorFn.mock.calls;
-      expect(calls.length).toBeGreaterThan(0);
-      const lastCall = calls[calls.length - 1]![0];
+      expect(indicatorTracker.calls.length).toBeGreaterThan(0);
+      const lastCall = indicatorTracker.calls[indicatorTracker.calls.length - 1]![0];
       expect(lastCall.offsetPx).toBe(-60);
       expect(lastCall.isSwiping).toBe(true);
     });
 
     it("indicator follows same offset as tabs", () => {
-      let indicatorOffset = 0;
+      const indicatorState = { offset: 0 };
 
       const { container, rerender } = render(
         <SwipePivotTabBar
@@ -677,7 +694,7 @@ describe("SwipePivotTabBar", () => {
           itemCount={5}
           inputState={idleState}
           renderIndicator={({ offsetPx }) => {
-            indicatorOffset = offsetPx;
+            indicatorState.offset = offsetPx;
             return <div data-testid="indicator" />;
           }}
         />
@@ -691,7 +708,7 @@ describe("SwipePivotTabBar", () => {
           itemCount={5}
           inputState={swipingLeftState(-80)}
           renderIndicator={({ offsetPx }) => {
-            indicatorOffset = offsetPx;
+            indicatorState.offset = offsetPx;
             return <div data-testid="indicator" />;
           }}
         />
@@ -700,7 +717,7 @@ describe("SwipePivotTabBar", () => {
       // Verify indicator offset matches tab offset
       const slot0 = getSlot(container, 0);
       expect(slot0).toHaveStyle({ transform: "translateX(-80px)" });
-      expect(indicatorOffset).toBe(-80);
+      expect(indicatorState.offset).toBe(-80);
     });
   });
 
@@ -742,8 +759,7 @@ describe("SwipePivotTabBar", () => {
 
   describe("Fixed tabs mode (iOS segmented control style)", () => {
     it("tabs stay fixed during swipe, only indicator moves", () => {
-      let indicatorOffset = 0;
-      let indicatorCenterX = 0;
+      const indicatorState = { offset: 0, centerX: 0 };
 
       const { container, rerender } = render(
         <SwipePivotTabBar
@@ -754,8 +770,8 @@ describe("SwipePivotTabBar", () => {
           fixedTabs={true}
           inputState={idleState}
           renderIndicator={({ offsetPx, centerX }) => {
-            indicatorOffset = offsetPx;
-            indicatorCenterX = centerX;
+            indicatorState.offset = offsetPx;
+            indicatorState.centerX = centerX;
             return <div data-testid="indicator" />;
           }}
         />
@@ -769,8 +785,8 @@ describe("SwipePivotTabBar", () => {
       // viewportWidth=500, 5 tabs * 100px = 500px, centeringOffset = (500-500)/2 = 0
       // centerX is fixed at centeringOffset = 0
       // offsetPx = activeIndex * tabWidth = 0 * 100 = 0
-      expect(indicatorCenterX).toBe(0);
-      expect(indicatorOffset).toBe(0);
+      expect(indicatorState.centerX).toBe(0);
+      expect(indicatorState.offset).toBe(0);
 
       // During swipe, tabs should NOT have transform (they're fixed)
       rerender(
@@ -782,8 +798,8 @@ describe("SwipePivotTabBar", () => {
           fixedTabs={true}
           inputState={swipingLeftState(-80)}
           renderIndicator={({ offsetPx, centerX }) => {
-            indicatorOffset = offsetPx;
-            indicatorCenterX = centerX;
+            indicatorState.offset = offsetPx;
+            indicatorState.centerX = centerX;
             return <div data-testid="indicator" />;
           }}
         />
@@ -791,7 +807,7 @@ describe("SwipePivotTabBar", () => {
 
       // Indicator should move OPPOSITE to swipe direction
       // Swipe left (displacement = -80) → indicator moves right (+80)
-      expect(indicatorOffset).toBe(80);
+      expect(indicatorState.offset).toBe(80);
 
       // Tabs should not have any transform applied (position is relative, not absolute with transform)
       const tabsAfterSwipe = container.querySelectorAll("[data-pivot-tab]");
@@ -804,12 +820,12 @@ describe("SwipePivotTabBar", () => {
     });
 
     it("indicator moves to new tab position when activeIndex changes", () => {
-      let indicatorOffsetPx = 0;
-      let indicatorCenterX = 0;
+      const indicatorState = { offsetPx: 0, centerX: 0 };
 
       // Mock performance.now to control animation timing
-      let mockTime = 0;
-      vi.spyOn(performance, "now").mockImplementation(() => mockTime);
+      const originalNow = performance.now;
+      const timeState = { value: 0 };
+      performance.now = () => timeState.value;
 
       const { rerender } = render(
         <SwipePivotTabBar
@@ -820,17 +836,17 @@ describe("SwipePivotTabBar", () => {
           fixedTabs={true}
           inputState={idleState}
           renderIndicator={({ offsetPx, centerX }) => {
-            indicatorOffsetPx = offsetPx;
-            indicatorCenterX = centerX;
+            indicatorState.offsetPx = offsetPx;
+            indicatorState.centerX = centerX;
             return <div data-testid="indicator" />;
           }}
         />
       );
 
       // centerX is fixed at centering offset (0 for 5 tabs * 100px = 500px viewport)
-      expect(indicatorCenterX).toBe(0);
+      expect(indicatorState.centerX).toBe(0);
       // offsetPx includes active tab position
-      expect(indicatorOffsetPx).toBe(0); // Tab 1 at position 0
+      expect(indicatorState.offsetPx).toBe(0); // Tab 1 at position 0
 
       rerender(
         <SwipePivotTabBar
@@ -841,25 +857,26 @@ describe("SwipePivotTabBar", () => {
           fixedTabs={true}
           inputState={idleState}
           renderIndicator={({ offsetPx, centerX }) => {
-            indicatorOffsetPx = offsetPx;
-            indicatorCenterX = centerX;
+            indicatorState.offsetPx = offsetPx;
+            indicatorState.centerX = centerX;
             return <div data-testid="indicator" />;
           }}
         />
       );
 
       // Animation starts - flush RAF callbacks until animation completes
-      mockTime = 500; // Advance past animation duration (300ms default)
+      timeState.value = 500; // Advance past animation duration (300ms default)
       act(() => {
-        for (let i = 0; i < 10; i++) {
+        Array.from({ length: 10 }).forEach(() => {
           flushRAF();
-        }
+        });
       });
 
       // centerX stays fixed
-      expect(indicatorCenterX).toBe(0);
+      expect(indicatorState.centerX).toBe(0);
       // offsetPx now includes Tab 3 position (after animation completes)
-      expect(indicatorOffsetPx).toBe(200); // Tab 3 at position 2 * 100
+      expect(indicatorState.offsetPx).toBe(200); // Tab 3 at position 2 * 100
+      performance.now = originalNow;
     });
   });
 });

@@ -72,8 +72,12 @@ export const IDLE_CONTINUOUS_OPERATION_STATE: ContinuousOperationState = {
  * - "ended" → "ended"
  */
 export function toContinuousPhase(phase: SwipeInputPhase): ContinuousOperationPhase {
-  if (phase === "idle") return "idle";
-  if (phase === "ended") return "ended";
+  if (phase === "idle") {
+    return "idle";
+  }
+  if (phase === "ended") {
+    return "ended";
+  }
   return "operating";
 }
 

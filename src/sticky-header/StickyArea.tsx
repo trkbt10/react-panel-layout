@@ -9,6 +9,7 @@
  */
 import * as React from "react";
 import { useIsomorphicLayoutEffect } from "../hooks/useIsomorphicLayoutEffect";
+import { calculateStickyMetrics } from "./calculateStickyMetrics";
 import type { StickyAreaProps, StickyAreaState } from "./types";
 
 /**
@@ -127,63 +128,34 @@ export const StickyArea: React.FC<StickyAreaProps> = ({
       const liveRect = area.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
 
-      if (position === "top") {
-        // TOP: Cover expands upward during pull-down overscroll
-        // liveRect.top > 0 means element moved down (overscroll)
-        // liveRect.top < 0 means element scrolled up
-        const coverAreaHeight = Math.max(0, liveRect.height + liveRect.top);
+      // Calculate metrics using pure function
+      const { coverAreaHeight, isStuck, scrollOffset } = calculateStickyMetrics(
+        position,
+        liveRect,
+        viewportHeight
+      );
 
-        if (coverAreaHeight !== prevHeight) {
-          coverArea.style.opacity = coverAreaHeight > 0 ? "1" : "0";
-          coverArea.style.height = `${coverAreaHeight}px`;
-          prevHeight = coverAreaHeight;
-        }
+      // Update height/opacity
+      if (coverAreaHeight !== prevHeight) {
+        coverArea.style.opacity = coverAreaHeight > 0 ? "1" : "0";
+        coverArea.style.height = `${coverAreaHeight}px`;
+        prevHeight = coverAreaHeight;
+      }
 
-        if (liveRect.left !== prevLeft || liveRect.width !== prevWidth) {
-          coverArea.style.left = `${liveRect.left}px`;
-          coverArea.style.width = `${liveRect.width}px`;
-          prevLeft = liveRect.left;
-          prevWidth = liveRect.width;
-        }
+      // Update left/width
+      if (liveRect.left !== prevLeft || liveRect.width !== prevWidth) {
+        coverArea.style.left = `${liveRect.left}px`;
+        coverArea.style.width = `${liveRect.width}px`;
+        prevLeft = liveRect.left;
+        prevWidth = liveRect.width;
+      }
 
-        const isStuck = liveRect.top < 0;
-        const scrollOffset = Math.max(0, -liveRect.top);
-
-        const shouldUpdateState = isFirstRun ? true : isStuck !== prevIsStuck;
-        if (shouldUpdateState) {
-          isFirstRun = false;
-          prevIsStuck = isStuck;
-          updateState({ isStuck, scrollOffset });
-        }
-      } else {
-        // BOTTOM: Cover expands downward during pull-up overscroll
-        // liveRect.bottom < viewportHeight means element moved up (overscroll at bottom)
-        // liveRect.bottom > viewportHeight means element is below viewport
-        const distanceFromBottom = viewportHeight - liveRect.bottom;
-        const coverAreaHeight = Math.max(0, liveRect.height + distanceFromBottom);
-
-        if (coverAreaHeight !== prevHeight) {
-          coverArea.style.opacity = coverAreaHeight > 0 ? "1" : "0";
-          coverArea.style.height = `${coverAreaHeight}px`;
-          prevHeight = coverAreaHeight;
-        }
-
-        if (liveRect.left !== prevLeft || liveRect.width !== prevWidth) {
-          coverArea.style.left = `${liveRect.left}px`;
-          coverArea.style.width = `${liveRect.width}px`;
-          prevLeft = liveRect.left;
-          prevWidth = liveRect.width;
-        }
-
-        const isStuck = liveRect.bottom > viewportHeight;
-        const scrollOffset = Math.max(0, liveRect.bottom - viewportHeight);
-
-        const shouldUpdateState = isFirstRun ? true : isStuck !== prevIsStuck;
-        if (shouldUpdateState) {
-          isFirstRun = false;
-          prevIsStuck = isStuck;
-          updateState({ isStuck, scrollOffset });
-        }
+      // Update state
+      const shouldUpdateState = isFirstRun ? true : isStuck !== prevIsStuck;
+      if (shouldUpdateState) {
+        isFirstRun = false;
+        prevIsStuck = isStuck;
+        updateState({ isStuck, scrollOffset });
       }
     };
 

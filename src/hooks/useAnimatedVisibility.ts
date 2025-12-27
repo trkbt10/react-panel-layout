@@ -72,6 +72,32 @@ export function useAnimatedVisibility({
   const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clear timeout on unmount
+  const shouldSkipLeaveAnimation = (
+    isSkipped: boolean,
+    animation: string | undefined,
+  ): boolean => {
+    if (isSkipped) {
+      return true;
+    }
+    if (!animation) {
+      return true;
+    }
+    if (animation === "none") {
+      return true;
+    }
+    return false;
+  };
+
+  const getShouldDisplay = (visible: boolean, animatingOut: boolean): boolean => {
+    if (visible) {
+      return true;
+    }
+    if (animatingOut) {
+      return true;
+    }
+    return false;
+  };
+
   React.useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -92,7 +118,7 @@ export function useAnimatedVisibility({
 
     if (wasVisible && !isVisible) {
       // Transitioning from visible to hidden
-      if (skipAnimation || !leaveAnimation || leaveAnimation === "none") {
+      if (shouldSkipLeaveAnimation(skipAnimation, leaveAnimation)) {
         // No animation, hide immediately
         setIsAnimatingOut(false);
       } else {
@@ -129,7 +155,7 @@ export function useAnimatedVisibility({
   // Element should be displayed if:
   // - It's visible, OR
   // - It's animating out (leave animation in progress)
-  const shouldDisplay = isVisible || isAnimatingOut;
+  const shouldDisplay = getShouldDisplay(isVisible, isAnimatingOut);
 
   return {
     state: {

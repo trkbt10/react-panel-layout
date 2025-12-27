@@ -5,6 +5,19 @@ import * as React from "react";
 import { renderHook, act } from "@testing-library/react";
 import { useDialogContainer } from "./useDialogContainer";
 
+type CallTracker = {
+  calls: ReadonlyArray<ReadonlyArray<unknown>>;
+  fn: (...args: ReadonlyArray<unknown>) => void;
+};
+
+const createCallTracker = (): CallTracker => {
+  const calls: Array<ReadonlyArray<unknown>> = [];
+  const fn = (...args: ReadonlyArray<unknown>): void => {
+    calls.push(args);
+  };
+  return { calls, fn };
+};
+
 /**
  * Mock SyntheticEvent with call tracking.
  */
@@ -95,14 +108,24 @@ function createMockMouseEvent(
 }
 
 describe("useDialogContainer", () => {
-  let mockDialog: HTMLDialogElement;
+  const dialogState = {
+    dialog: document.createElement("dialog") as HTMLDialogElement,
+    showModal: createCallTracker(),
+    close: createCallTracker(),
+  };
 
   beforeEach(() => {
     // Create mock dialog element
-    mockDialog = document.createElement("dialog");
-    mockDialog.showModal = vi.fn();
-    mockDialog.close = vi.fn();
-    Object.defineProperty(mockDialog, "open", {
+    dialogState.dialog = document.createElement("dialog");
+    dialogState.showModal = createCallTracker();
+    dialogState.close = createCallTracker();
+    dialogState.dialog.showModal = () => {
+      dialogState.showModal.fn();
+    };
+    dialogState.dialog.close = () => {
+      dialogState.close.fn();
+    };
+    Object.defineProperty(dialogState.dialog, "open", {
       value: false,
       writable: true,
       configurable: true,
@@ -110,17 +133,16 @@ describe("useDialogContainer", () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
   });
 
   it("should return dialogRef and dialogProps", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { result } = renderHook(() =>
       useDialogContainer({
         visible: false,
-        onClose,
+        onClose: onClose.fn,
       }),
     );
 
@@ -131,56 +153,56 @@ describe("useDialogContainer", () => {
   });
 
   it("should call showModal when visible becomes true", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { result, rerender } = renderHook(
       ({ visible }) =>
         useDialogContainer({
           visible,
-          onClose,
+          onClose: onClose.fn,
         }),
       { initialProps: { visible: false } },
     );
 
     // Assign mock dialog to ref
     act(() => {
-      (result.current.dialogRef as React.MutableRefObject<HTMLDialogElement | null>).current = mockDialog;
+      (result.current.dialogRef as React.MutableRefObject<HTMLDialogElement | null>).current = dialogState.dialog;
     });
 
     // Make visible
     rerender({ visible: true });
 
-    expect(mockDialog.showModal).toHaveBeenCalled();
+    expect(dialogState.showModal.calls).toHaveLength(1);
   });
 
   it("should call close when visible becomes false", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { result, rerender } = renderHook(
       ({ visible }) =>
         useDialogContainer({
           visible,
-          onClose,
+          onClose: onClose.fn,
         }),
       { initialProps: { visible: true } },
     );
 
     // Assign mock dialog to ref and set as open
     act(() => {
-      (result.current.dialogRef as React.MutableRefObject<HTMLDialogElement | null>).current = mockDialog;
-      Object.defineProperty(mockDialog, "open", { value: true, configurable: true });
+      (result.current.dialogRef as React.MutableRefObject<HTMLDialogElement | null>).current = dialogState.dialog;
+      Object.defineProperty(dialogState.dialog, "open", { value: true, configurable: true });
     });
 
     // Make invisible
     rerender({ visible: false });
 
-    expect(mockDialog.close).toHaveBeenCalled();
+    expect(dialogState.close.calls).toHaveLength(1);
   });
 
   it("should prevent default on cancel event and call onClose when closeOnEscape is true", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { result } = renderHook(() =>
       useDialogContainer({
         visible: true,
-        onClose,
+        onClose: onClose.fn,
         closeOnEscape: true,
       }),
     );
@@ -192,15 +214,15 @@ describe("useDialogContainer", () => {
     });
 
     expect(mockEvent.preventDefault.calls).toBeGreaterThan(0);
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(1);
   });
 
   it("should prevent default on cancel event but NOT call onClose when closeOnEscape is false", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { result } = renderHook(() =>
       useDialogContainer({
         visible: true,
-        onClose,
+        onClose: onClose.fn,
         closeOnEscape: false,
       }),
     );
@@ -212,54 +234,54 @@ describe("useDialogContainer", () => {
     });
 
     expect(mockEvent.preventDefault.calls).toBeGreaterThan(0);
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(0);
   });
 
   it("should call onClose on backdrop click when dismissible is true", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { result } = renderHook(() =>
       useDialogContainer({
         visible: true,
-        onClose,
+        onClose: onClose.fn,
         dismissible: true,
       }),
     );
 
     // Simulate click on dialog element itself (backdrop area)
-    const mockEvent = createMockMouseEvent(mockDialog, mockDialog);
+    const mockEvent = createMockMouseEvent(dialogState.dialog, dialogState.dialog);
 
     act(() => {
       result.current.dialogProps.onClick(mockEvent);
     });
 
-    expect(onClose).toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(1);
   });
 
   it("should NOT call onClose on backdrop click when dismissible is false", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { result } = renderHook(() =>
       useDialogContainer({
         visible: true,
-        onClose,
+        onClose: onClose.fn,
         dismissible: false,
       }),
     );
 
-    const mockEvent = createMockMouseEvent(mockDialog, mockDialog);
+    const mockEvent = createMockMouseEvent(dialogState.dialog, dialogState.dialog);
 
     act(() => {
       result.current.dialogProps.onClick(mockEvent);
     });
 
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(0);
   });
 
   it("should NOT call onClose when click is on content (not backdrop)", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { result } = renderHook(() =>
       useDialogContainer({
         visible: true,
-        onClose,
+        onClose: onClose.fn,
         dismissible: true,
       }),
     );
@@ -267,21 +289,21 @@ describe("useDialogContainer", () => {
     const contentElement = document.createElement("div");
 
     // Click on content inside dialog
-    const mockEvent = createMockMouseEvent(contentElement, mockDialog);
+    const mockEvent = createMockMouseEvent(contentElement, dialogState.dialog);
 
     act(() => {
       result.current.dialogProps.onClick(mockEvent);
     });
 
-    expect(onClose).not.toHaveBeenCalled();
+    expect(onClose.calls).toHaveLength(0);
   });
 
   it("should set body overflow to hidden when visible and preventBodyScroll is true", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     const { unmount } = renderHook(() =>
       useDialogContainer({
         visible: true,
-        onClose,
+        onClose: onClose.fn,
         preventBodyScroll: true,
       }),
     );
@@ -295,11 +317,11 @@ describe("useDialogContainer", () => {
   });
 
   it("should NOT set body overflow when preventBodyScroll is false", () => {
-    const onClose = vi.fn();
+    const onClose = createCallTracker();
     renderHook(() =>
       useDialogContainer({
         visible: true,
-        onClose,
+        onClose: onClose.fn,
         preventBodyScroll: false,
       }),
     );

@@ -1,16 +1,25 @@
 /**
  * @file Tests for scaleInputState utility
  */
-import { describe, it, expect } from "vitest";
 import { scaleInputState } from "./scaleInputState";
 import type { SwipeInputState } from "../../hooks/gesture/types";
 
 describe("scaleInputState", () => {
+  const getDirection = (value: number): -1 | 0 | 1 => {
+    if (value > 0) {
+      return 1;
+    }
+    if (value < 0) {
+      return -1;
+    }
+    return 0;
+  };
+
   const createSwipingState = (x: number, vx: number): SwipeInputState => ({
     phase: "swiping",
     displacement: { x, y: 0 },
     velocity: { x: vx, y: 0 },
-    direction: x > 0 ? 1 : x < 0 ? -1 : 0,
+    direction: getDirection(x),
   });
 
   describe("scaling factor calculation", () => {

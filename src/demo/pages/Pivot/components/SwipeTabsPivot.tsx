@@ -22,6 +22,15 @@ type ContentItemsProps = {
   containerWidth: number;
 };
 
+type TabBarProps = {
+  contentContainerWidth: number;
+  items: PivotItem[];
+  pivot: UsePivotResult;
+  tabInputState: SwipeInputState;
+  tabWidth: number;
+  indicatorStyle: IndicatorStyle;
+};
+
 /** Renders content items */
 const ContentItems: React.FC<ContentItemsProps> = ({ items, pivot, inputState, containerWidth }) => {
   if (containerWidth <= 0) {
@@ -52,6 +61,43 @@ const ContentItems: React.FC<ContentItemsProps> = ({ items, pivot, inputState, c
         );
       })}
     </>
+  );
+};
+
+const TabBar: React.FC<TabBarProps> = ({
+  contentContainerWidth,
+  items,
+  pivot,
+  tabInputState,
+  tabWidth,
+  indicatorStyle,
+}) => {
+  if (contentContainerWidth <= 0) {
+    return null;
+  }
+
+  return (
+    <SwipePivotTabBar
+      items={items}
+      activeId={pivot.activeId}
+      activeIndex={pivot.activeIndex}
+      itemCount={pivot.itemCount}
+      inputState={tabInputState}
+      tabWidth={tabWidth}
+      viewportWidth={contentContainerWidth}
+      navigationMode={pivot.navigationMode}
+      fixedTabs={indicatorStyle === "sliding"}
+      renderTab={(item, isActive) => (
+        <button
+          className={indicatorStyle === "sliding" ? styles.tabIos : styles.tab}
+          data-active={isActive}
+          onClick={() => pivot.setActiveId(item.id)}
+        >
+          {item.label}
+        </button>
+      )}
+      renderIndicator={indicatorStyle === "sliding" ? SlidingIndicator : undefined}
+    />
   );
 };
 
@@ -225,29 +271,14 @@ export const SwipeTabsPivot: React.FC = () => {
           className={styles.tabsContainer}
           data-style={indicatorStyle === "sliding" ? "ios" : undefined}
         >
-          {contentContainerWidth > 0 && (
-            <SwipePivotTabBar
-              items={items}
-              activeId={pivot.activeId}
-              activeIndex={pivot.activeIndex}
-              itemCount={pivot.itemCount}
-              inputState={tabInputState}
-              tabWidth={tabWidth}
-              viewportWidth={contentContainerWidth}
-              navigationMode={pivot.navigationMode}
-              fixedTabs={indicatorStyle === "sliding"}
-              renderTab={(item, isActive) => (
-                <button
-                  className={indicatorStyle === "sliding" ? styles.tabIos : styles.tab}
-                  data-active={isActive}
-                  onClick={() => pivot.setActiveId(item.id)}
-                >
-                  {item.label}
-                </button>
-              )}
-              renderIndicator={indicatorStyle === "sliding" ? SlidingIndicator : undefined}
-            />
-          )}
+          <TabBar
+            contentContainerWidth={contentContainerWidth}
+            items={items}
+            pivot={pivot}
+            tabInputState={tabInputState}
+            tabWidth={tabWidth}
+            indicatorStyle={indicatorStyle}
+          />
         </div>
 
         {/* Content area - uses original inputState */}

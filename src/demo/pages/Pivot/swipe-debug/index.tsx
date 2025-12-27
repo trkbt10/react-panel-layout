@@ -261,7 +261,7 @@ const SwipeDebugPage: React.FC = () => {
             [{log.time}] {log.message}
           </div>
         ))}
-        {logs.length === 0 && <div>No logs yet. Start swiping...</div>}
+        {logs.length === 0 ? <div>No logs yet. Start swiping...</div> : null}
       </div>
 
       {/* Manual navigation */}

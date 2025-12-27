@@ -1,7 +1,6 @@
 /**
  * @file ContentRegistry tests - state persistence across tab switch, panel move, and split
  */
-/* eslint-disable no-restricted-imports, no-restricted-properties, no-restricted-syntax -- integration test */
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { ContentRegistryProvider, useContentRegistry } from "./ContentRegistry";
@@ -49,6 +48,21 @@ const TestHarness: React.FC<{ state: TestState }> = ({ state }) => {
 };
 
 describe("ContentRegistry", () => {
+  const defaultRect = {
+    top: 0,
+    left: 0,
+    width: 100,
+    height: 100,
+    right: 100,
+    bottom: 100,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  } as DOMRect;
+  const originalPointerCapture = Element.prototype.setPointerCapture;
+  const originalReleasePointerCapture = Element.prototype.releasePointerCapture;
+  const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+
   const createPanel = (id: string): TabDefinition => ({
     id,
     title: `Panel ${id}`,
@@ -59,25 +73,18 @@ describe("ContentRegistry", () => {
     // Mock ResizeObserver (polyfill provided in vitest.setup.ts)
 
     // Mock pointer capture methods
-    Element.prototype.setPointerCapture = vi.fn();
-    Element.prototype.releasePointerCapture = vi.fn();
+    Element.prototype.setPointerCapture = () => {};
+    Element.prototype.releasePointerCapture = () => {};
     // Mock getBoundingClientRect
-    Element.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
-      top: 0,
-      left: 0,
-      width: 100,
-      height: 100,
-      right: 100,
-      bottom: 100,
-      x: 0,
-      y: 0,
-      toJSON: () => ({}),
-    });
+    Element.prototype.getBoundingClientRect = () => defaultRect;
   });
 
   afterEach(() => {
     // Clean up any portal containers
     document.querySelectorAll("[data-panel-content-root]").forEach((el) => el.remove());
+    Element.prototype.setPointerCapture = originalPointerCapture;
+    Element.prototype.releasePointerCapture = originalReleasePointerCapture;
+    Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
   });
 
   it("should render content inside the registered container element", () => {

@@ -156,11 +156,93 @@ export const StackBasics: React.FC = () => {
   const showBackButton = navigation.state.depth > 0;
   const showEditButton = navigation.state.depth === 1;
 
+  const renderBackButton = (): React.ReactNode => {
+    if (!showBackButton) {
+      return null;
+    }
+    return <BackButton onClick={backButtonProps.onClick} disabled={backButtonProps.disabled} />;
+  };
+
+  const renderPanelContent = (panelId: string): React.ReactNode => {
+    if (panelId === "list") {
+      return (
+        <div className={styles.panel}>
+          <ul className={styles.list}>
+            {listItems.map((item) => (
+              <li key={item.id} className={styles.listItem}>
+                <button
+                  className={styles.listItemButton}
+                  onClick={() => handleItemClick(item)}
+                >
+                  <span className={styles.listItemName}>{item.name}</span>
+                  <span className={styles.listItemDesc}>{item.description}</span>
+                  <span className={styles.chevron}>→</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    if (panelId === "detail") {
+      return (
+        <div className={styles.panel}>
+          <div className={styles.detailContent}>
+            <h2>{selectedItem?.name}</h2>
+            <p>{selectedItem?.description}</p>
+            <div className={styles.detailMeta}>
+              <span>ID: {selectedItem?.id}</span>
+            </div>
+            <p className={styles.hint}>
+              Swipe from the left edge to go back, or tap the Back button.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (panelId === "edit") {
+      return (
+        <div className={styles.panel}>
+          <div className={styles.editContent}>
+            <h2>Edit {selectedItem?.name}</h2>
+            <div className={styles.form}>
+              <label className={styles.label}>
+                Name
+                <input
+                  type="text"
+                  className={styles.input}
+                  defaultValue={selectedItem?.name}
+                />
+              </label>
+              <label className={styles.label}>
+                Description
+                <textarea
+                  className={styles.textarea}
+                  defaultValue={selectedItem?.description}
+                />
+              </label>
+            </div>
+            <button
+              className={styles.saveButton}
+              onClick={() => navigation.go(-1)}
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className={styles.container}>
       {/* Header */}
       <header className={styles.header}>
-        {showBackButton && <BackButton onClick={backButtonProps.onClick} disabled={backButtonProps.disabled} />}
+        {renderBackButton()}
         <h1 className={styles.title}>{getHeaderTitle()}</h1>
         {showEditButton ? <EditButton onClick={handleEdit} /> : null}
       </header>
@@ -190,68 +272,7 @@ export const StackBasics: React.FC = () => {
               animationDuration={ANIMATION_DURATION}
               displayMode="overlay"
             >
-              {panelId === "list" && (
-                <div className={styles.panel}>
-                  <ul className={styles.list}>
-                    {listItems.map((item) => (
-                      <li key={item.id} className={styles.listItem}>
-                        <button
-                          className={styles.listItemButton}
-                          onClick={() => handleItemClick(item)}
-                        >
-                          <span className={styles.listItemName}>{item.name}</span>
-                          <span className={styles.listItemDesc}>{item.description}</span>
-                          <span className={styles.chevron}>→</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {panelId === "detail" && (
-                <div className={styles.panel}>
-                  <div className={styles.detailContent}>
-                    <h2>{selectedItem?.name}</h2>
-                    <p>{selectedItem?.description}</p>
-                    <div className={styles.detailMeta}>
-                      <span>ID: {selectedItem?.id}</span>
-                    </div>
-                    <p className={styles.hint}>
-                      Swipe from the left edge to go back, or tap the Back button.
-                    </p>
-                  </div>
-                </div>
-              )}
-              {panelId === "edit" && (
-                <div className={styles.panel}>
-                  <div className={styles.editContent}>
-                    <h2>Edit {selectedItem?.name}</h2>
-                    <div className={styles.form}>
-                      <label className={styles.label}>
-                        Name
-                        <input
-                          type="text"
-                          className={styles.input}
-                          defaultValue={selectedItem?.name}
-                        />
-                      </label>
-                      <label className={styles.label}>
-                        Description
-                        <textarea
-                          className={styles.textarea}
-                          defaultValue={selectedItem?.description}
-                        />
-                      </label>
-                    </div>
-                    <button
-                      className={styles.saveButton}
-                      onClick={() => navigation.go(-1)}
-                    >
-                      Save Changes
-                    </button>
-                  </div>
-                </div>
-              )}
+              {renderPanelContent(panelId)}
             </SwipeStackContent>
           );
         })}

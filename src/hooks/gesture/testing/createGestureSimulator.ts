@@ -182,10 +182,10 @@ export function createGestureSimulator(options: GestureSimulatorOptions = {}): G
     pointerId = 1,
   } = options;
 
-  let isDown = false;
+  const pointerState = { isDown: false };
 
   const pointerDown = (x: number, y: number): void => {
-    isDown = true;
+    pointerState.isDown = true;
 
     const event = new PointerEvent("pointerdown", {
       clientX: x,
@@ -204,7 +204,7 @@ export function createGestureSimulator(options: GestureSimulatorOptions = {}): G
   };
 
   const pointerMove = (x: number, y: number): void => {
-    if (!isDown) {
+    if (!pointerState.isDown) {
       return;
     }
 
@@ -228,7 +228,7 @@ export function createGestureSimulator(options: GestureSimulatorOptions = {}): G
       return;
     }
 
-    isDown = false;
+    pointerState.isDown = false;
 
     const event = new PointerEvent("pointerup", {
       pointerId,
@@ -263,28 +263,37 @@ export function createGestureSimulator(options: GestureSimulatorOptions = {}): G
     containerSize = 300,
   ): void => {
     const edgeOffset = 10; // Start 10px from edge
+    const getEdgeSwipePoints = (
+      direction: "left" | "right" | "top" | "bottom",
+      size: number,
+      travel: number,
+      offset: number,
+    ): { from: Point; to: Point } => {
+      if (direction === "left") {
+        return {
+          from: { x: offset, y: size / 2 },
+          to: { x: offset + travel, y: size / 2 },
+        };
+      }
+      if (direction === "right") {
+        return {
+          from: { x: size - offset, y: size / 2 },
+          to: { x: size - offset - travel, y: size / 2 },
+        };
+      }
+      if (direction === "top") {
+        return {
+          from: { x: size / 2, y: offset },
+          to: { x: size / 2, y: offset + travel },
+        };
+      }
+      return {
+        from: { x: size / 2, y: size - offset },
+        to: { x: size / 2, y: size - offset - travel },
+      };
+    };
 
-    let from: Point;
-    let to: Point;
-
-    switch (edge) {
-      case "left":
-        from = { x: edgeOffset, y: containerSize / 2 };
-        to = { x: edgeOffset + distance, y: containerSize / 2 };
-        break;
-      case "right":
-        from = { x: containerSize - edgeOffset, y: containerSize / 2 };
-        to = { x: containerSize - edgeOffset - distance, y: containerSize / 2 };
-        break;
-      case "top":
-        from = { x: containerSize / 2, y: edgeOffset };
-        to = { x: containerSize / 2, y: edgeOffset + distance };
-        break;
-      case "bottom":
-        from = { x: containerSize / 2, y: containerSize - edgeOffset };
-        to = { x: containerSize / 2, y: containerSize - edgeOffset - distance };
-        break;
-    }
+    const { from, to } = getEdgeSwipePoints(edge, containerSize, distance, edgeOffset);
 
     swipe(from, to);
   };

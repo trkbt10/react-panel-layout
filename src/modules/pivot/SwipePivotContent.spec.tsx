@@ -10,68 +10,67 @@ import type { SwipeInputState } from "../../hooks/gesture/types.js";
  * Mock Animation that implements the full Animation interface.
  * Used to polyfill Web Animations API for JSDOM testing.
  */
-class MockAnimation implements Animation {
-  currentTime: number | null = 0;
-  effect: AnimationEffect | null = null;
-  id = "";
-  oncancel: ((this: Animation, ev: AnimationPlaybackEvent) => unknown) | null = null;
-  onfinish: ((this: Animation, ev: AnimationPlaybackEvent) => unknown) | null = null;
-  onremove: ((this: Animation, ev: Event) => unknown) | null = null;
-  pending = false;
-  playState: AnimationPlayState = "running";
-  playbackRate = 1;
-  replaceState: AnimationReplaceState = "active";
-  startTime: number | null = 0;
-  timeline: AnimationTimeline | null = null;
+const createMockAnimation = (): Animation => {
+  const animation = {} as Animation;
+  const animationState = {
+    resolveFinished: (value: Animation): void => {
+      void value;
+    },
+  };
 
-  finished: Promise<Animation>;
-  ready: Promise<Animation>;
-  private resolveFinished!: (value: Animation) => void;
-
-  constructor() {
-    this.finished = new Promise((resolve) => {
-      this.resolveFinished = resolve;
-    });
-    this.ready = Promise.resolve(this);
-  }
-
-  cancel(): void {
-    this.playState = "idle";
-  }
-
-  finish(): void {
-    this.playState = "finished";
-    this.resolveFinished(this);
-  }
-
-  commitStyles(): void {}
-  pause(): void {}
-  persist(): void {}
-  play(): void {}
-  reverse(): void {}
-  updatePlaybackRate(): void {}
+  animation.currentTime = 0;
+  animation.effect = null;
+  animation.id = "";
+  animation.oncancel = null;
+  animation.onfinish = null;
+  animation.onremove = null;
+  animation.pending = false;
+  animation.playState = "running";
+  animation.playbackRate = 1;
+  animation.replaceState = "active";
+  animation.startTime = 0;
+  animation.timeline = null;
+  animation.finished = new Promise((resolve) => {
+    animationState.resolveFinished = resolve;
+  });
+  animation.ready = Promise.resolve(animation);
+  animation.cancel = () => {
+    animation.playState = "idle";
+  };
+  animation.finish = () => {
+    animation.playState = "finished";
+    animationState.resolveFinished(animation);
+  };
+  animation.commitStyles = () => {};
+  animation.pause = () => {};
+  animation.persist = () => {};
+  animation.play = () => {};
+  animation.reverse = () => {};
+  animation.updatePlaybackRate = () => {};
 
   // EventTarget methods
-  addEventListener(): void {}
-  removeEventListener(): void {}
-  dispatchEvent(): boolean {
-    return true;
-  }
-}
+  animation.addEventListener = () => {};
+  animation.removeEventListener = () => {};
+  animation.dispatchEvent = () => true;
+
+  return animation;
+};
 
 describe("SwipePivotContent", () => {
-  let originalAnimate: typeof Element.prototype.animate | undefined;
+  const animationState = {
+    originalAnimate: Element.prototype.animate as typeof Element.prototype.animate | undefined,
+  };
 
   beforeAll(() => {
-    originalAnimate = Element.prototype.animate;
-    Element.prototype.animate = function (): Animation {
-      return new MockAnimation();
+    animationState.originalAnimate = Element.prototype.animate;
+    Element.prototype.animate = (): Animation => {
+      return createMockAnimation();
     };
   });
 
   afterAll(() => {
-    if (originalAnimate) {
-      Element.prototype.animate = originalAnimate;
+    if (animationState.originalAnimate) {
+      Element.prototype.animate = animationState.originalAnimate;
     }
   });
   const idleState: SwipeInputState = {

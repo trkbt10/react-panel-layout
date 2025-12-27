@@ -6,6 +6,19 @@ import { usePivot } from "./usePivot.js";
 import type { PivotItem } from "./types.js";
 
 describe("usePivot", () => {
+  type CallTracker = {
+    calls: ReadonlyArray<ReadonlyArray<unknown>>;
+    fn: (...args: ReadonlyArray<unknown>) => void;
+  };
+
+  const createCallTracker = (): CallTracker => {
+    const calls: Array<ReadonlyArray<unknown>> = [];
+    const fn = (...args: ReadonlyArray<unknown>): void => {
+      calls.push(args);
+    };
+    return { calls, fn };
+  };
+
   const createItems = (): ReadonlyArray<PivotItem<"a" | "b" | "c">> => [
     { id: "a", label: "Item A", content: "Content A" },
     { id: "b", label: "Item B", content: "Content B" },
@@ -244,16 +257,17 @@ describe("usePivot", () => {
   describe("onActiveChange callback", () => {
     it("calls onActiveChange when navigating with go", () => {
       const items = createItems();
-      const onActiveChange = vi.fn();
+      const onActiveChange = createCallTracker();
       const { result } = renderHook(() =>
-        usePivot({ items, defaultActiveId: "a", onActiveChange }),
+        usePivot({ items, defaultActiveId: "a", onActiveChange: onActiveChange.fn }),
       );
 
       act(() => {
         result.current.go(1);
       });
 
-      expect(onActiveChange).toHaveBeenCalledWith("b");
+      expect(onActiveChange.calls).toHaveLength(1);
+      expect(onActiveChange.calls[0]?.[0]).toBe("b");
     });
   });
 

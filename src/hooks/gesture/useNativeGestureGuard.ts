@@ -57,7 +57,9 @@ export function useNativeGestureGuard(options: UseNativeGestureGuardOptions): Us
 
   // Apply overscroll-behavior to html synchronously (called from onPointerDown)
   const applyHtmlOverscroll = React.useCallback(() => {
-    if (!preventOverscroll) return;
+    if (!preventOverscroll) {
+      return;
+    }
 
     const html = document.documentElement;
     if (previousHtmlOverscrollRef.current === null) {

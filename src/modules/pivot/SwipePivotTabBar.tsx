@@ -113,8 +113,18 @@ const getItemAtPosition = (
 ): number | null => {
   const targetIndex = activeIndex + slotPosition;
 
+  const isOutOfRange = (index: number, count: number): boolean => {
+    if (index < 0) {
+      return true;
+    }
+    if (index >= count) {
+      return true;
+    }
+    return false;
+  };
+
   if (navigationMode === "linear") {
-    if (targetIndex < 0 || targetIndex >= itemCount) {
+    if (isOutOfRange(targetIndex, itemCount)) {
       return null;
     }
     return targetIndex;
@@ -190,6 +200,9 @@ const easeOutExpo = (t: number): number => {
   return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
 };
 
+/**
+ * Swipeable tab bar for pivot navigation.
+ */
 export function SwipePivotTabBar<TId extends string = string>({
   items,
   activeId,
@@ -205,8 +218,49 @@ export function SwipePivotTabBar<TId extends string = string>({
   fixedTabs = false,
   renderIndicator,
 }: SwipePivotTabBarProps<TId>): React.ReactElement {
+  const isSwipePhase = (phase: SwipeInputState["phase"]): boolean => {
+    if (phase === "swiping") {
+      return true;
+    }
+    if (phase === "tracking") {
+      return true;
+    }
+    return false;
+  };
+
+  const getIsAnimating = (
+    slotAnimation: typeof animationRef.current,
+    fixedAnimation: typeof fixedAnimationRef.current,
+  ): boolean => {
+    if (slotAnimation !== null) {
+      return true;
+    }
+    if (fixedAnimation !== null) {
+      return true;
+    }
+    return false;
+  };
+
+  const getDelta = (
+    mode: "linear" | "loop",
+    nextIndex: number,
+    previousIndex: number,
+    totalItems: number,
+  ): number => {
+    if (mode === "loop") {
+      // Use shortest path in loop mode
+      const forwardDist = normalizeIndex(nextIndex - previousIndex, totalItems);
+      const backwardDist = totalItems - forwardDist;
+      if (forwardDist <= backwardDist) {
+        return forwardDist;
+      }
+      return -backwardDist;
+    }
+    return nextIndex - previousIndex;
+  };
+
   const displacement = getAxisDisplacement(inputState, axis);
-  const isSwiping = inputState.phase === "swiping" || inputState.phase === "tracking";
+  const isSwiping = isSwipePhase(inputState.phase);
 
   // ============================================================
   // Animation state for SLOT-BASED mode (scrolling tabs)
@@ -247,7 +301,12 @@ export function SwipePivotTabBar<TId extends string = string>({
   // Fixed tabs mode: track swipe position
   // ============================================================
   React.useEffect(() => {
-    if (!fixedTabs || !isSwiping) return;
+    if (!fixedTabs) {
+      return;
+    }
+    if (!isSwiping) {
+      return;
+    }
 
     // During swipe, track the visual position
     // Swipe direction is OPPOSITE to indicator movement
@@ -260,7 +319,12 @@ export function SwipePivotTabBar<TId extends string = string>({
   // Fixed tabs mode: animate when swipe ends or tab clicked
   // ============================================================
   React.useEffect(() => {
-    if (!fixedTabs || isSwiping) return;
+    if (!fixedTabs) {
+      return;
+    }
+    if (isSwiping) {
+      return;
+    }
 
     // When swipe ends or tab changes via click
     const targetPosition = activeIndex * tabWidth;
@@ -309,7 +373,9 @@ export function SwipePivotTabBar<TId extends string = string>({
   // Slot-based mode animation: handle activeIndex changes
   // ============================================================
   React.useEffect(() => {
-    if (fixedTabs) return; // Skip for fixed tabs mode
+    if (fixedTabs) {
+      return; // Skip for fixed tabs mode
+    }
 
     if (prevActiveIndexRef.current === activeIndex) {
       return;
@@ -319,15 +385,7 @@ export function SwipePivotTabBar<TId extends string = string>({
     prevActiveIndexRef.current = activeIndex;
 
     // Calculate direction of movement
-    let delta: number;
-    if (navigationMode === "loop") {
-      // Use shortest path in loop mode
-      const forwardDist = normalizeIndex(activeIndex - prevIndex, itemCount);
-      const backwardDist = itemCount - forwardDist;
-      delta = forwardDist <= backwardDist ? forwardDist : -backwardDist;
-    } else {
-      delta = activeIndex - prevIndex;
-    }
+    const delta = getDelta(navigationMode, activeIndex, prevIndex, itemCount);
 
     // Target offset to animate to (then snap to 0)
     const targetOffsetPx = -delta * tabWidth;
@@ -407,7 +465,7 @@ export function SwipePivotTabBar<TId extends string = string>({
 
   // Current offset for slot-based mode
   const currentOffset = isSwiping ? displacement : animatedOffset;
-  const isAnimating = animationRef.current !== null || fixedAnimationRef.current !== null;
+  const isAnimating = getIsAnimating(animationRef.current, fixedAnimationRef.current);
 
   // Cancel slot animation when swiping starts
   React.useEffect(() => {
@@ -428,6 +486,7 @@ export function SwipePivotTabBar<TId extends string = string>({
 
     return (
       <div
+        data-active-id={activeId}
         style={{
           position: "relative",
           width: "100%",
@@ -486,6 +545,7 @@ export function SwipePivotTabBar<TId extends string = string>({
 
   return (
     <div
+      data-active-id={activeId}
       style={{
         position: "relative",
         width: "100%",

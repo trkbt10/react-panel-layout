@@ -1,19 +1,23 @@
 /**
  * @file Tests for useEdgeSwipeInput hook.
  */
-/* eslint-disable no-restricted-globals, no-restricted-properties -- test requires vi for timing control */
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
 import { useEdgeSwipeInput } from "./useEdgeSwipeInput.js";
 
 describe("useEdgeSwipeInput", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
+  type CallTracker = {
+    calls: ReadonlyArray<ReadonlyArray<unknown>>;
+    fn: (...args: ReadonlyArray<unknown>) => void;
+  };
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
+  const createCallTracker = (): CallTracker => {
+    const calls: Array<ReadonlyArray<unknown>> = [];
+    const fn = (...args: ReadonlyArray<unknown>): void => {
+      calls.push(args);
+    };
+    return { calls, fn };
+  };
 
   const createRef = (rect: Partial<DOMRect> = {}): React.RefObject<HTMLDivElement> => {
     const element = document.createElement("div");
@@ -28,7 +32,10 @@ describe("useEdgeSwipeInput", () => {
       y: 0,
       toJSON: () => ({}),
     };
-    vi.spyOn(element, "getBoundingClientRect").mockReturnValue({ ...defaultRect, ...rect });
+    const mergedRect = Object.assign({}, defaultRect, rect);
+    Object.defineProperty(element, "getBoundingClientRect", {
+      value: () => mergedRect,
+    });
     return { current: element };
   };
 
@@ -283,7 +290,7 @@ describe("useEdgeSwipeInput", () => {
   describe("swipe completion callback", () => {
     it("calls onSwipeEnd when edge swipe threshold is met", () => {
       const containerRef = createRef({ left: 0, right: 300 });
-      const onSwipeEnd = vi.fn();
+      const onSwipeEnd = createCallTracker();
 
       const { result } = renderHook(() =>
         useEdgeSwipeInput({
@@ -291,7 +298,7 @@ describe("useEdgeSwipeInput", () => {
           edge: "left",
           edgeWidth: 20,
           thresholds: { distanceThreshold: 50, velocityThreshold: 0.3, lockThreshold: 10 },
-          onSwipeEnd,
+          onSwipeEnd: onSwipeEnd.fn,
         }),
       );
 
@@ -327,7 +334,8 @@ describe("useEdgeSwipeInput", () => {
         document.dispatchEvent(upEvent);
       });
 
-      expect(onSwipeEnd).toHaveBeenCalledWith(
+      expect(onSwipeEnd.calls).toHaveLength(1);
+      expect(onSwipeEnd.calls[0]?.[0]).toEqual(
         expect.objectContaining({
           phase: "ended",
           direction: 1,
@@ -337,7 +345,7 @@ describe("useEdgeSwipeInput", () => {
 
     it("does not call onSwipeEnd when gesture starts outside edge", () => {
       const containerRef = createRef({ left: 0, right: 300 });
-      const onSwipeEnd = vi.fn();
+      const onSwipeEnd = createCallTracker();
 
       const { result } = renderHook(() =>
         useEdgeSwipeInput({
@@ -345,7 +353,7 @@ describe("useEdgeSwipeInput", () => {
           edge: "left",
           edgeWidth: 20,
           thresholds: { distanceThreshold: 50, velocityThreshold: 0.3, lockThreshold: 10 },
-          onSwipeEnd,
+          onSwipeEnd: onSwipeEnd.fn,
         }),
       );
 
@@ -365,7 +373,7 @@ describe("useEdgeSwipeInput", () => {
 
       // The gesture should not be tracked, so no callback should be fired
       expect(result.current.isEdgeGesture).toBe(false);
-      expect(onSwipeEnd).not.toHaveBeenCalled();
+      expect(onSwipeEnd.calls).toHaveLength(0);
     });
   });
 
