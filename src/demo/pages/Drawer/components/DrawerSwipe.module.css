@@ -1,0 +1,316 @@
+/**
+ * @file Styles for DrawerSwipe demo
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 24px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e9ecef;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 480px;
+}
+
+.lead {
+  color: #adb5bd;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.instruction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #ced4da;
+}
+
+.instructionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.searchBox {
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e9ecef;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.searchInput:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
+}
+
+.searchInput::placeholder {
+  color: #868e96;
+}
+
+.scrollableSection {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #868e96;
+  margin: 0 0 8px 4px;
+  position: sticky;
+  top: 0;
+  background: inherit;
+  padding: 4px 0;
+}
+
+.drawerList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drawerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.drawerItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.drawerItem small {
+  color: #868e96;
+  font-size: 11px;
+}
+
+.formSection {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(76, 175, 80, 0.08);
+  border-radius: 8px;
+  border: 1px dashed rgba(76, 175, 80, 0.4);
+  position: relative;
+}
+
+.formSection::before {
+  content: "SAFE";
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: rgba(76, 175, 80, 0.7);
+}
+
+.textInput {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #e9ecef;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.textInput:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
+}
+
+.textInput::placeholder {
+  color: #868e96;
+}
+
+.textArea {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #e9ecef;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.textArea:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
+}
+
+.textArea::placeholder {
+  color: #868e96;
+}
+
+.swipeHint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  margin-top: auto;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  color: #667eea;
+  font-size: 13px;
+}
+
+.swipeArrow {
+  animation: swipeHint 1.5s ease-in-out infinite;
+}
+
+@keyframes swipeHint {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateX(-8px);
+    opacity: 1;
+  }
+}
+
+.edgeIndicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, rgba(102, 126, 234, 0.8) 0%, rgba(102, 126, 234, 0.3) 100%);
+  pointer-events: none;
+  z-index: 100;
+}
+
+.edgeIndicatorLeft {
+  left: 0;
+}
+
+.edgeIndicatorRight {
+  right: 0;
+}
+
+.configPanel {
+  margin-top: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.configTitle {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #868e96;
+  margin: 0 0 12px 0;
+}
+
+.configOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.configOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #ced4da;
+}
+
+.configOption input[type="checkbox"] {
+  accent-color: #667eea;
+}
+
+.anchorSelect {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.anchorButton {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #ced4da;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.anchorButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.anchorButton[data-active="true"] {
+  background: rgba(102, 126, 234, 0.3);
+  border-color: #667eea;
+  color: #fff;
+}

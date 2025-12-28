@@ -27,6 +27,7 @@ import PL_Overlays from "./pages/PanelLayout/draggable-overlays";
 import DR_Basics from "./pages/Drawer/basics";
 import DR_Menu from "./pages/Drawer/menu";
 import DR_Animations from "./pages/Drawer/animations";
+import DR_Swipe from "./pages/Drawer/swipe";
 
 import DL_Modal from "./pages/Dialog/modal";
 import DL_Alerts from "./pages/Dialog/alerts";
@@ -91,6 +92,7 @@ export const demoCategories: DemoCategory[] = [
       { id: "basics", label: "Basics", path: "basics", element: <DR_Basics /> },
       { id: "menu", label: "Menu", path: "menu", element: <DR_Menu /> },
       { id: "animations", label: "Animations", path: "animations", element: <DR_Animations /> },
+      { id: "swipe", label: "Swipe Gestures", path: "swipe", element: <DR_Swipe /> },
     ],
   },
   {

@@ -57,6 +57,7 @@ export { Drawer } from "../components/window/Drawer.js";
 export { DrawerLayers } from "../components/window/DrawerLayers.js";
 export { DialogOverlay } from "../components/window/DialogOverlay.js";
 export { PopupLayerPortal } from "../components/window/PopupLayerPortal.js";
+export { SwipeSafeZone } from "../components/gesture/SwipeSafeZone.js";
 
 // Hooks
 export { useFloatingState } from "../modules/window/useFloatingState.js";
@@ -65,3 +66,4 @@ export { useDrawerState } from "../modules/window/useDrawerState.js";
 // Types
 export type { FloatingWindowProps } from "../components/window/FloatingWindow.js";
 export type { DrawerProps } from "../components/window/Drawer.js";
+export type { SwipeSafeZoneProps } from "../components/gesture/SwipeSafeZone.js";

@@ -225,6 +225,24 @@ export type DrawerBehavior = {
     title?: string;
     showCloseButton?: boolean;
   };
+  /**
+   * Enable swipe gestures for opening/closing the drawer.
+   * - true: Enable both edge-swipe-to-open and swipe-to-close
+   * - false: Disable swipe gestures (default)
+   * - Object: Fine-grained control over swipe behavior
+   */
+  swipeGestures?:
+    | boolean
+    | {
+        /** Enable edge swipe from container to open. @default true */
+        edgeSwipeOpen?: boolean;
+        /** Enable swipe within drawer to close. @default true */
+        swipeClose?: boolean;
+        /** Width of edge detection zone in pixels. @default 20 */
+        edgeWidth?: number;
+        /** Threshold ratio (0-1) to trigger close. @default 0.3 */
+        dismissThreshold?: number;
+      };
 };
 
 // ============================================================================
