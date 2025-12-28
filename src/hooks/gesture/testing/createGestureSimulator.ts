@@ -15,7 +15,7 @@ function createFullPointerEvent(
   x: number,
   y: number,
   pointerId: number,
-  pointerType: string,
+  pointerType: "touch" | "mouse" | "pen",
 ): React.PointerEvent {
   const noop = (): void => {};
   const noopBool = (): boolean => false;
@@ -77,7 +77,7 @@ function createFullPointerEvent(
     width: 1,
     // UIEvent properties
     detail: 0,
-    view: window,
+    view: window as unknown as React.AbstractView,
   };
 }
 
